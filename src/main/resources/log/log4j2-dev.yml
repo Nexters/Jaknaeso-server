@@ -1,0 +1,65 @@
+Configuration:
+  name: jaknaeso-dev
+
+  Properties:
+    Property:
+      - name: "log-path"
+        value: "./logs"
+      - name: "pattern"
+        value: "%d{yyyy-MM-dd HH:mm:ss} %highlight{%-5level}{FATAL=red bold, ERROR=red, WARN=yellow bold, INFO=blue, DEBUG=green bold, TRACE=green} [%style{%thread}{magenta}] %style{%logger{36}}{cyan} - %msg%n%throwable"
+      - name: "charset-UTF-8"
+        value: "UTF-8"
+
+  Appenders:
+    Console:
+      name: CONSOLE
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: ${pattern}
+        charset: ${charset-UTF-8}
+
+    RollingFile:
+      name: FILE
+      fileName: ${log-path}/app.log
+      filePattern: ${log-path}/app-%d{yyyy-MM-dd}-%i.log.gz
+      PatternLayout:
+        Pattern: ${pattern}
+        charset: ${charset-UTF-8}
+      Policies:
+        TimeBasedTriggeringPolicy:
+          interval: 1
+          modulate: true
+        SizeBasedTriggeringPolicy:
+          size: 100MB
+      DefaultRolloverStrategy:
+        max: 30
+
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        - ref: CONSOLE
+        - ref: FILE
+
+    AsyncLogger:
+      name: async-logger
+      level: info
+      additivity: false
+      AppenderRef:
+        - ref: CONSOLE
+        - ref: FILE
+
+    Logger:
+      - name: org.springframework
+        additivity: "false"
+        level: INFO
+        AppenderRef:
+          - ref: CONSOLE
+          - ref: FILE
+
+      - name: "org.nexters.jaknaeso"
+        additivity: "false"
+        level: DEBUG
+        AppenderRef:
+          - ref: CONSOLE
+          - ref: FILE

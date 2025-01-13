@@ -1,6 +1,4 @@
 spring:
-  application:
-    name: jaknaeso
 
   datasource:
     url: jdbc:mysql://${DATABASE_HOST}/${DATABASE_NAME}
@@ -11,3 +9,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: none
+
+
+logging:
+  config: classpath:log/log4j2-local.yml
