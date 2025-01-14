@@ -6,7 +6,7 @@ Configuration:
       - name: "log-path"
         value: "./logs"
       - name: "pattern"
-        value: "%d{yyyy-MM-dd HH:mm:ss} %highlight{%-5level}{FATAL=red bold, ERROR=red, WARN=yellow bold, INFO=blue, DEBUG=green bold, TRACE=green} [%style{%thread}{magenta}] %style{%logger{36}}{cyan} - %msg%n%throwable"
+        value: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n%throwable"
       - name: "charset-UTF-8"
         value: "UTF-8"
 
