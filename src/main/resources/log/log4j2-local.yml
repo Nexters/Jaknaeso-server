@@ -43,3 +43,9 @@ Configuration:
         level: DEBUG
         AppenderRef:
           - ref: CONSOLE
+
+      - name: "p6spy"
+        additivity: "false"
+        level: DEBUG
+        AppenderRef:
+        - ref: CONSOLE

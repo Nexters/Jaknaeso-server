@@ -39,6 +39,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-log4j2")
     implementation("com.lmax:disruptor:4.0.0")
 
+    // p6spy (local db query log)
+    implementation("p6spy:p6spy:3.9.1")
+    implementation("com.github.vertical-blank:sql-formatter:2.0.5")
+
+
     // Jackson
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
 
