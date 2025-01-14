@@ -43,6 +43,8 @@ dependencies {
     implementation("p6spy:p6spy:3.9.1")
     implementation("com.github.vertical-blank:sql-formatter:2.0.5")
 
+    // log4jdbc
+    implementation("org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16")
 
     // Jackson
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
