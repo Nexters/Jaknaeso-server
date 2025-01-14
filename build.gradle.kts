@@ -37,6 +37,7 @@ dependencies {
 
     // log4j2
     implementation("org.springframework.boot:spring-boot-starter-log4j2")
+    implementation("com.lmax:disruptor:4.0.0")
 
     // Jackson
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
