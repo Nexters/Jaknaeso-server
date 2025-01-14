@@ -1,0 +1,53 @@
+name: Deploy Swagger UI
+
+on:
+  push:
+    branches:
+      # - main
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Build Swagger UI with Gradle
+        run: ./gradlew clean build
+
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Docker build and push to NCP container registry
+        run: |
+          sudo docker build -t ${{ secrets.NCP_CONTAINER_REGISTRY_API }}/jaknaeso-api-doc -f Dockerfile.api-doc .
+          sudo docker login ${{ secrets.NCP_CONTAINER_REGISTRY_API }} -u ${{ secrets.NCP_ACCESS_KEY }} -p ${{ secrets.NCP_SECRET_KEY }}
+          sudo docker push ${{ secrets.NCP_CONTAINER_REGISTRY_API }}/jaknaeso-api-doc
+        shell: bash
+
+  deploy-to-server:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Swagger UI server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.API_DOC_SERVER_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.API_DOC_SERVER_USERNAME }}
+          password: ${{ secrets.API_DOC_SERVER_PASSWORD }}
+          script: |
+            sudo docker rm -f $(docker ps -qa)
+  
+            sudo docker login ${{ secrets.NCP_CONTAINER_REGISTRY_API }} -u ${{ secrets.NCP_ACCESS_KEY }} -p ${{ secrets.NCP_SECRET_KEY }}
+            sudo docker pull ${{ secrets.NCP_CONTAINER_REGISTRY_API }}/jaknaeso-api-doc
+            sudo docker run -d -p 80:80 --name api-doc ${{ secrets.NCP_CONTAINER_REGISTRY_API }}/jaknaeso-api-doc
