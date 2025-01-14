@@ -49,3 +49,31 @@ Configuration:
         level: DEBUG
         AppenderRef:
         - ref: CONSOLE
+
+      - name: "jdbc.sqlonly"
+        additivity: "false"
+        level: OFF
+
+      - name: "jdbc.resultsettable"
+        additivity: "false"
+        level: DEBUG
+        AppenderRef:
+          - ref: CONSOLE
+
+      - name: "jdbc.audit"
+        additivity: "false"
+        level: OFF
+
+      - name: "jdbc.resultset"
+        additivity: "false"
+        level: OFF
+
+      - name: "jdbc.connection"
+        additivity: "false"
+        level: WARN
+        AppenderRef:
+          - ref: CONSOLE
+
+      - name: "jdbc.sqltiming"
+        additivity: "false"
+        level: OFF
