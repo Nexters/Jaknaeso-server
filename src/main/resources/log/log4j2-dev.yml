@@ -33,6 +33,13 @@ Configuration:
           size: 100MB
       DefaultRolloverStrategy:
         max: 30
+        DELETE:
+          basePath: ${log-path}
+          maxDepth: 1
+          IfFileName:
+            glob: "app-*.log.gz"
+          IfLastModified:
+            age: "7d"
 
   Loggers:
     Root:
@@ -59,7 +66,7 @@ Configuration:
 
       - name: "org.nexters.jaknaeso"
         additivity: "false"
-        level: DEBUG
+        level: INFO
         AppenderRef:
           - ref: CONSOLE
           - ref: FILE
