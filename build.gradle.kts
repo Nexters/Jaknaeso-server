@@ -42,21 +42,8 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
-val oasDir = file("build/api-spec")
-val swaggerUiDir = file("swagger-ui")
-
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-tasks.register<Copy>("copyOasToSwaggerUi") {
-    dependsOn("openapi3")
-    from("$oasDir/openapi3.yaml")
-    into(swaggerUiDir)
-}
-
-tasks.named("build") {
-    finalizedBy("copyOasToSwaggerUi")
 }
 
 openapi3 {
