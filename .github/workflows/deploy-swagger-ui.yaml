@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-copy:
-    if: { { false } } # 추후 삭제
+    if: { { false } } # TODO: 추후 삭제
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -22,7 +22,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build Swagger UI with Gradle
+      - name: Build with Gradle
         run: ./gradlew clean build
 
       - name: Copy OAS to API-doc Server
@@ -38,10 +38,10 @@ jobs:
           overwrite: true
 
   deploy-to-server:
-    needs: build-and-push
+    needs: build-and-copy
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to Swagger UI server
+      - name: Deploy Swagger UI
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.API_DOC_SERVER_HOST }}
@@ -56,6 +56,5 @@ jobs:
               sudo docker run -d -p 80:8080 \
                 -v ~/app/docs:/usr/share/nginx/html/docs \
                 -e URL="/docs/openapi3.yaml" \
-                --name $CONTAINER_NAME \ 
-                swaggerapi/swagger-ui:latest
+                --name $CONTAINER_NAME swaggerapi/swagger-ui:latest
             fi
