@@ -1,7 +1,7 @@
-FROM nginx:alpine
+FROM swaggerapi/swagger-ui:latest
 
-COPY swagger-ui /usr/share/nginx/html
+COPY ./build/api-spec/openapi3.yaml /usr/share/nginx/html/docs/openapi3.yaml
 
-COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+ENV URL="/docs/openapi3.yaml"
 
-CMD ["nginx", "-g", "daemon off;"]
+EXPOSE 8080
