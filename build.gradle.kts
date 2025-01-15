@@ -64,6 +64,10 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
+tasks.named("build") {
+    finalizedBy("openapi3")
+}
+
 openapi3 {
     this.setServer("http://localhost:8080")
     title = "Jaknaeso API"
