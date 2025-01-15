@@ -10,9 +10,11 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Slf4j
 @RestControllerAdvice
@@ -56,6 +58,20 @@ public class ApiControllerAdvice {
             .toList();
 
         return new ResponseEntity<>(ApiResponse.error(ErrorType.BINDING_ERROR, validationErrors), ErrorType.BINDING_ERROR.getStatus());
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ApiResponse<?>> handleHandlerMethodValidationException(HandlerMethodValidationException e) {
+        log.warn("Validation error occurred: {}", e.getMessage(), e);
+
+        List<Map<String, String>> validationErrors = e.getValueResults().stream()
+            .map(result -> Map.of(
+                "field", result.getMethodParameter().getParameterName(),
+                "message", result.getResolvableErrors().getFirst().getDefaultMessage()
+            ))
+            .toList();
+
+        return new ResponseEntity<>(ApiResponse.error(ErrorType.METHOD_ARGUMENT_NOT_VALID, validationErrors), ErrorType.METHOD_ARGUMENT_NOT_VALID.getStatus());
     }
 
     @ExceptionHandler(Exception.class)
