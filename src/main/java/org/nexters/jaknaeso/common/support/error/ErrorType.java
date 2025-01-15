@@ -8,7 +8,10 @@ import org.springframework.http.HttpStatus;
 public enum ErrorType {
 
     DEFAULT_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.E500, "An unexpected error has occurred.",
-            LogLevel.ERROR);
+            LogLevel.ERROR),
+    METHOD_ARGUMENT_NOT_VALID(HttpStatus.BAD_REQUEST,ErrorCode.E400,"Method argument validation failed.", LogLevel.DEBUG),
+    BINDING_ERROR(HttpStatus.BAD_REQUEST,ErrorCode.E400,"Data binding failed.", LogLevel.WARN),
+    ;
 
     private final HttpStatus status;
 
