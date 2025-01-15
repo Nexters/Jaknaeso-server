@@ -1,7 +1,0 @@
-FROM swaggerapi/swagger-ui:latest
-
-COPY ./build/api-spec/openapi3.yaml /usr/share/nginx/html/docs/openapi3.yaml
-
-ENV URL="/docs/openapi3.yaml"
-
-EXPOSE 8080
