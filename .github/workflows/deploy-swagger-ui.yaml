@@ -2,13 +2,12 @@ name: Deploy Swagger UI
 
 on:
   push:
-    branches-ignore:
-      - '*'
-    # branches:
-      # - main
+    branches:
+      - main
 
 jobs:
   build-and-push:
+    if: {{ false }} # 추후 삭제
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -52,4 +51,4 @@ jobs:
   
             sudo docker login ${{ secrets.NCP_CONTAINER_REGISTRY_API }} -u ${{ secrets.NCP_ACCESS_KEY }} -p ${{ secrets.NCP_SECRET_KEY }}
             sudo docker pull ${{ secrets.NCP_CONTAINER_REGISTRY_API }}/jaknaeso-api-doc
-            sudo docker run -d -p 80:80 --name api-doc ${{ secrets.NCP_CONTAINER_REGISTRY_API }}/jaknaeso-api-doc
+            sudo docker run -d -p 80:8080 --name api-doc ${{ secrets.NCP_CONTAINER_REGISTRY_API }}/jaknaeso-api-doc
