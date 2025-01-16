@@ -35,3 +35,13 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Terraform files
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+.terraformrc
+terraform.rc
+*.pem
+*password.txt
