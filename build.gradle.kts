@@ -1,3 +1,5 @@
+import java.io.ByteArrayOutputStream
+
 plugins {
     java
     id("org.springframework.boot") version "3.4.1"
@@ -48,6 +50,30 @@ tasks.withType<Test> {
 
 tasks.named("build") {
     finalizedBy("openapi3")
+}
+
+val containerName = "api-doc"
+
+tasks.register<Exec>("runSwagger") {
+    commandLine("/usr/local/bin/docker", "ps", "--filter", "name=$containerName", "-qa")
+    standardOutput = ByteArrayOutputStream()
+
+    doLast {
+        val containerId = standardOutput.toString().trim()
+        if (containerId.isEmpty()) {
+            exec {
+                commandLine(
+                    "/usr/local/bin/docker",
+                    "run", "-d",
+                    "-p", "8088:8080",
+                    "--name", containerName,
+                    "-v", "./build/api-spec:/usr/share/nginx/html/docs",
+                    "-e", "URL=/docs/openapi3.yaml",
+                    "swaggerapi/swagger-ui:latest"
+                )
+            }
+        }
+    }
 }
 
 openapi3 {
