@@ -46,7 +46,9 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:${{ env.BUILD_NUMBER }}
+          tags: |
+            ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:${{ env.BUILD_NUMBER }}
+            ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:latest
           build-args: SPRING_PROFILES_ACTIVE=dev
           cache-from: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:latest
           cache-to: type=inline
