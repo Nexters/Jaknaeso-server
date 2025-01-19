@@ -1,10 +1,7 @@
 name: CD Pipeline
 
 on:
-  workflow_run:
-    workflows: [ "CI Pipeline" ]
-    types:
-      - completed
+  push:
     branches:
       - main
 
@@ -21,11 +18,11 @@ env:
   NCP_SERVER_PASSWORD: ${{ secrets.NCP_SERVER_PASSWORD }}
   NCP_SERVER_PORT: ${{ secrets.NCP_SERVER_PORT }}
   SSH_PORT: 22
+  BUILD_NUMBER: ${{ github.sha }}-${{ github.run_id }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout
@@ -37,13 +34,45 @@ jobs:
           PUBLIC_IP=$(curl -s https://ifconfig.me)
           echo "::set-output name=public_ip::$PUBLIC_IP"
 
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to NCP Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ env.NCP_ACCESS_KEY }}
+          password: ${{ env.NCP_SECRET_KEY }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:${{ env.BUILD_NUMBER }}
+            ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:latest
+          build-args: SPRING_PROFILES_ACTIVE=dev
+          cache-from: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:latest
+          cache-to: type=inline
+
       - name: Setting NCP CLI & Credentials
         run: |
           cd ~
-            wget https://www.ncloud.com/api/support/download/5/65
-            unzip 65
-            mkdir ~/.ncloud
-            echo -e "[DEFAULT]\nncloud_access_key_id = ${{ env.NCP_ACCESS_KEY }}\nncloud_secret_access_key = ${{ env.NCP_SECRET_KEY }}\nncloud_api_url = ${{ env.NCP_API_URL }}" >> ~/.ncloud/configure
+          wget https://www.ncloud.com/api/support/download/5/65
+          unzip 65
+          mkdir ~/.ncloud
+          echo -e "[DEFAULT]\nncloud_access_key_id = ${{ env.NCP_ACCESS_KEY }}\nncloud_secret_access_key = ${{ env.NCP_SECRET_KEY }}\nncloud_api_url = ${{ env.NCP_API_URL }}" >> ~/.ncloud/configure
 
       - name: Add Github Action Ip to Security group
         run: |
@@ -72,15 +101,15 @@ jobs:
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
         with:
-            host: ${{ env.NCP_SERVER_HOST }}
-            username: ${{ env.NCP_SERVER_USERNAME }}
-            password: ${{ env.NCP_SERVER_PASSWORD }}
-            port: ${{ env.NCP_SERVER_PORT }}
-            script: |
-              cd ~
-              docker-compose pull
-              docker-compose up -d
-              docker-compose ps
+          host: ${{ env.NCP_SERVER_HOST }}
+          username: ${{ env.NCP_SERVER_USERNAME }}
+          password: ${{ env.NCP_SERVER_PASSWORD }}
+          port: ${{ env.NCP_SERVER_PORT }}
+          script: |
+            cd ~
+            docker-compose pull
+            docker-compose up -d
+            docker-compose ps
 
       - name: Remove Github Action Ip to Security group
         if: always()

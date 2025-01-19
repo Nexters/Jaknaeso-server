@@ -1,9 +1,9 @@
 version: '3.8'
 services:
-  db:
+  mysql:
     image: mysql:8.0
     container_name: jaknaeso-mysql
-    ports:
+    expose:
       - "3306:3306"
     environment:
       MYSQL_DATABASE: ${DATABASE_NAME}
@@ -29,7 +29,7 @@ services:
       - DATABASE_USER=${DATABASE_USER}
       - DATABASE_PASSWORD=${DATABASE_PASSWORD}
     depends_on:
-      - db
+      - mysql
     networks:
       - jaknaeso-network
     restart: on-failure
