@@ -7,11 +7,14 @@ resource "ncloud_access_control_group" "jaknaeso_server_acg_01" {
 resource "ncloud_access_control_group_rule" "jaknaeso_server_acg_01_rule_01" {
   access_control_group_no = ncloud_access_control_group.jaknaeso_server_acg_01.id
 
-  inbound {
-    protocol    = "TCP"
-    ip_block    = "0.0.0.0/0"
-    port_range  = "22"
-    description = "SSH access"
+  dynamic "inbound" {
+    for_each = var.admin_ip_cidrs
+    content {
+      protocol = "TCP"
+      ip_block = inbound.value
+      port_range = "22"
+      description = "SSH access from ${inbound.value}"
+    }
   }
 
   inbound {
@@ -28,12 +31,6 @@ resource "ncloud_access_control_group_rule" "jaknaeso_server_acg_01_rule_01" {
     description = "All TCP outbound"
   }
 
-  outbound {
-    protocol    = "UDP"
-    ip_block    = "0.0.0.0/0"
-    port_range  = "1-65535"
-    description = "All UDP outbound"
-  }
 }
 
 resource "ncloud_network_interface" "jaknaeso_server_nic_01" {
