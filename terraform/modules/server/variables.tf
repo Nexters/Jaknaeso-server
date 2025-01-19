@@ -21,3 +21,9 @@ variable "vpc_no" {
 variable "subnet_public_id" {
   description = "subnet public id"
 }
+
+variable "admin_ip_cidrs" {
+  description = "List of CIDR blocks to allow SSH access from"
+  type = list(string)
+  default = []
+}
