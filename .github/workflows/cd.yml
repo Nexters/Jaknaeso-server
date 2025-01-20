@@ -16,7 +16,6 @@ env:
   NCP_SERVER_HOST: ${{ secrets.NCP_SERVER_HOST }}
   NCP_SERVER_USERNAME: ${{ secrets.NCP_SERVER_USERNAME }}
   NCP_SERVER_PASSWORD: ${{ secrets.NCP_SERVER_PASSWORD }}
-  NCP_SERVER_PORT: ${{ secrets.NCP_SERVER_PORT }}
   SSH_PORT: 22
   BUILD_NUMBER: ${{ github.sha }}-${{ github.run_id }}
 
@@ -93,7 +92,7 @@ jobs:
           host: ${{ env.NCP_SERVER_HOST}}
           username: ${{ env.NCP_SERVER_USERNAME }}
           password: ${{ env.NCP_SERVER_PASSWORD }}
-          port: ${{ env.NCP_SERVER_PORT }}
+          port: ${{ env.SSH_PORT }}
           source: "docker-compose.yml,.env"
           target: "~/"
 
@@ -104,7 +103,7 @@ jobs:
           host: ${{ env.NCP_SERVER_HOST }}
           username: ${{ env.NCP_SERVER_USERNAME }}
           password: ${{ env.NCP_SERVER_PASSWORD }}
-          port: ${{ env.NCP_SERVER_PORT }}
+          port: ${{ env.SSH_PORT }}
           script: |
             cd ~
             docker-compose pull
