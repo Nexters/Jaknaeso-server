@@ -39,18 +39,7 @@ resource "ncloud_network_interface" "jaknaeso_server_nic_01" {
   name      = "${var.name_terra}-jaknaeso-nic-01"
 }
 
-resource "ncloud_network_interface" "jaknaeso_swagger_nic_01" {
-  access_control_groups = [ncloud_access_control_group.jaknaeso_server_acg_01.id]
-  subnet_no = var.subnet_public_id
-  name      = "${var.name_terra}-swagger-nic-01"
-}
-
 resource "ncloud_public_ip" "jaknaeso_public_ip" {
   server_instance_no = ncloud_server.jaknaeso_server.instance_no
   description        = "for ${ncloud_server.jaknaeso_server.name} public ip"
-}
-
-resource "ncloud_public_ip" "jaknaeso_swagger_public_ip" {
-  server_instance_no = ncloud_server.jaknaeso_swagger_server.instance_no
-  description        = "for ${ncloud_server.jaknaeso_swagger_server.name} public ip"
 }
