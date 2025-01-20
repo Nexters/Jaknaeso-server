@@ -6,7 +6,7 @@ data "ncloud_server_image" "server_image" {
 }
 
 data "ncloud_server_image_numbers" "kvm_image" {
-  server_image_name = "ubuntu-22.04"
+  server_image_name = "ubuntu-22.04-base"
   filter {
     name = "hypervisor_type"
     values = ["KVM"]
@@ -17,6 +17,10 @@ data "ncloud_server_specs" "kvm-spec" {
   filter {
     name = "server_spec_code"
     values = ["mi1-g3"]
+  }
+  filter {
+    name = "block_storage_max_count"
+    values = ["10GB"]
   }
 }
 
