@@ -9,5 +9,10 @@ spring:
       password: ${DATABASE_PASSWORD}
 
   jpa:
+    database-platform: org.hibernate.dialect.MySQLDialect
     hibernate:
       ddl-auto: none
+
+cors:
+  origins:
+    api-doc: ${API_DOC_SERVER_HOST}
