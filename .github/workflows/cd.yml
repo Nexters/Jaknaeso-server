@@ -49,6 +49,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: |
             ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:${{ env.BUILD_NUMBER }}
             ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:latest
@@ -106,7 +107,8 @@ jobs:
             docker-compose -f ~/docker-compose.yml pull
             docker-compose -f ~/docker-compose.yml up -d
 
-      - name: Remove Github Action Ip to Security group
+      - name: Remove Github Action Ip from Security group
+        if: always()
         run: |
           chmod -R 777 ~/cli_linux
           cd ~/cli_linux
@@ -114,4 +116,5 @@ jobs:
           --regionCode KR \
           --vpcNo ${{ env.NCP_VPC_ID }} \
           --accessControlGroupNo ${{ env.NCP_AGC_ID }} \
-          --accessControlGroupRuleList "protocolTypeCode=TCP,ipBlock=${{ steps.ip.outputs.public_ip }}/32,portRange=22"
+          --accessControlGroupRuleList "protocolTypeCode=TCP,ipBlock=${{ steps.ip.outputs.public_ip }}/32,portRange=22" \
+          || echo "Failed to remove rule with exit code $?"
