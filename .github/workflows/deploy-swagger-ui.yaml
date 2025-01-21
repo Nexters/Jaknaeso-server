@@ -19,7 +19,7 @@ env:
   SSH_PORT: 22
 
 jobs:
-  build-and-copy:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -72,10 +72,6 @@ jobs:
           strip_components: 2
           overwrite: true
 
-  deploy-to-server:
-    needs: build-and-copy
-    runs-on: ubuntu-latest
-    steps:
       - name: Deploy Swagger UI
         uses: appleboy/ssh-action@master
         with:
