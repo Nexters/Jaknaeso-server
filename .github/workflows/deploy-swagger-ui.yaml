@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/#3-api-문서-기본-설정
 
 jobs:
   build-and-copy:
