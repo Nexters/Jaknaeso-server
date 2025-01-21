@@ -24,6 +24,8 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew clean build
+        env:
+          API_DOC_SERVER_HOST=${{ secrets.API_DOC_SERVER_HOST }}
 
       - name: Copy OAS to API-doc Server
         uses: appleboy/scp-action@master
