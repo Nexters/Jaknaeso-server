@@ -33,15 +33,6 @@ jobs:
           PUBLIC_IP=$(curl -s https://ifconfig.me)
           echo "::set-output name=public_ip::$PUBLIC_IP"
 
-      - name: Set up JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-
-      - name: Build with Gradle
-        run: ./gradlew build
-
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
@@ -77,8 +68,13 @@ jobs:
         run: |
           chmod -R 777 ~/cli_linux
           cd ~/cli_linux
-          ./ncloud vserver addAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ env.NCP_VPC_ID }} --accessControlGroupNo ${{ secrets.NCP_AGC_ID }} --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.public_ip }}/32', portRange='22'"
-
+          ./ncloud vserver getAccessControlGroupList --regionCode KR --vpcNo ${{ env.NCP_VPC_ID }} || true
+          ./ncloud vserver addAccessControlGroupInboundRule \
+            --regionCode KR \
+            --vpcNo ${{ env.NCP_VPC_ID }} \
+            --accessControlGroupNo ${{ env.NCP_AGC_ID }} \
+            --accessControlGroupRuleList "protocolTypeCode=TCP,ipBlock=${{ steps.ip.outputs.public_ip }}/32,portRange=22" \
+            || echo "Failed to add rule with exit code $?"
       - name: Create .env file
         run: |
           echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
@@ -105,15 +101,17 @@ jobs:
           password: ${{ env.NCP_SERVER_PASSWORD }}
           port: ${{ env.SSH_PORT }}
           script: |
-            cd ~
-            docker-compose pull
-            docker-compose up -d
-            docker-compose ps
+            docker login ${{ env.REGISTRY_URL }} -u ${{ env.NCP_ACCESS_KEY }} -p ${{ env.NCP_SECRET_KEY }}
+
+            docker-compose -f ~/docker-compose.yml pull
+            docker-compose -f ~/docker-compose.yml up -d
 
       - name: Remove Github Action Ip to Security group
-        if: always()
         run: |
           chmod -R 777 ~/cli_linux
           cd ~/cli_linux
-          ./ncloud vserver removeAccessControlGroupInboundRule --regionCode KR --vpcNo ${{ env.NCP_VPC_ID }} --accessControlGroupNo ${{ env.NCP_AGC_ID }} --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.public_ip }}/32', portRange='${{ env.SSH_PORT }}'"
-
+          ./ncloud vserver removeAccessControlGroupInboundRule \
+          --regionCode KR \
+          --vpcNo ${{ env.NCP_VPC_ID }} \
+          --accessControlGroupNo ${{ env.NCP_AGC_ID }} \
+          --accessControlGroupRuleList "protocolTypeCode=TCP,ipBlock=${{ steps.ip.outputs.public_ip }}/32,portRange=22"
