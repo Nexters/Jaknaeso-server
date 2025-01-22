@@ -38,14 +38,14 @@ jobs:
 
       - name: Create terraform.tfvars
         run: |
-          echo 'admin_ip_cidrs = ${{ secrets.ADMIN_IP_CIDRS }}' > terraform.tfvars
+          echo 'admin_ip_cidrs = ${{ secrets.ADMIN_IP_CIDRS }}' > terraform.tfvars 2>/dev/null
 
       - name: Terraform Init
-        run: terraform init
+        run: terraform init > /dev/null 2>&1
 
       - name: Terraform Plan
         run: terraform plan -input=false
 
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply -auto-approve -input=false > /dev/null 2>&1
