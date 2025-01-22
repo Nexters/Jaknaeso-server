@@ -68,7 +68,7 @@ jobs:
           password: ${{ env.API_DOC_SERVER_PASSWORD }}
           source: jaknaeso-server/build/api-spec/openapi3.yaml
           target: ~/app/docs
-          strip_components: 2
+          strip_components: 3
           overwrite: true
 
       - name: Deploy Swagger UI
