@@ -1,7 +1,7 @@
 package org.nexters.jaknaesocore.domain.sample.service;
 
 import lombok.RequiredArgsConstructor;
-import org.nexters.jaknaesocore.domain.sample.exception.SampleNotFound;
+import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.sample.model.Sample;
 import org.nexters.jaknaesocore.domain.sample.repository.SampleJpaRepository;
 import org.springframework.stereotype.Service;
@@ -20,6 +20,7 @@ public class SampleService {
 
   @Transactional(readOnly = true)
   public Long getBy(final Long sampleId) {
-    return sampleJpaRepository.findById(sampleId).orElseThrow(SampleNotFound::getInstance).getId();
+    return sampleJpaRepository.findById(sampleId)
+        .orElseThrow(() -> CustomException.SAMPLE_NOT_FOUND).getId();
   }
 }
