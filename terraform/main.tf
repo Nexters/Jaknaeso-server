@@ -37,4 +37,5 @@ module "server" {
   source  = "./modules/server"
   vpc_no = module.network.vpc_no
   subnet_public_id = module.network.subnet_public_id
+  admin_ip_cidrs = var.admin_ip_cidrs
 }
