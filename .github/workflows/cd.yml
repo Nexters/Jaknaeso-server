@@ -69,13 +69,11 @@ jobs:
         run: |
           chmod -R 777 ~/cli_linux
           cd ~/cli_linux
-          ./ncloud vserver getAccessControlGroupList --regionCode KR --vpcNo ${{ env.NCP_VPC_ID }} || true
           ./ncloud vserver addAccessControlGroupInboundRule \
-            --regionCode KR \
-            --vpcNo ${{ env.NCP_VPC_ID }} \
-            --accessControlGroupNo ${{ env.NCP_AGC_ID }} \
-            --accessControlGroupRuleList "protocolTypeCode=TCP,ipBlock=${{ steps.ip.outputs.public_ip }}/32,portRange=22" \
-            || echo "Failed to add rule with exit code $?"
+            --regionCode KR --vpcNo ${{ env.NCP_VPC_ID }} \
+            --accessControlGroupNo ${{ secrets.NCP_AGC_ID }} \
+            --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.public_ip }}/32', portRange='22'" > /dev/null 2>&1
+
       - name: Create .env file
         run: |
           echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
@@ -113,8 +111,6 @@ jobs:
           chmod -R 777 ~/cli_linux
           cd ~/cli_linux
           ./ncloud vserver removeAccessControlGroupInboundRule \
-          --regionCode KR \
-          --vpcNo ${{ env.NCP_VPC_ID }} \
-          --accessControlGroupNo ${{ env.NCP_AGC_ID }} \
-          --accessControlGroupRuleList "protocolTypeCode=TCP,ipBlock=${{ steps.ip.outputs.public_ip }}/32,portRange=22" \
-          || echo "Failed to remove rule with exit code $?"
+            --regionCode KR --vpcNo ${{ env.NCP_VPC_ID }} \
+            --accessControlGroupNo ${{ env.NCP_AGC_ID }} \
+            --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.public_ip }}/32', portRange='22'" > /dev/null 2>&1
