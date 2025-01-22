@@ -1,0 +1,35 @@
+#!/bin/sh
+
+# 현재 브랜치 이름 가져오기
+branch_name=$(git symbolic-ref --short HEAD)
+
+# 커밋 메시지 파일 경로
+commit_msg_file=$1
+
+# 커밋 메시지 파일이 존재하는지 확인
+if [ ! -f "$commit_msg_file" ]; then
+    echo "Commit message file not found!"
+    exit 1
+fi
+
+# 이슈 번호 추출 (feature/#123-설명 형식에서 123만 추출)
+issue_number=$(echo "$branch_name" | sed -n 's/.*#\([0-9]*\).*/\1/p')
+
+if [ -n "$issue_number" ]; then
+    # 현재 커밋 메시지 읽기
+    commit_msg=$(cat "$commit_msg_file")
+
+    # 이미 [#issue_number] 형식이 있는지 확인
+    if ! echo "$commit_msg" | grep -q "\[#$issue_number\]"; then
+        # OS 확인
+        if [ "$(uname)" = "Darwin" ]; then
+            # MacOS의 경우
+            sed -i '' "1s/^/[#$issue_number] /" "$commit_msg_file"
+        else
+            # Linux의 경우
+            sed -i "1s/^/[#$issue_number] /" "$commit_msg_file"
+        fi
+    fi
+else
+    echo "Warning: No issue number found in branch name ($branch_name)"
+fi

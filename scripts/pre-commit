@@ -1,0 +1,33 @@
+#!/bin/sh
+
+# ==========================
+# Pre-commit 훅 스크립트
+# ==========================
+
+set -e  # 오류 발생 시 스크립트 중단
+
+# 변경사항이 있을 때만 stash 수행
+if ! git diff --quiet; then
+    git stash push -k -u -m "Pre-commit: Auto-format changes"
+    stash_created=true
+else
+    stash_created=false
+fi
+
+# Staged 파일 목록 가져오기
+stagedFiles=$(git diff --staged --name-only)
+
+# spotlessApply 실행
+if ! ./gradlew spotlessApply --daemon; then
+    echo "spotlessApply failed"
+    [ "$stash_created" = true ] && git stash pop
+    exit 1
+fi
+
+# Spotless가 수정한 파일들 자동 add
+git add -u  # 변경된 파일을 자동으로 스테이징
+
+# 임시 저장했던 변경사항 복원
+[ "$stash_created" = true ] && git stash pop
+
+exit 0
