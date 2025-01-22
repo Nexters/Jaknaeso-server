@@ -39,8 +39,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Build with Gradle
-        run: ./gradlew clean build
+      - name: Create OpenAPI Documentation
+        run: ./gradlew clean :jaknaeso-server:openapi3
 
       - name: Setting NCP CLI & Credentials
         run: |
@@ -66,7 +66,7 @@ jobs:
           port: ${{ env.API_DOC_SERVER_SSH_PORT }}
           username: ${{ env.API_DOC_SERVER_USERNAME }}
           password: ${{ env.API_DOC_SERVER_PASSWORD }}
-          source: build/api-spec/openapi3.yaml
+          source: jaknaeso-server/build/api-spec/openapi3.yaml
           target: ~/app/docs
           strip_components: 2
           overwrite: true
