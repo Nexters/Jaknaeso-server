@@ -57,7 +57,7 @@ jobs:
           ./ncloud vserver addAccessControlGroupInboundRule \
             --regionCode KR --vpcNo ${{ env.NCP_VPC_ID }} \
             --accessControlGroupNo ${{ secrets.NCP_AGC_ID }} \
-            --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.public_ip }}/32', portRange='22'"
+            --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.public_ip }}/32', portRange='22'" > /dev/null 2>&1
 
       - name: Copy OAS to API-doc Server
         uses: appleboy/scp-action@master
@@ -97,4 +97,4 @@ jobs:
           ./ncloud vserver removeAccessControlGroupInboundRule \
             --regionCode KR --vpcNo ${{ env.NCP_VPC_ID }} \
             --accessControlGroupNo ${{ env.NCP_AGC_ID }} \
-            --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.public_ip }}/32', portRange='${{ env.SSH_PORT }}'"
+            --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.public_ip }}/32', portRange='${{ env.SSH_PORT }}'" > /dev/null 2>&1
