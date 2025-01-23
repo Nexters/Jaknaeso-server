@@ -9,6 +9,4 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaAuditing
 @EntityScan(basePackages = "org.nexters")
 @EnableJpaRepositories(basePackages = "org.nexters")
-public class JpaConfig {
-
-}
+public class JpaConfig {}

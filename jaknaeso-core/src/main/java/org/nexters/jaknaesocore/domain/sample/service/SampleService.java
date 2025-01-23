@@ -11,16 +11,18 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class SampleService {
 
-  private final SampleJpaRepository sampleJpaRepository;
+    private final SampleJpaRepository sampleJpaRepository;
 
-  @Transactional
-  public Long save() {
-    return sampleJpaRepository.save(Sample.of()).getId();
-  }
+    @Transactional
+    public Long save() {
+        return sampleJpaRepository.save(Sample.of()).getId();
+    }
 
-  @Transactional(readOnly = true)
-  public Long getBy(final Long sampleId) {
-    return sampleJpaRepository.findById(sampleId)
-        .orElseThrow(() -> CustomException.SAMPLE_NOT_FOUND).getId();
-  }
+    @Transactional(readOnly = true)
+    public Long getBy(final Long sampleId) {
+        return sampleJpaRepository
+                .findById(sampleId)
+                .orElseThrow(() -> CustomException.SAMPLE_NOT_FOUND)
+                .getId();
+    }
 }

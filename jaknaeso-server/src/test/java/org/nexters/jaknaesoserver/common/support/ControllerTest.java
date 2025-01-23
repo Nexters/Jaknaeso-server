@@ -12,9 +12,9 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureRestDocs
 public abstract class ControllerTest {
 
-  @Autowired
-  protected MockMvc mockMvc;
+    @Autowired
+    protected MockMvc mockMvc;
 
-  @MockitoBean
-  protected SampleService sampleService;
+    @MockitoBean
+    protected SampleService sampleService;
 }

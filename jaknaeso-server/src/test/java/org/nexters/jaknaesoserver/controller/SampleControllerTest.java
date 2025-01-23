@@ -18,32 +18,26 @@ import org.springframework.restdocs.payload.JsonFieldType;
 
 class SampleControllerTest extends ControllerTest {
 
-  @Test
-  void testGetSampleById() throws Exception {
-    Long sampleId = 1L;
+    @Test
+    void testGetSampleById() throws Exception {
+        Long sampleId = 1L;
 
-    given(sampleService.getBy(anyLong())).willReturn(sampleId);
+        given(sampleService.getBy(anyLong())).willReturn(sampleId);
 
-    this.mockMvc.perform(
-            get("/api/samples/{sampleId}", sampleId)
-                .accept(APPLICATION_JSON)
-        )
-        .andExpect(status().isOk())
-        .andDo(
-            document(
-                "sample-get-by-id",
-                resource(ResourceSnippetParameters.builder()
-                    .description("ID를 통해 샘플 조회")
-                    .tags("Sample Domain")
-                    .pathParameters(
-                        parameterWithName("sampleId").type(SimpleType.NUMBER).description("샘플 ID")
-                    )
-                    .responseFields(
-                        fieldWithPath("sampleId").type(JsonFieldType.NUMBER).description("샘플 ID")
-                    )
-                    .build()
-                )
-            )
-        );
-  }
+        this.mockMvc
+                .perform(get("/api/samples/{sampleId}", sampleId).accept(APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andDo(document(
+                        "sample-get-by-id",
+                        resource(ResourceSnippetParameters.builder()
+                                .description("ID를 통해 샘플 조회")
+                                .tags("Sample Domain")
+                                .pathParameters(parameterWithName("sampleId")
+                                        .type(SimpleType.NUMBER)
+                                        .description("샘플 ID"))
+                                .responseFields(fieldWithPath("sampleId")
+                                        .type(JsonFieldType.NUMBER)
+                                        .description("샘플 ID"))
+                                .build())));
+    }
 }

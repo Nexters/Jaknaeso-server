@@ -33,5 +33,4 @@ public class ApiResponse<S> {
     public static ApiResponse<?> error(ErrorType error, Object errorData) {
         return new ApiResponse<>(ResultType.ERROR, null, new ErrorMessage(error, errorData));
     }
-
 }
