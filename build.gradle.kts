@@ -4,6 +4,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.4.1"
     id("io.spring.dependency-management") version "1.1.7"
+    id("com.diffplug.spotless") version "7.0.2" apply false
 }
 
 java {
@@ -25,6 +26,22 @@ subprojects{
     apply(plugin = "java")
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
+    apply(plugin = "com.diffplug.spotless")
+
+    configure<com.diffplug.gradle.spotless.SpotlessExtension> {
+        encoding("UTF-8")
+        java {
+            toggleOffOn()
+            removeUnusedImports()
+            trimTrailingWhitespace()
+            endWithNewline()
+            palantirJavaFormat()
+        }
+    }
+
+    tasks.compileJava {
+        dependsOn("spotlessApply")
+    }
 
     configurations {
         compileOnly {
