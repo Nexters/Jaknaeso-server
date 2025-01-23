@@ -92,3 +92,21 @@ project(":jaknaeso-core") {
     bootJar.enabled = false
     jar.enabled = true
 }
+
+tasks.register<Copy>("installGitHooks") {
+    description = "Git hooks를 설치"
+    group = "git"
+
+    from("$rootDir/scripts/")
+    into("$rootDir/.git/hooks/")
+
+    filePermissions {
+        user {
+           execute = true
+            read = true
+            write = true
+        }
+        group.execute = true
+        other.execute = true
+    }
+}
