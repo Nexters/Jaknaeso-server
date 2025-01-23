@@ -14,9 +14,6 @@ else
     stash_created=false
 fi
 
-# Staged 파일 목록 가져오기
-stagedFiles=$(git diff --staged --name-only)
-
 # spotlessApply 실행
 if ! ./gradlew spotlessApply --daemon; then
     echo "spotlessApply failed"
