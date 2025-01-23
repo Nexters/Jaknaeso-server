@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public class CustomException extends RuntimeException {
 
-    public static final CustomException SAMPLE_NOT_FOUND = new CustomException(ErrorType.SAMPLE_NOT_FOUND);
+    public static final CustomException SAMPLE_NOT_FOUND =
+            new CustomException(ErrorType.SAMPLE_NOT_FOUND);
 
     private final ErrorType errorType;
 

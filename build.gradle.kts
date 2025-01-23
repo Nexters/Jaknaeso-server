@@ -35,7 +35,7 @@ subprojects{
             removeUnusedImports()
             trimTrailingWhitespace()
             endWithNewline()
-            palantirJavaFormat()
+            googleJavaFormat().aosp()
         }
     }
 
