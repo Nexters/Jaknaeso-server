@@ -8,14 +8,15 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    @Value("${cors.origins.api-doc}")
-    private String API_DOC_HOST;
+  @Value("${cors.origins.api-doc}")
+  private String API_DOC_HOST;
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins(API_DOC_HOST)
-                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
-                .allowedHeaders("*");
-    }
+  @Override
+  public void addCorsMappings(CorsRegistry registry) {
+    registry
+        .addMapping("/**")
+        .allowedOrigins(API_DOC_HOST)
+        .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE")
+        .allowedHeaders("*");
+  }
 }

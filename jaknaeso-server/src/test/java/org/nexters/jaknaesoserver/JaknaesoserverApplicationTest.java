@@ -8,6 +8,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 @SpringBootTest
 class JaknaesoserverApplicationTest {
 
-    @Test
-    void contextLoads() {}
+  @Test
+  void contextLoads() {}
 }

@@ -14,17 +14,17 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SampleController {
 
-    private final SampleService sampleService;
+  private final SampleService sampleService;
 
-    @PostMapping()
-    ResponseEntity<SampleResponse> saveSample() {
-        return ResponseEntity.ok(new SampleResponse(sampleService.save()));
-    }
+  @PostMapping()
+  ResponseEntity<SampleResponse> saveSample() {
+    return ResponseEntity.ok(new SampleResponse(sampleService.save()));
+  }
 
-    @GetMapping("/{sampleId}")
-    ResponseEntity<SampleResponse> getSampleById(@PathVariable final Long sampleId) {
-        return ResponseEntity.ok(new SampleResponse(sampleService.getBy(sampleId)));
-    }
+  @GetMapping("/{sampleId}")
+  ResponseEntity<SampleResponse> getSampleById(@PathVariable final Long sampleId) {
+    return ResponseEntity.ok(new SampleResponse(sampleService.getBy(sampleId)));
+  }
 
-    public record SampleResponse(Long sampleId) {}
+  public record SampleResponse(Long sampleId) {}
 }
