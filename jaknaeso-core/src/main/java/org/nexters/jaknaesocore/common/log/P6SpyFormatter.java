@@ -8,7 +8,13 @@ public class P6SpyFormatter implements MessageFormattingStrategy {
 
     @Override
     public String formatMessage(
-            int connectionId, String now, long elapsed, String category, String prepared, String sql, String url) {
+            int connectionId,
+            String now,
+            long elapsed,
+            String category,
+            String prepared,
+            String sql,
+            String url) {
         StackTraceElement[] stackTrace = new Throwable().getStackTrace();
         String callStack = findCallingClass(stackTrace);
 
@@ -35,9 +41,11 @@ public class P6SpyFormatter implements MessageFormattingStrategy {
 
     private String findCallingClass(StackTraceElement[] stackTrace) {
         return Arrays.stream(stackTrace)
-                .filter(element -> element.getClassName().contains("org.nexters")
-                        && !element.getClassName().contains("P6SpyFormatter")
-                        && !element.getClassName().contains("$Proxy"))
+                .filter(
+                        element ->
+                                element.getClassName().contains("org.nexters")
+                                        && !element.getClassName().contains("P6SpyFormatter")
+                                        && !element.getClassName().contains("$Proxy"))
                 .findFirst()
                 .map(element -> element.getClassName() + "." + element.getMethodName())
                 .orElse("Unknown");

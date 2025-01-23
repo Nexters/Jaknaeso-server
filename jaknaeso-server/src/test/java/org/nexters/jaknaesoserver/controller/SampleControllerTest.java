@@ -27,17 +27,21 @@ class SampleControllerTest extends ControllerTest {
         this.mockMvc
                 .perform(get("/api/samples/{sampleId}", sampleId).accept(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andDo(document(
-                        "sample-get-by-id",
-                        resource(ResourceSnippetParameters.builder()
-                                .description("ID를 통해 샘플 조회")
-                                .tags("Sample Domain")
-                                .pathParameters(parameterWithName("sampleId")
-                                        .type(SimpleType.NUMBER)
-                                        .description("샘플 ID"))
-                                .responseFields(fieldWithPath("sampleId")
-                                        .type(JsonFieldType.NUMBER)
-                                        .description("샘플 ID"))
-                                .build())));
+                .andDo(
+                        document(
+                                "sample-get-by-id",
+                                resource(
+                                        ResourceSnippetParameters.builder()
+                                                .description("ID를 통해 샘플 조회")
+                                                .tags("Sample Domain")
+                                                .pathParameters(
+                                                        parameterWithName("sampleId")
+                                                                .type(SimpleType.NUMBER)
+                                                                .description("샘플 ID"))
+                                                .responseFields(
+                                                        fieldWithPath("sampleId")
+                                                                .type(JsonFieldType.NUMBER)
+                                                                .description("샘플 ID"))
+                                                .build())));
     }
 }

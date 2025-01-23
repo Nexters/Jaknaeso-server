@@ -7,9 +7,15 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorType {
     DEFAULT_ERROR(
-            HttpStatus.INTERNAL_SERVER_ERROR, ErrorCode.E500, "An unexpected error has occurred.", LogLevel.ERROR),
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            ErrorCode.E500,
+            "An unexpected error has occurred.",
+            LogLevel.ERROR),
     METHOD_ARGUMENT_NOT_VALID(
-            HttpStatus.BAD_REQUEST, ErrorCode.E400, "Method argument validation failed.", LogLevel.DEBUG),
+            HttpStatus.BAD_REQUEST,
+            ErrorCode.E400,
+            "Method argument validation failed.",
+            LogLevel.DEBUG),
     BINDING_ERROR(HttpStatus.BAD_REQUEST, ErrorCode.E400, "Data binding failed.", LogLevel.WARN),
     SAMPLE_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "Sample not found.", LogLevel.WARN),
     ;
