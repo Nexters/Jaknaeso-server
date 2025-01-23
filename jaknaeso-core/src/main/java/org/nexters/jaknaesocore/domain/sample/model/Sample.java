@@ -12,19 +12,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Sample {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Getter
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Getter
+    private Long id;
 
-  private String name;
+    private String name;
 
-  private Sample(final String name) {
-    this.name = name;
-  }
+    private Sample(final String name) {
+        this.name = name;
+    }
 
-  public static Sample of() {
-    final String name = "name";
-    return new Sample(name);
-  }
+    public static Sample of() {
+        final String name = "name";
+        return new Sample(name);
+    }
 }
