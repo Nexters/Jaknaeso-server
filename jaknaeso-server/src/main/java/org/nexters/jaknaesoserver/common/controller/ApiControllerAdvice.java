@@ -1,7 +1,9 @@
 package org.nexters.jaknaesoserver.common.controller;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
+import javax.naming.AuthenticationException;
 import lombok.extern.slf4j.Slf4j;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.common.support.error.ErrorType;
@@ -85,6 +87,20 @@ public class ApiControllerAdvice {
     return new ResponseEntity<>(
         ApiResponse.error(ErrorType.METHOD_ARGUMENT_NOT_VALID, validationErrors),
         ErrorType.METHOD_ARGUMENT_NOT_VALID.getStatus());
+  }
+
+  @ExceptionHandler(AuthenticationException.class)
+  public ResponseEntity<ApiResponse<?>> handleAuthenticationException(AuthenticationException e) {
+    log.warn("Authentication error occurred: {}", e.getMessage(), e);
+    return new ResponseEntity<>(
+        ApiResponse.error(ErrorType.UNAUTHORIZED), ErrorType.UNAUTHORIZED.getStatus());
+  }
+
+  @ExceptionHandler(AccessDeniedException.class)
+  public ResponseEntity<ApiResponse<?>> handleAccessDeniedException(AccessDeniedException e) {
+    log.warn("Access denied error occurred: {}", e.getMessage(), e);
+    return new ResponseEntity<>(
+        ApiResponse.error(ErrorType.FORBIDDEN), ErrorType.FORBIDDEN.getStatus());
   }
 
   @ExceptionHandler(Exception.class)

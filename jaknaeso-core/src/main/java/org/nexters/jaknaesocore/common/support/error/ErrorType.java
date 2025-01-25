@@ -18,6 +18,8 @@ public enum ErrorType {
   INVALID_TOKEN(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Invalid token.", LogLevel.WARN),
   UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Unsupported token.", LogLevel.WARN),
   EMPTY_TOKEN(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Empty token.", LogLevel.WARN),
+  UNAUTHORIZED(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Unauthorized.", LogLevel.WARN),
+  FORBIDDEN(HttpStatus.FORBIDDEN, ErrorCode.E403, "Forbidden.", LogLevel.WARN),
   SAMPLE_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "Sample not found.", LogLevel.WARN),
   ;
 
