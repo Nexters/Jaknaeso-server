@@ -22,6 +22,10 @@ dependencies {
     // spring-rest-docs
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
 
+    // spring-security
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    testImplementation("org.springframework.security:spring-security-test")
+
     // jwt
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.12.6")
