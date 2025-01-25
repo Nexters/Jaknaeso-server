@@ -13,15 +13,22 @@ public class JwtParser {
   private final JwtProperties jwtProperties;
 
   public Long extractIdFromToken(String token) {
-    try {
-      io.jsonwebtoken.JwtParser jwtParser =
-          Jwts.parser().verifyWith(jwtProperties.getSecretKey()).build();
 
-      String subject = jwtParser.parseSignedClaims(token).getPayload().getSubject();
-      return Long.parseLong(subject);
+    Jws<Claims> claimsJws = parseClaims(token);
+
+    String subject = claimsJws.getPayload().getSubject();
+    return Long.parseLong(subject);
+  }
+
+  private Jws<Claims> parseClaims(String token) {
+    try {
+      return Jwts.parser()
+          .verifyWith(jwtProperties.getSecretKey())
+          .build()
+          .parseSignedClaims(token);
     } catch (ExpiredJwtException e) {
       throw CustomException.TOKEN_EXPIRED;
-    } catch (MalformedJwtException | NumberFormatException e) {
+    } catch (MalformedJwtException e) {
       throw CustomException.INVALID_TOKEN;
     } catch (UnsupportedJwtException e) {
       throw CustomException.UNSUPPORTED_TOKEN;
