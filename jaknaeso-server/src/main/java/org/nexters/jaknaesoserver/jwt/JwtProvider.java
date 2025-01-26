@@ -8,20 +8,20 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-public class JwtGenerator {
+public class JwtProvider {
 
   private final JwtProperties jwtProperties;
 
-  public String generateAccessToken(final Long id) {
-    return generateToken(Map.of(), id.toString(), jwtProperties.getAccessTokenExpiration());
+  public String generateAccessToken(final Long userId) {
+    return generateToken(Map.of(), userId.toString(), jwtProperties.getAccessTokenExpiration());
   }
 
-  public String reissueAccessToken(final Long id) {
-    return generateAccessToken(id);
+  public String reissueAccessToken(final Long userId) {
+    return generateAccessToken(userId);
   }
 
-  public String generateRefreshToken(final Long id) {
-    return generateToken(Map.of(), id.toString(), jwtProperties.getRefreshTokenExpiration());
+  public String generateRefreshToken(final Long userId) {
+    return generateToken(Map.of(), userId.toString(), jwtProperties.getRefreshTokenExpiration());
   }
 
   private String generateToken(
