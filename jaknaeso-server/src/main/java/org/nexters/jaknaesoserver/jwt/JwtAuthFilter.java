@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +20,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-  private static final String AUTHORIZATION_HEADER = "Authorization";
   private static final String BEARER_PREFIX = "Bearer ";
 
   private final JwtParser jwtParser;
@@ -44,7 +44,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
   private String extractToken(HttpServletRequest request) {
     try {
-      String header = request.getHeader(AUTHORIZATION_HEADER);
+      String header = request.getHeader(HttpHeaders.AUTHORIZATION);
       if (header == null || !header.startsWith(BEARER_PREFIX)) {
         throw CustomException.INCORRECT_TOKEN_FORMAT;
       }
