@@ -5,13 +5,16 @@ import lombok.Getter;
 @Getter
 public class CustomException extends RuntimeException {
 
+  public static final CustomException INTERNAL_SERVER_ERROR =
+      new CustomException(ErrorType.DEFAULT_ERROR);
   public static final CustomException SAMPLE_NOT_FOUND =
       new CustomException(ErrorType.SAMPLE_NOT_FOUND);
   public static final CustomException TOKEN_EXPIRED = new CustomException(ErrorType.EXPIRED_TOKEN);
   public static final CustomException INVALID_TOKEN = new CustomException(ErrorType.INVALID_TOKEN);
   public static final CustomException UNSUPPORTED_TOKEN =
       new CustomException(ErrorType.UNSUPPORTED_TOKEN);
-  public static final CustomException EMPTY_TOKEN = new CustomException(ErrorType.EMPTY_TOKEN);
+  public static final CustomException INCORRECT_TOKEN_FORMAT =
+      new CustomException(ErrorType.INCORRECT_TOKEN_FORMAT);
 
   private final ErrorType errorType;
 

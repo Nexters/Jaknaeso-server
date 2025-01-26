@@ -72,7 +72,7 @@ class JwtParserTest {
     // when & then
     assertThatThrownBy(() -> jwtParser.extractIdFromToken(emptyToken))
         .isInstanceOf(CustomException.class)
-        .isEqualTo(CustomException.EMPTY_TOKEN);
+        .isEqualTo(CustomException.INCORRECT_TOKEN_FORMAT);
   }
 
   private String createToken(Long userId) {
