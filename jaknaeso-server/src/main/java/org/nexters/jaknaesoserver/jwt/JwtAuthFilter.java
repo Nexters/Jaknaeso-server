@@ -6,9 +6,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -28,29 +30,34 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     String token = extractToken(request);
 
-    if (token != null) {
-      try {
-        Long userId = jwtParser.extractIdFromToken(token);
-        UsernamePasswordAuthenticationToken authentication = createAuthentication(userId);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-      } catch (CustomException e) {
-        SecurityContextHolder.clearContext();
-        request.setAttribute("exception", e);
-      }
+    try {
+      Long userId = jwtParser.extractIdFromToken(token);
+      UsernamePasswordAuthenticationToken authentication = createAuthentication(userId);
+      SecurityContextHolder.getContext().setAuthentication(authentication);
+    } catch (CustomException e) {
+      SecurityContextHolder.clearContext();
+      request.setAttribute("exception", e);
     }
 
     filterChain.doFilter(request, response);
   }
 
   private String extractToken(HttpServletRequest request) {
-    String header = request.getHeader(AUTHORIZATION_HEADER);
-    if (header != null && header.startsWith(BEARER_PREFIX)) {
+    try {
+      String header = request.getHeader(AUTHORIZATION_HEADER);
+      if (header == null || !header.startsWith(BEARER_PREFIX)) {
+        throw CustomException.INCORRECT_TOKEN_FORMAT;
+      }
       return header.substring(BEARER_PREFIX.length());
+    } catch (Exception e) {
+      throw CustomException.INTERNAL_SERVER_ERROR;
     }
-    return null;
   }
 
   private UsernamePasswordAuthenticationToken createAuthentication(Long userId) {
-    return new UsernamePasswordAuthenticationToken(userId, null, Collections.emptyList());
+    Long principal = userId;
+    Object credentials = null;
+    List<GrantedAuthority> authorities = Collections.emptyList();
+    return new UsernamePasswordAuthenticationToken(principal, credentials, authorities);
   }
 }

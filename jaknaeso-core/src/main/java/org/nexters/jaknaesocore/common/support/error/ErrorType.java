@@ -17,7 +17,8 @@ public enum ErrorType {
   EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Token expired.", LogLevel.WARN),
   INVALID_TOKEN(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Invalid token.", LogLevel.WARN),
   UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Unsupported token.", LogLevel.WARN),
-  EMPTY_TOKEN(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Empty token.", LogLevel.WARN),
+  INCORRECT_TOKEN_FORMAT(
+      HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Request token format is incorrect.", LogLevel.WARN),
   UNAUTHORIZED(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Unauthorized.", LogLevel.WARN),
   FORBIDDEN(HttpStatus.FORBIDDEN, ErrorCode.E403, "Forbidden.", LogLevel.WARN),
   SAMPLE_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "Sample not found.", LogLevel.WARN),

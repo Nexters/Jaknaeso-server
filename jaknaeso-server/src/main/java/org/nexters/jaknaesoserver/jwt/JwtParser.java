@@ -3,7 +3,6 @@ package org.nexters.jaknaesoserver.jwt;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
-import org.nexters.jaknaesocore.common.support.error.ErrorType;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
@@ -33,9 +32,9 @@ public class JwtParser {
     } catch (UnsupportedJwtException e) {
       throw CustomException.UNSUPPORTED_TOKEN;
     } catch (IllegalArgumentException e) {
-      throw CustomException.EMPTY_TOKEN;
+      throw CustomException.INCORRECT_TOKEN_FORMAT;
     } catch (Exception e) {
-      throw new CustomException(ErrorType.DEFAULT_ERROR);
+      throw CustomException.INTERNAL_SERVER_ERROR;
     }
   }
 }
