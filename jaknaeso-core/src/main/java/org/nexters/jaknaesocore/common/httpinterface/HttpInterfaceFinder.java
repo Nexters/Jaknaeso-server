@@ -1,6 +1,7 @@
-package org.nexters.jaknaesoserver.common.httpinterface;
+package org.nexters.jaknaesocore.common.httpinterface;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -19,19 +20,35 @@ public class HttpInterfaceFinder {
       @Override
       protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
         AnnotationMetadata beanMetadata = beanDefinition.getMetadata();
-        try {
-          Class<?> clazz = Class.forName(beanMetadata.getClassName());
-
-          return beanMetadata.isInterface()
-              && beanMetadata.hasAnnotation(HttpExchange.class.getName())
-              && !java.lang.reflect.Modifier.isPrivate(clazz.getModifiers());
-        } catch (ClassNotFoundException e) {
-          return false;
-        }
+        return beanMetadata.isInterface()
+            && beanMetadata.hasAnnotation(HttpExchange.class.getName());
       }
     };
 
     scanner.addIncludeFilter(new AnnotationTypeFilter(HttpExchange.class));
+    if (isTestEnvironment(environment)) {
+      return scanner.findCandidateComponents(basePackage).stream()
+          .filter(HttpInterfaceFinder::filterFixture).collect(Collectors.toSet());
+    }
     return scanner.findCandidateComponents(basePackage);
+  }
+
+  static boolean filterFixture(final BeanDefinition beanDefinition) {
+    try {
+      Class<?> clazz = Class.forName(beanDefinition.getBeanClassName());
+      return !clazz.getPackage().getName().contains("fixture");
+    } catch (ClassNotFoundException e) {
+      return false;
+    }
+  }
+
+  static boolean isTestEnvironment(final Environment environment) {
+    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+    for (StackTraceElement element : stackTrace) {
+      if (element.getClassName().contains("org.springframework.boot.test.context")) {
+        return true;
+      }
+    }
+    return false;
   }
 }
