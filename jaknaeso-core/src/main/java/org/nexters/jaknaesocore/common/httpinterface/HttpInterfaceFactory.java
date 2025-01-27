@@ -1,8 +1,8 @@
 package org.nexters.jaknaesocore.common.httpinterface;
 
 import java.util.Map;
-import org.nexters.jaknaesocore.common.httpinterface.errorhandler.KakaoClientErrorHandler;
 import org.nexters.jaknaesocore.common.httpinterface.errorhandler.RestClientErrorHandler;
+import org.nexters.jaknaesocore.domain.oauth.restclient.errorhandler.KakaoClientErrorHandler;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Component;
