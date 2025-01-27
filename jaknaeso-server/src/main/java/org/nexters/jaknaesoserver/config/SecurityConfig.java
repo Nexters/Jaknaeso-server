@@ -1,6 +1,7 @@
 package org.nexters.jaknaesoserver.config;
 
 import lombok.RequiredArgsConstructor;
+import org.nexters.jaknaesoserver.jwt.JwtAuthFilter;
 import org.nexters.jaknaesoserver.jwt.SecurityExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -16,6 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
   private final SecurityExceptionHandler securityExceptionHandler;
+  private final JwtAuthFilter jwtAuthFilter;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -24,6 +27,7 @@ public class SecurityConfig {
         .authorizeHttpRequests(request -> request.requestMatchers("/**").permitAll())
         .formLogin(AbstractHttpConfigurer::disable)
         .logout(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable)
         .sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
         .exceptionHandling(
@@ -31,6 +35,7 @@ public class SecurityConfig {
                 exception
                     .authenticationEntryPoint(securityExceptionHandler)
                     .accessDeniedHandler(securityExceptionHandler))
+        .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
   }
 }

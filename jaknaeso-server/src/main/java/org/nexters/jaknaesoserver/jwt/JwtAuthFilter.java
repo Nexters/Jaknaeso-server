@@ -21,16 +21,15 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthFilter extends OncePerRequestFilter {
 
   private static final String BEARER_PREFIX = "Bearer ";
-
   private final JwtParser jwtParser;
 
   @Override
   protected void doFilterInternal(
       HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
-    String token = extractToken(request);
 
     try {
+      String token = extractToken(request);
       Long userId = jwtParser.extractIdFromToken(token);
       UsernamePasswordAuthenticationToken authentication = createAuthentication(userId);
       SecurityContextHolder.getContext().setAuthentication(authentication);
