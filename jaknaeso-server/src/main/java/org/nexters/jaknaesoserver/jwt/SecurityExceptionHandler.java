@@ -43,6 +43,11 @@ public class SecurityExceptionHandler implements AuthenticationEntryPoint, Acces
       HttpServletResponse response,
       AccessDeniedException accessDeniedException)
       throws IOException, ServletException {
+    CustomException exception = (CustomException) request.getAttribute("exception");
+    if (exception != null) {
+      resolver.resolveException(request, response, null, exception);
+      return;
+    }
     resolver.resolveException(request, response, null, accessDeniedException);
   }
 }
