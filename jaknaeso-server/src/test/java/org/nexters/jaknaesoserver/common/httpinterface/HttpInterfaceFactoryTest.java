@@ -5,9 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.nexters.jaknaesocore.common.httpinterface.HttpInterfaceFactory;
 import org.nexters.jaknaesocore.domain.oauth.restclient.KakaoClient;
-import org.springframework.web.service.annotation.GetExchange;
-import org.springframework.web.service.annotation.HttpExchange;
+import org.nexters.jaknaesoserver.common.httpinterface.fixture.HttpInterfaceFixture.EmptyUrlHttpInterface;
+import org.nexters.jaknaesoserver.common.httpinterface.fixture.HttpInterfaceFixture.NoHttpExchangeHttpInterface;
 
 class HttpInterfaceFactoryTest {
 
@@ -24,7 +25,8 @@ class HttpInterfaceFactoryTest {
   @DisplayName("HttpExchange 애노테이션이 없는 HttpInterface는 프록시 객체를 생성할 수 없다.")
   @Test
   void failToCreateHttpInterfaceWithoutHttpExchange() {
-    assertThatThrownBy(() -> httpInterfaceFactory.create(NoHttpExchangeHttpInterface.class))
+    assertThatThrownBy(
+        () -> httpInterfaceFactory.create(NoHttpExchangeHttpInterface.class))
         .isInstanceOf(IllegalStateException.class);
   }
 
@@ -33,18 +35,5 @@ class HttpInterfaceFactoryTest {
   void failToCreateHttpInterfaceWithoutUrl() {
     assertThatThrownBy(() -> httpInterfaceFactory.create(EmptyUrlHttpInterface.class))
         .isInstanceOf(IllegalArgumentException.class);
-  }
-
-  private interface NoHttpExchangeHttpInterface {
-
-    @GetExchange("hello")
-    String hello();
-  }
-
-  @HttpExchange
-  private interface EmptyUrlHttpInterface {
-
-    @GetExchange("hello")
-    String hello();
   }
 }

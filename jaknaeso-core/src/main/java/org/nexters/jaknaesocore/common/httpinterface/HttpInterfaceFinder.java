@@ -26,7 +26,7 @@ public class HttpInterfaceFinder {
     };
 
     scanner.addIncludeFilter(new AnnotationTypeFilter(HttpExchange.class));
-    if (isTestEnvironment(environment)) {
+    if (isTestEnvironment()) {
       return scanner.findCandidateComponents(basePackage).stream()
           .filter(HttpInterfaceFinder::filterFixture).collect(Collectors.toSet());
     }
@@ -42,7 +42,7 @@ public class HttpInterfaceFinder {
     }
   }
 
-  static boolean isTestEnvironment(final Environment environment) {
+  static boolean isTestEnvironment() {
     StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
     for (StackTraceElement element : stackTrace) {
       if (element.getClassName().contains("org.springframework.boot.test.context")) {
