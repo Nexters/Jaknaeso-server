@@ -1,4 +1,4 @@
-package org.nexters.jaknaesoserver.common.httpinterface.errorhandler;
+package org.nexters.jaknaesocore.common.httpinterface.errorhandler;
 
 import org.springframework.http.HttpStatusCode;
 

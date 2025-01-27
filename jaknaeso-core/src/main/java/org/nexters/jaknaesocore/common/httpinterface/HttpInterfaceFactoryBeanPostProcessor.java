@@ -1,4 +1,4 @@
-package org.nexters.jaknaesoserver.common.httpinterface;
+package org.nexters.jaknaesocore.common.httpinterface;
 
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
