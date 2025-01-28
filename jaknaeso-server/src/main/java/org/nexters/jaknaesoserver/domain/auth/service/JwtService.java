@@ -13,8 +13,8 @@ public class JwtService {
   private final JwtParser jwtParser;
   private final JwtProvider jwtProvider;
 
-  public TokenResponse reissueToken(String refreshToken) {
-    refreshToken = refreshToken.substring(BEARER_PREFIX.length());
+  public TokenResponse reissueToken(final String bearerRefreshToken) {
+    String refreshToken = bearerRefreshToken.replace(BEARER_PREFIX, "");
     Long userId = jwtParser.extractIdFromToken(refreshToken);
     String accessToken = jwtProvider.generateAccessToken(userId);
     String newRefreshToken = jwtProvider.generateRefreshToken(userId);
