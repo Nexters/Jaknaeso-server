@@ -36,7 +36,7 @@ class AuthControllerTest extends ControllerTest {
 
   @DisplayName("카카오 API를 호출하여 서비스에 로그인한다.")
   @Test
-  void loginKakao() throws Exception {
+  void kakaoLoginSuccess() throws Exception {
     KakaoLoginRequest request = new KakaoLoginRequest("access token");
 
     given(authService.kakaoLogin(request.toServiceDto()))
@@ -64,7 +64,7 @@ class AuthControllerTest extends ControllerTest {
 
   @DisplayName("카카오 API 호출이 실패하여 서비스 로그인에 실패하고 서버 오류를 반환한다.")
   @Test
-  void loginKakaoWithInvalidAuthorizationHeader() throws Exception {
+  void kakaoLoginFail() throws Exception {
     KakaoLoginRequest request = new KakaoLoginRequest("invalid access token");
 
     given(authService.kakaoLogin(request.toServiceDto())).willThrow(RestClientException.class);
