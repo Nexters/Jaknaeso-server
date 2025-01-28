@@ -11,7 +11,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 class HttpInterfaceFinderTest {
 
-  @DisplayName("현재 클래스가 존재하는 패키지에서 HttpExchange 애노테이션이 있는 HttpInterface BeanDefinition을 찾을 수 있다.")
+  @DisplayName("현재 클래스가 존재하는 패키지에서 HttpExchange 애노테이션이 있는 HttpInterface BeanDefinition을 찾는다.")
   @Test
   void findHttpInterfaceBeanDefinitions() {
     Set<BeanDefinition> actual =
