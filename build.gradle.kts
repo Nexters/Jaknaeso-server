@@ -22,7 +22,7 @@ allprojects {
     }
 }
 
-subprojects{
+subprojects {
     apply(plugin = "java")
     apply(plugin = "org.springframework.boot")
     apply(plugin = "io.spring.dependency-management")
@@ -102,7 +102,7 @@ tasks.register<Copy>("installGitHooks") {
 
     filePermissions {
         user {
-           execute = true
+            execute = true
             read = true
             write = true
         }

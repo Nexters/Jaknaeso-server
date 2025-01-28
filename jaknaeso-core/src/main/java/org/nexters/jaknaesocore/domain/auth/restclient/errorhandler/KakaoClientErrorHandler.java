@@ -10,8 +10,7 @@ public class KakaoClientErrorHandler implements RestClientErrorHandler {
 
   @Override
   public void handleError(
-      HttpStatusCode statusCode, HttpRequest request, ClientHttpResponse response
-  ) {
+      HttpStatusCode statusCode, HttpRequest request, ClientHttpResponse response) {
     if (statusCode.value() == 401) {
       throw new RestClientException("인증에 실패했습니다. 카카오 API 토큰을 확인해주세요.");
     }

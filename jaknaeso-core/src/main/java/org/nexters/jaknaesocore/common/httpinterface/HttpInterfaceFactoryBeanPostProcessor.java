@@ -24,13 +24,9 @@ public class HttpInterfaceFactoryBeanPostProcessor implements BeanFactoryPostPro
   }
 
   private void registerSingletonBean(
-      final ConfigurableListableBeanFactory beanFactory,
-      final BeanDefinition beanDefinition
-  ) {
+      final ConfigurableListableBeanFactory beanFactory, final BeanDefinition beanDefinition) {
     beanFactory.registerSingleton(
-        beanDefinition.getBeanClassName(),
-        createHttpInterfaceProxy(beanDefinition)
-    );
+        beanDefinition.getBeanClassName(), createHttpInterfaceProxy(beanDefinition));
   }
 
   private Object createHttpInterfaceProxy(final BeanDefinition beanDefinition) {
@@ -40,8 +36,7 @@ public class HttpInterfaceFactoryBeanPostProcessor implements BeanFactoryPostPro
   private Class<?> findHttpInterface(final BeanDefinition beanDefinition) {
     try {
       return ClassUtils.forName(
-          beanDefinition.getBeanClassName(), this.getClass().getClassLoader()
-      );
+          beanDefinition.getBeanClassName(), this.getClass().getClassLoader());
     } catch (ClassNotFoundException e) {
       throw new IllegalStateException(e);
     }

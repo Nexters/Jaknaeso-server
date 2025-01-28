@@ -4,7 +4,8 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VAL
 
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.http.MediaTypeValueBuilder;
-import org.nexters.jaknaesocore.domain.auth.dto.LoginKakaoCommand;
+import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginCommand;
+import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginResponse;
 import org.nexters.jaknaesocore.domain.auth.restclient.KakaoClient;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse;
 import org.nexters.jaknaesocore.domain.member.model.Member;
@@ -17,26 +18,24 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AuthService {
 
+  private static final String BEARER_TOKEN_PREFIX = "Bearer ";
+
   private final MemberRepository memberRepository;
-
   private final KakaoClient kakaoClient;
-//  private final JwtProvider jwtProvider;
-
-  private final String BEARER_TOKEN_FORMAT = "Bearer %s";
 
   @Transactional
-  public void loginKakao(final LoginKakaoCommand command) {
-    String mediaType = MediaTypeValueBuilder.builder(APPLICATION_FORM_URLENCODED_VALUE)
-        .charset("utf-8")
-        .build();
-    KakaoUserInfoResponse userInfo = kakaoClient.requestUserInfo(
-        String.format(BEARER_TOKEN_FORMAT, command.accessToken()), mediaType
-    );
+  public KakaoLoginResponse kakaoLogin(final KakaoLoginCommand command) {
+    String mediaType =
+        MediaTypeValueBuilder.builder(APPLICATION_FORM_URLENCODED_VALUE).charset("utf-8").build();
+    KakaoUserInfoResponse userInfo =
+        kakaoClient.requestUserInfo(BEARER_TOKEN_PREFIX + command.accessToken(), mediaType);
 
     String oauthId = userInfo.id().toString();
     if (!memberRepository.existsKakaoMember(oauthId)) {
       memberRepository.save(Member.kakaoSignup(oauthId));
     }
+
     // TODO: JWT 발급 로직
+    return new KakaoLoginResponse("access token", "refresh token");
   }
 }
