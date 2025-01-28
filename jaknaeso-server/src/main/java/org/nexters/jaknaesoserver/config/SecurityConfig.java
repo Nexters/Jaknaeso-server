@@ -2,8 +2,8 @@ package org.nexters.jaknaesoserver.config;
 
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesoserver.common.controller.PublicEndpoints;
-import org.nexters.jaknaesoserver.jwt.JwtAuthFilter;
-import org.nexters.jaknaesoserver.jwt.SecurityExceptionHandler;
+import org.nexters.jaknaesoserver.security.JwtAuthFilter;
+import org.nexters.jaknaesoserver.security.SecurityExceptionHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

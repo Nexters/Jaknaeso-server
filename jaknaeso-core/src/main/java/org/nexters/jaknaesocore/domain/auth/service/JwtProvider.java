@@ -1,9 +1,10 @@
-package org.nexters.jaknaesoserver.jwt;
+package org.nexters.jaknaesocore.domain.auth.service;
 
 import io.jsonwebtoken.Jwts;
 import java.util.Date;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
+import org.nexters.jaknaesocore.domain.auth.model.JwtProperties;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor

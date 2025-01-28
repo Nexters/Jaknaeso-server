@@ -1,4 +1,4 @@
-package org.nexters.jaknaesoserver.jwt;
+package org.nexters.jaknaesoserver.security;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
+import org.nexters.jaknaesocore.domain.auth.service.JwtParser;
 import org.nexters.jaknaesoserver.common.controller.PublicEndpoints;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
