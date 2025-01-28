@@ -1,7 +1,7 @@
-package org.nexters.jaknaesocore.domain.auth.service;
+package org.nexters.jaknaesoserver.domain.auth.service;
 
 import lombok.RequiredArgsConstructor;
-import org.nexters.jaknaesocore.domain.auth.dto.TokenResponse;
+import org.nexters.jaknaesoserver.domain.auth.dto.TokenResponse;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -18,6 +18,6 @@ public class JwtService {
     Long userId = jwtParser.extractIdFromToken(refreshToken);
     String accessToken = jwtProvider.generateAccessToken(userId);
     String newRefreshToken = jwtProvider.generateRefreshToken(userId);
-    return TokenResponse.of(accessToken, newRefreshToken);
+    return TokenResponse.of(userId, accessToken, newRefreshToken);
   }
 }

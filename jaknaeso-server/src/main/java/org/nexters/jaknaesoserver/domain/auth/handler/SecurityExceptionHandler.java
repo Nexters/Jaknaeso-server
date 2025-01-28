@@ -1,4 +1,4 @@
-package org.nexters.jaknaesoserver.security;
+package org.nexters.jaknaesoserver.domain.auth.handler;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
