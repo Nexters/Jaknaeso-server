@@ -13,7 +13,6 @@ import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class AuthService {
@@ -31,11 +30,9 @@ public class AuthService {
         kakaoClient.requestUserInfo(BEARER_TOKEN_PREFIX + command.accessToken(), mediaType);
 
     String oauthId = userInfo.id().toString();
-    if (!memberRepository.existsKakaoMember(oauthId)) {
-      memberRepository.save(Member.kakaoSignup(oauthId));
-    }
+    Member member = memberRepository.saveKakaoMember(oauthId);
 
     // TODO: JWT 발급 로직
-    return new KakaoLoginResponse("access token", "refresh token");
+    return new KakaoLoginResponse(member.getId(), "access token", "refresh token");
   }
 }
