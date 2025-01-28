@@ -1,6 +1,6 @@
 package org.nexters.jaknaesocore.domain.auth.restclient.errorhandler;
 
-import org.nexters.jaknaesocore.common.httpinterface.errorhandler.RestClientErrorHandler;
+import org.nexters.jaknaesocore.common.http.errorhandler.RestClientErrorHandler;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
