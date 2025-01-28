@@ -1,14 +1,13 @@
-package org.nexters.jaknaesoserver.common.httpinterface;
+package org.nexters.jaknaesocore.common.http.httpinterface;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.common.httpinterface.HttpInterfaceFactory;
+import org.nexters.jaknaesocore.common.http.httpinterface.fixture.HttpInterfaceFixture.EmptyUrlHttpInterface;
+import org.nexters.jaknaesocore.common.http.httpinterface.fixture.HttpInterfaceFixture.NoHttpExchangeHttpInterface;
 import org.nexters.jaknaesocore.domain.auth.restclient.KakaoClient;
-import org.nexters.jaknaesoserver.common.httpinterface.fixture.HttpInterfaceFixture.EmptyUrlHttpInterface;
-import org.nexters.jaknaesoserver.common.httpinterface.fixture.HttpInterfaceFixture.NoHttpExchangeHttpInterface;
 
 class HttpInterfaceFactoryTest {
 

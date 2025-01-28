@@ -1,11 +1,10 @@
-package org.nexters.jaknaesoserver.common.httpinterface;
+package org.nexters.jaknaesocore.common.http.httpinterface;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.common.httpinterface.HttpInterfaceFinder;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

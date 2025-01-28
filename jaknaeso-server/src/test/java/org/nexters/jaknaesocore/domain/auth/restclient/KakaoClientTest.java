@@ -1,12 +1,11 @@
-package org.nexters.jaknaesoserver.domain.auth.restclient;
+package org.nexters.jaknaesocore.domain.auth.restclient;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.common.http.MediaTypeValueBuilder;
-import org.nexters.jaknaesocore.domain.auth.restclient.KakaoClient;
+import org.nexters.jaknaesocore.common.http.support.MediaTypeValueBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.web.client.RestClientException;

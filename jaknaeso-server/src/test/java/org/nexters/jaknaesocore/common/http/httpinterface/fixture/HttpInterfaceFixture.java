@@ -1,4 +1,4 @@
-package org.nexters.jaknaesoserver.common.httpinterface.fixture;
+package org.nexters.jaknaesocore.common.http.httpinterface.fixture;
 
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;

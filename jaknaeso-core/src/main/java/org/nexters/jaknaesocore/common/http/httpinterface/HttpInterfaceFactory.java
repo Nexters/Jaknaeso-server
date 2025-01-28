@@ -1,7 +1,7 @@
-package org.nexters.jaknaesocore.common.httpinterface;
+package org.nexters.jaknaesocore.common.http.httpinterface;
 
 import java.util.Map;
-import org.nexters.jaknaesocore.common.httpinterface.errorhandler.RestClientErrorHandler;
+import org.nexters.jaknaesocore.common.http.errorhandler.RestClientErrorHandler;
 import org.nexters.jaknaesocore.domain.auth.restclient.errorhandler.KakaoClientErrorHandler;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatusCode;

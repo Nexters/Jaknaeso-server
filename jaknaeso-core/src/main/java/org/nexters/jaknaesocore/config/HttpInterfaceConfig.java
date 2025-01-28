@@ -1,9 +1,9 @@
-package org.nexters.jaknaesoserver.config;
+package org.nexters.jaknaesocore.config;
 
 import java.util.Set;
-import org.nexters.jaknaesocore.common.httpinterface.HttpInterfaceFactory;
-import org.nexters.jaknaesocore.common.httpinterface.HttpInterfaceFactoryBeanPostProcessor;
-import org.nexters.jaknaesocore.common.httpinterface.HttpInterfaceFinder;
+import org.nexters.jaknaesocore.common.http.httpinterface.HttpInterfaceFactory;
+import org.nexters.jaknaesocore.common.http.httpinterface.HttpInterfaceFactoryBeanPostProcessor;
+import org.nexters.jaknaesocore.common.http.httpinterface.HttpInterfaceFinder;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
