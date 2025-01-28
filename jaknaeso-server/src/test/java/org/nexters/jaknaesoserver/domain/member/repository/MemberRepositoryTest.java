@@ -42,4 +42,17 @@ class MemberRepositoryTest {
 
     assertAll(() -> then(actual1).isEqualTo(true), () -> then(actual2).isEqualTo(false));
   }
+
+  @DisplayName("oauth_id에 해당하는 카카오 멤버를 조회하고, 존재하는 경우 조회한 멤버 정보를 반환하고 존재하지 않으면 새롭게 생성한다.")
+  @Test
+  void saveKakaoMember() {
+    Member existMember = memberRepository.save(Member.kakaoSignup("oauthId1"));
+
+    Member actual1 = memberRepository.saveKakaoMember("oauthId1");
+    Member actual2 = memberRepository.saveKakaoMember("oauthId2");
+
+    assertAll(
+        () -> then(actual1).isEqualTo(existMember),
+        () -> then(actual2.getOauthId()).isEqualTo("oauthId2"));
+  }
 }
