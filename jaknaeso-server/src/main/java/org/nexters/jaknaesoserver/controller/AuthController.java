@@ -15,8 +15,8 @@ public class AuthController {
 
   @PostMapping("/reissue")
   public ApiResponse<TokenResponse> refreshToken(
-      @RequestHeader(value = "Refresh-Token") String refreshToken) {
-    TokenResponse response = jwtService.reissueToken(refreshToken);
+      @RequestHeader(value = "Refresh-Token") String bearerRefreshToken) {
+    TokenResponse response = jwtService.reissueToken(bearerRefreshToken);
     return ApiResponse.success(response);
   }
 }
