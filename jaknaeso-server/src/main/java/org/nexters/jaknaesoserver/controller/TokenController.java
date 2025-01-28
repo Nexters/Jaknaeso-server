@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/token")
+@RequestMapping("/api/v1/token")
 public class TokenController {
 
   private final JwtService jwtService;
 
-  @PostMapping("/v1/reissue")
+  @PostMapping("/reissue")
   public ApiResponse<TokenResponse> refreshToken(
       @RequestHeader(value = "Refresh-Token") String refreshToken) {
     TokenResponse response = jwtService.reissueToken(refreshToken);
