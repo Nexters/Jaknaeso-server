@@ -9,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
+import org.nexters.jaknaesocore.domain.auth.model.JwtProperties;
+import org.nexters.jaknaesocore.domain.auth.service.JwtParser;
 
 class JwtParserTest {
   private static final String SECRET = "thisIsTestSecretKeyShouldBeLongEnoughForHS512";

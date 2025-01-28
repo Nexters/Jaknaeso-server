@@ -3,6 +3,7 @@ package org.nexters.jaknaesoserver.jwt;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.nexters.jaknaesocore.domain.auth.model.JwtProperties;
 
 class JwtPropertiesTest {
 

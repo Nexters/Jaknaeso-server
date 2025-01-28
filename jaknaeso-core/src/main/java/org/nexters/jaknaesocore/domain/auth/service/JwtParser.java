@@ -1,8 +1,9 @@
-package org.nexters.jaknaesoserver.jwt;
+package org.nexters.jaknaesocore.domain.auth.service;
 
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
+import org.nexters.jaknaesocore.domain.auth.model.JwtProperties;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor

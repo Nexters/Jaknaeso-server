@@ -1,4 +1,4 @@
-package org.nexters.jaknaesoserver.jwt;
+package org.nexters.jaknaesoserver.security;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
