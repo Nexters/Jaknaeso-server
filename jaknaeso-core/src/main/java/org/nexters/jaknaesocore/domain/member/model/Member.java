@@ -8,14 +8,14 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.nexters.jaknaesocore.common.model.BaseEntity;
+import org.nexters.jaknaesocore.common.model.BaseTimeEntity;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "member")
 @Entity
-public class Member extends BaseEntity {
+public class Member extends BaseTimeEntity {
 
   @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<SocialAccount> socialAccounts;
