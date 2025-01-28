@@ -17,8 +17,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginRequest;
-import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginResponse;
 import org.nexters.jaknaesocore.domain.auth.service.AuthService;
+import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginResponse;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -40,11 +40,11 @@ class AuthControllerTest extends ControllerTest {
     KakaoLoginRequest request = new KakaoLoginRequest("access token");
 
     given(authService.kakaoLogin(request.toServiceDto()))
-        .willReturn(new KakaoLoginResponse("access token", "refresh token"));
+        .willReturn(new KakaoLoginResponse(1L, "access token", "refresh token"));
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/auth/kakao-login")
+            MockMvcRequestBuilders.post("/api/v1/auth/kakao-login")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
@@ -71,7 +71,7 @@ class AuthControllerTest extends ControllerTest {
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/auth/kakao-login")
+            MockMvcRequestBuilders.post("/api/v1/auth/kakao-login")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
