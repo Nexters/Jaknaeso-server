@@ -14,6 +14,5 @@ public interface KakaoClient {
   @GetExchange("/v2/user/me")
   KakaoUserInfoResponse requestUserInfo(
       @RequestHeader(AUTHORIZATION) String authorization,
-      @RequestHeader(CONTENT_TYPE) String contentType
-  );
+      @RequestHeader(CONTENT_TYPE) String contentType);
 }

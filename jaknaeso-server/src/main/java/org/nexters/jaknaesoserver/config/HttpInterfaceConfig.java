@@ -13,17 +13,15 @@ import org.springframework.context.annotation.Configuration;
 public class HttpInterfaceConfig {
 
   @Bean
-  public HttpInterfaceFactoryBeanPostProcessor httpInterfaceFactoryBeanPostProcessor
-      (final ApplicationContext context, final HttpInterfaceFactory httpInterfaceFactory) {
-    Set<BeanDefinition> beanDefinitions = findHttpInterfaceBeanDefinitions(
-        "org.nexters.jaknaesocore", context
-    );
+  public HttpInterfaceFactoryBeanPostProcessor httpInterfaceFactoryBeanPostProcessor(
+      final ApplicationContext context, final HttpInterfaceFactory httpInterfaceFactory) {
+    Set<BeanDefinition> beanDefinitions =
+        findHttpInterfaceBeanDefinitions("org.nexters.jaknaesocore", context);
     return new HttpInterfaceFactoryBeanPostProcessor(httpInterfaceFactory, beanDefinitions);
   }
 
   Set<BeanDefinition> findHttpInterfaceBeanDefinitions(
-      final String basePackage, final ApplicationContext context
-  ) {
+      final String basePackage, final ApplicationContext context) {
     return HttpInterfaceFinder.findBeanDefinitions(basePackage, context.getEnvironment());
   }
 }

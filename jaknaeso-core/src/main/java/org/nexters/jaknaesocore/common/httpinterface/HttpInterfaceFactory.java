@@ -16,9 +16,8 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 @Component
 public class HttpInterfaceFactory {
 
-  Map<String, RestClientErrorHandler> errorHandlers = Map.of(
-      "https://kapi.kakao.com", new KakaoClientErrorHandler()
-  );
+  Map<String, RestClientErrorHandler> errorHandlers =
+      Map.of("https://kapi.kakao.com", new KakaoClientErrorHandler());
 
   public <S> S create(final Class<S> httpClient) {
     HttpExchange httpExchange = AnnotationUtils.getAnnotation(httpClient, HttpExchange.class);
@@ -27,15 +26,16 @@ public class HttpInterfaceFactory {
 
     String url = httpExchange.url();
     RestClientErrorHandler errorHandler = getErrorHandler(url);
-    RestClient restClient = RestClient.builder()
-        .baseUrl(url)
-        .defaultStatusHandler(HttpStatusCode::isError,
-            (request, response) ->
-                errorHandler.handleError(response.getStatusCode(), request, response))
-        .build();
+    RestClient restClient =
+        RestClient.builder()
+            .baseUrl(url)
+            .defaultStatusHandler(
+                HttpStatusCode::isError,
+                (request, response) ->
+                    errorHandler.handleError(response.getStatusCode(), request, response))
+            .build();
 
-    return HttpServiceProxyFactory
-        .builderFor(RestClientAdapter.create(restClient))
+    return HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient))
         .build()
         .createClient(httpClient);
   }
@@ -50,10 +50,10 @@ public class HttpInterfaceFactory {
   }
 
   private RestClientErrorHandler getErrorHandler(final String url) {
-    return errorHandlers.getOrDefault(url,
-        (statusCode, request, response) -> new RestClientException(
-            String.format("알 수 없는 오류가 발생했습니다. [%s] [%d]", url, statusCode.value())
-        )
-    );
+    return errorHandlers.getOrDefault(
+        url,
+        (statusCode, request, response) ->
+            new RestClientException(
+                String.format("알 수 없는 오류가 발생했습니다. [%s] [%d]", url, statusCode.value())));
   }
 }
