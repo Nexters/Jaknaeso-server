@@ -4,10 +4,10 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VAL
 
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.http.MediaTypeValueBuilder;
-import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginCommand;
-import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginResponse;
 import org.nexters.jaknaesocore.domain.auth.restclient.KakaoClient;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse;
+import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;
+import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginResponse;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.springframework.stereotype.Service;
