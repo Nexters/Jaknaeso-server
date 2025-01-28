@@ -9,15 +9,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "jwt")
 public class JwtProperties {
   private final String secret;
-  private final Long accessTokenExpiration;
-  private final Long refreshTokenExpiration;
+  private final Long accessTokenExpirationHours;
+  private final Long refreshTokenExpirationHours;
   private final SecretKey secretKey;
 
-  public JwtProperties(String secret, Long accessTokenExpiration, Long refreshTokenExpiration) {
-    validateTokenExpirations(accessTokenExpiration, refreshTokenExpiration);
+  public JwtProperties(
+      String secret, Long accessTokenExpirationHours, Long refreshTokenExpirationHours) {
+    validateTokenExpirations(accessTokenExpirationHours, refreshTokenExpirationHours);
     this.secret = secret;
-    this.accessTokenExpiration = accessTokenExpiration;
-    this.refreshTokenExpiration = refreshTokenExpiration;
+    this.accessTokenExpirationHours = accessTokenExpirationHours;
+    this.refreshTokenExpirationHours = refreshTokenExpirationHours;
     this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
   }
 
