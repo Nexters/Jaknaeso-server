@@ -16,10 +16,6 @@ public class JwtProvider {
     return generateToken(Map.of(), userId.toString(), jwtProperties.getAccessTokenExpiration());
   }
 
-  public String reissueAccessToken(final Long userId) {
-    return generateAccessToken(userId);
-  }
-
   public String generateRefreshToken(final Long userId) {
     return generateToken(Map.of(), userId.toString(), jwtProperties.getRefreshTokenExpiration());
   }

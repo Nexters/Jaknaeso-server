@@ -1,6 +1,7 @@
 package org.nexters.jaknaesoserver.config;
 
 import lombok.RequiredArgsConstructor;
+import org.nexters.jaknaesoserver.common.controller.PublicEndpoints;
 import org.nexters.jaknaesoserver.jwt.JwtAuthFilter;
 import org.nexters.jaknaesoserver.jwt.SecurityExceptionHandler;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +25,13 @@ public class SecurityConfig {
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
     return httpSecurity
         .csrf(AbstractHttpConfigurer::disable)
-        .authorizeHttpRequests(request -> request.requestMatchers("/**").permitAll())
+        .authorizeHttpRequests(
+            request ->
+                request
+                    .requestMatchers(PublicEndpoints.getPatterns())
+                    .permitAll()
+                    .anyRequest()
+                    .authenticated())
         .formLogin(AbstractHttpConfigurer::disable)
         .logout(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)

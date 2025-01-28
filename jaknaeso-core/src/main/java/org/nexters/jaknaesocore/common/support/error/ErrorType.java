@@ -14,7 +14,7 @@ public enum ErrorType {
   METHOD_ARGUMENT_NOT_VALID(
       HttpStatus.BAD_REQUEST, ErrorCode.E400, "Method argument validation failed.", LogLevel.DEBUG),
   BINDING_ERROR(HttpStatus.BAD_REQUEST, ErrorCode.E400, "Data binding failed.", LogLevel.WARN),
-  EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Token expired.", LogLevel.WARN),
+  EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, ErrorCode.E4011, "Token expired.", LogLevel.WARN),
   INVALID_TOKEN(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Invalid token.", LogLevel.WARN),
   UNSUPPORTED_TOKEN(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "Unsupported token.", LogLevel.WARN),
   INCORRECT_TOKEN_FORMAT(
