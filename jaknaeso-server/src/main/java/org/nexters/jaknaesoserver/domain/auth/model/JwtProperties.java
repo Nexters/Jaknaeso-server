@@ -1,4 +1,4 @@
-package org.nexters.jaknaesocore.domain.auth.model;
+package org.nexters.jaknaesoserver.domain.auth.model;
 
 import io.jsonwebtoken.security.Keys;
 import javax.crypto.SecretKey;

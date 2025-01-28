@@ -2,14 +2,14 @@ package org.nexters.jaknaesoserver.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
-import org.nexters.jaknaesocore.domain.auth.dto.TokenResponse;
-import org.nexters.jaknaesocore.domain.auth.service.JwtService;
+import org.nexters.jaknaesoserver.domain.auth.dto.TokenResponse;
+import org.nexters.jaknaesoserver.domain.auth.service.JwtService;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/token")
-public class TokenController {
+@RequestMapping("/api/v1/auth")
+public class AuthController {
 
   private final JwtService jwtService;
 

@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 public enum PublicEndpoints {
-  REISSUE_TOKEN("/api/v1/token/**");
+  REISSUE_TOKEN("/api/v1/auth/**");
 
   private final String path;
 
