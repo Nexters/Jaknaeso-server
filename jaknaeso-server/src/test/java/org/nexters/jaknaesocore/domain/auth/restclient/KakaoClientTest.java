@@ -1,6 +1,6 @@
 package org.nexters.jaknaesocore.domain.auth.restclient;
 
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,7 @@ class KakaoClientTest {
     String mediaType =
         MediaTypeValueBuilder.builder(APPLICATION_FORM_URLENCODED_VALUE).charset("utf-8").build();
 
-    assertThatThrownBy(() -> kakaoClient.requestUserInfo("", mediaType))
+    thenThrownBy(() -> kakaoClient.requestUserInfo("", mediaType))
         .isInstanceOf(RestClientException.class);
   }
 }

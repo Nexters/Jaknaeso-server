@@ -1,6 +1,6 @@
 package org.nexters.jaknaesocore.common.http.httpinterface;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.BDDAssertions.then;
 
 import java.util.Set;
 import org.junit.jupiter.api.DisplayName;
@@ -18,6 +18,6 @@ class HttpInterfaceFinderTest {
             this.getClass().getPackage().getName(),
             new AnnotationConfigApplicationContext().getEnvironment());
 
-    assertThat(actual.size()).isEqualTo(1);
+    then(actual.size()).isEqualTo(1);
   }
 }
