@@ -9,11 +9,13 @@ import java.util.Collections;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
+import org.nexters.jaknaesoserver.common.controller.PublicEndpoints;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @RequiredArgsConstructor
@@ -22,6 +24,13 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
   private static final String BEARER_PREFIX = "Bearer ";
   private final JwtParser jwtParser;
+
+  @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+    String path = request.getServletPath();
+    return PublicEndpoints.getAllPaths().stream()
+        .anyMatch(p -> new AntPathMatcher().match(p, path));
+  }
 
   @Override
   protected void doFilterInternal(
@@ -42,15 +51,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   }
 
   private String extractToken(HttpServletRequest request) {
-    try {
-      String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-      if (header == null || !header.startsWith(BEARER_PREFIX)) {
-        throw CustomException.INCORRECT_TOKEN_FORMAT;
-      }
-      return header.substring(BEARER_PREFIX.length());
-    } catch (Exception e) {
-      throw CustomException.INTERNAL_SERVER_ERROR;
+    String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+    if (header == null || !header.startsWith(BEARER_PREFIX)) {
+      throw CustomException.INCORRECT_TOKEN_FORMAT;
     }
+    return header.substring(BEARER_PREFIX.length());
   }
 
   private UsernamePasswordAuthenticationToken createAuthentication(Long userId) {

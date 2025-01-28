@@ -25,14 +25,12 @@ public class JwtParser {
           .verifyWith(jwtProperties.getSecretKey())
           .build()
           .parseSignedClaims(token);
-    } catch (ExpiredJwtException e) {
-      throw CustomException.TOKEN_EXPIRED;
-    } catch (MalformedJwtException e) {
-      throw CustomException.INVALID_TOKEN;
     } catch (UnsupportedJwtException e) {
       throw CustomException.UNSUPPORTED_TOKEN;
-    } catch (IllegalArgumentException e) {
-      throw CustomException.INCORRECT_TOKEN_FORMAT;
+    } catch (MalformedJwtException e) {
+      throw CustomException.INVALID_TOKEN;
+    } catch (ExpiredJwtException e) {
+      throw CustomException.TOKEN_EXPIRED;
     } catch (Exception e) {
       throw CustomException.INTERNAL_SERVER_ERROR;
     }
