@@ -1,4 +1,4 @@
-package org.nexters.jaknaesocore.domain.oauth.restclient.errorhandler;
+package org.nexters.jaknaesocore.domain.auth.restclient.errorhandler;
 
 import org.nexters.jaknaesocore.common.httpinterface.errorhandler.RestClientErrorHandler;
 import org.springframework.http.HttpRequest;

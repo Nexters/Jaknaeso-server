@@ -1,9 +1,9 @@
-package org.nexters.jaknaesocore.domain.oauth.restclient;
+package org.nexters.jaknaesocore.domain.auth.restclient;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
 
-import org.nexters.jaknaesocore.domain.oauth.restclient.dto.KakaoUserInfoResponse;
+import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.service.annotation.GetExchange;
 import org.springframework.web.service.annotation.HttpExchange;

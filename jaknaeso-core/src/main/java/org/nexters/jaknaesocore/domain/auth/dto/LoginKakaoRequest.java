@@ -1,4 +1,4 @@
-package org.nexters.jaknaesocore.domain.oauth.dto;
+package org.nexters.jaknaesocore.domain.auth.dto;
 
 public record LoginKakaoRequest(
     String accessToken
