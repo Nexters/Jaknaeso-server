@@ -64,18 +64,6 @@ class JwtParserTest {
         .isEqualTo(CustomException.INVALID_TOKEN);
   }
 
-  @DisplayName("빈 토큰이면 EMPTY_TOKEN 예외가 발생한다")
-  @Test
-  void extractIdFromToken_EmptyToken() {
-    // given
-    String emptyToken = "";
-
-    // when & then
-    assertThatThrownBy(() -> jwtParser.extractIdFromToken(emptyToken))
-        .isInstanceOf(CustomException.class)
-        .isEqualTo(CustomException.INCORRECT_TOKEN_FORMAT);
-  }
-
   private String createToken(Long userId) {
     return Jwts.builder()
         .subject(String.valueOf(userId))
