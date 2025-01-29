@@ -17,3 +17,8 @@ spring:
 cors:
   origins:
     api-doc: --
+
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-expiration-hours: 1
+  refresh-token-expiration-hours: 240
