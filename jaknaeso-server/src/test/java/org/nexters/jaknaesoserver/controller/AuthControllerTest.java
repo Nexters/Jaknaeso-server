@@ -17,43 +17,44 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginRequest;
-import org.nexters.jaknaesocore.domain.auth.service.AuthService;
-import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginResponse;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.client.RestClientException;
 import org.nexters.jaknaesoserver.domain.auth.dto.TokenResponse;
+import org.nexters.jaknaesoserver.domain.auth.service.AuthFacadeService;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.client.RestClientException;
 
 @WebMvcTest(AuthController.class)
 class AuthControllerTest extends ControllerTest {
 
-  @MockitoBean AuthService authService;
+  @MockitoBean AuthFacadeService authFacadeService;
 
   ObjectMapper objectMapper = new ObjectMapper();
 
+  @WithMockUser
   @DisplayName("카카오 API를 호출하여 서비스에 로그인한다.")
   @Test
   void kakaoLoginSuccess() throws Exception {
     KakaoLoginRequest request = new KakaoLoginRequest("access token");
 
-    given(authService.kakaoLogin(request.toServiceDto()))
-        .willReturn(new KakaoLoginResponse(1L, "access token", "refresh token"));
+    given(authFacadeService.kakaoLogin(request.toServiceDto()))
+        .willReturn(new TokenResponse(1L, "accessToken", "refreshToken"));
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/v1/auth/kakao-login")
+            post("/api/v1/auth/kakao-login")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
         .andExpect(status().isOk())
         .andDo(
             document(
                 "kakao-login-success",
                 resource(
                     ResourceSnippetParameters.builder()
+                        .description("카카오 로그인 및 토큰 발급")
                         .tags("Auth Domain")
                         .requestFields(
                             fieldWithPath("accessToken")
@@ -62,19 +63,22 @@ class AuthControllerTest extends ControllerTest {
                         .build())));
   }
 
+  @WithMockUser
   @DisplayName("카카오 API 호출이 실패하여 서비스 로그인에 실패하고 서버 오류를 반환한다.")
   @Test
   void kakaoLoginFail() throws Exception {
     KakaoLoginRequest request = new KakaoLoginRequest("invalid access token");
 
-    given(authService.kakaoLogin(request.toServiceDto())).willThrow(RestClientException.class);
+    given(authFacadeService.kakaoLogin(request.toServiceDto()))
+        .willThrow(RestClientException.class);
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.post("/api/v1/auth/kakao-login")
+            post("/api/v1/auth/kakao-login")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request)))
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
         .andExpect(status().is5xxServerError())
         .andDo(
             document(
@@ -90,10 +94,10 @@ class AuthControllerTest extends ControllerTest {
   }
 
   @WithMockUser
-  @DisplayName("리프레시토큰을 통해 토큰을 재발급한다.")
+  @DisplayName("리프레시 토큰을 통해 토큰을 재발급한다.")
   @Test
   void reissueToken() throws Exception {
-    given(jwtService.reissueToken(any()))
+    given(authFacadeService.reissueToken(any()))
         .willReturn(new TokenResponse(1L, "accessToken", "refreshToken"));
 
     mockMvc
