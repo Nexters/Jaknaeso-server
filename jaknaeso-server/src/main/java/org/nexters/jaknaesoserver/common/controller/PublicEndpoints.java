@@ -7,6 +7,7 @@ import lombok.Getter;
 
 @Getter
 public enum PublicEndpoints {
+  SAMPLE("/api/samples/**"),
   SOCIAL_LOGIN("/api/v1/auth/*-login"),
   REISSUE_TOKEN("/api/v1/auth/reissue");
 
