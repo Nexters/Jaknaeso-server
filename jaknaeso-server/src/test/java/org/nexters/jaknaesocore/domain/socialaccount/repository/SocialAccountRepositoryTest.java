@@ -8,11 +8,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialProvider;
+import org.nexters.jaknaesoserver.common.support.RepositoryTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-@DataJpaTest
-class SocialAccountRepositoryTest {
+class SocialAccountRepositoryTest extends RepositoryTest {
 
   @Autowired SocialAccountRepository socialAccountRepository;
 
