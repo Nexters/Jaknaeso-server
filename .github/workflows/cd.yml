@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      # - feature/#19-domain-name-적용
+      - feature/#19-domain-name-적용
 
 env:
   NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
