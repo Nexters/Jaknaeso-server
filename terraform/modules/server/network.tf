@@ -10,9 +10,9 @@ resource "ncloud_access_control_group_rule" "jaknaeso_server_acg_01_rule_01" {
   dynamic "inbound" {
     for_each = var.admin_ip_cidrs
     content {
-      protocol = "TCP"
-      ip_block = inbound.value
-      port_range = "22"
+      protocol    = "TCP"
+      ip_block    = inbound.value
+      port_range  = "22"
       description = "SSH access from ${inbound.value}"
     }
   }
@@ -20,8 +20,8 @@ resource "ncloud_access_control_group_rule" "jaknaeso_server_acg_01_rule_01" {
   inbound {
     protocol    = "TCP"
     ip_block    = "0.0.0.0/0"
-    port_range  = "8080"
-    description = "Backend server port"
+    port_range  = "80"
+    description = "Backend server HTTP port"
   }
 
   outbound {
