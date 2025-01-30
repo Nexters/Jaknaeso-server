@@ -10,14 +10,14 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.nexters.jaknaesocore.common.model.BaseAuditableEntity;
+import org.nexters.jaknaesocore.common.model.BaseTimeEntity;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "social_account")
 @Entity
-public class SocialAccount extends BaseAuditableEntity {
+public class SocialAccount extends BaseTimeEntity {
 
   private String oauthId;
 
