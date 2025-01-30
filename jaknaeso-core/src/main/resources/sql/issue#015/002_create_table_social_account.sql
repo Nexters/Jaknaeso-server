@@ -6,7 +6,5 @@ create table social_account if not exists social_account
   member_id       bigint,
   created_at      timestamp(6),
   updated_at      timestamp(6),
-  deleted_at      timestamp(6),
-  created_by      bigint,
-  updated_by      bigint
+  deleted_at      timestamp(6)
 );
