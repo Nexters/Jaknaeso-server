@@ -27,7 +27,10 @@ services:
       - DATABASE_NAME=${DATABASE_NAME}
       - DATABASE_USER=${DATABASE_USER}
       - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - LOG_PATH=/var/log/jaknaeso
       - JWT_SECRET=${JWT_SECRET}
+    volumes:
+      - /var/log/jaknaeso:/var/log/jaknaeso
     depends_on:
       - mysql
     networks:
