@@ -3,7 +3,7 @@ package org.nexters.jaknaesocore.domain.auth.service;
 import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 
 import lombok.RequiredArgsConstructor;
-import org.nexters.jaknaesocore.common.http.support.MediaTypeValueBuilder;
+import org.nexters.jaknaesocore.common.support.MediaTypeValueBuilder;
 import org.nexters.jaknaesocore.domain.auth.restclient.KakaoClient;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse;
 import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;

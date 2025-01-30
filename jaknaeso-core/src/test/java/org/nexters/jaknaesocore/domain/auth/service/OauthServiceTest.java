@@ -8,12 +8,12 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VAL
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.common.http.support.MediaTypeValueBuilder;
+import org.nexters.jaknaesocore.common.support.MediaTypeValueBuilder;
+import org.nexters.jaknaesocore.common.support.ServiceTest;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse;
 import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
-import org.nexters.jaknaesoserver.common.support.ServiceTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClientException;
@@ -63,7 +63,6 @@ class OauthServiceTest extends ServiceTest {
   @DisplayName("카카오 로그인 API 호출에 실패하면 RestClientException를 반환한다.")
   @Test
   void kakaoLoginFail() {
-    Long oauthId = 1L;
     KakaoLoginCommand command = new KakaoLoginCommand("access token");
 
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + command.accessToken(), MEDIA_TYPE))

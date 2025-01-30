@@ -1,4 +1,4 @@
-package org.nexters.jaknaesocore.common.http.support;
+package org.nexters.jaknaesocore.common.support;
 
 import lombok.NoArgsConstructor;
 

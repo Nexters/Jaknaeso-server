@@ -5,8 +5,8 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VAL
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.common.http.support.MediaTypeValueBuilder;
-import org.nexters.jaknaesoserver.common.support.IntegrationTest;
+import org.nexters.jaknaesocore.common.support.IntegrationTest;
+import org.nexters.jaknaesocore.common.support.MediaTypeValueBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestClientException;
 
