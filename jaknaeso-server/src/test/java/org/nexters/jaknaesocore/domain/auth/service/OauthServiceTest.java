@@ -8,42 +8,23 @@ import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VAL
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.common.http.httpinterface.HttpInterfaceFactoryBeanPostProcessor;
 import org.nexters.jaknaesocore.common.http.support.MediaTypeValueBuilder;
-import org.nexters.jaknaesocore.domain.auth.restclient.KakaoClient;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse;
 import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;
 import org.nexters.jaknaesocore.domain.member.model.Member;
-import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
-import org.nexters.jaknaesocore.domain.socialaccount.repository.SocialAccountRepository;
-import org.nexters.jaknaesoserver.common.support.IntegrationTest;
-import org.nexters.jaknaesoserver.config.SecurityConfig;
-import org.nexters.jaknaesoserver.domain.auth.service.JwtService;
+import org.nexters.jaknaesoserver.common.support.ServiceTest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestClientException;
 
-class OauthServiceTest extends IntegrationTest {
+class OauthServiceTest extends ServiceTest {
 
   static final String BEARER_PREFIX = "Bearer ";
   static final String MEDIA_TYPE =
       MediaTypeValueBuilder.builder(APPLICATION_FORM_URLENCODED_VALUE).charset("utf-8").build();
 
   @Autowired OauthService oauthService;
-
-  @MockitoBean SocialAccountRepository socialAccountRepository;
-
-  @MockitoBean MemberRepository memberRepository;
-
-  @MockitoBean KakaoClient kakaoClient;
-
-  @MockitoBean SecurityConfig securityConfig;
-
-  @MockitoBean JwtService jwtService;
-
-  @MockitoBean HttpInterfaceFactoryBeanPostProcessor httpInterfaceFactoryBeanPostProcessor;
 
   @DisplayName("처음 카카오 계정으로 로그인하면 소셜 계정과 멤버를 생성하고 생성한 멤버 아이디를 반환한다.")
   @Test

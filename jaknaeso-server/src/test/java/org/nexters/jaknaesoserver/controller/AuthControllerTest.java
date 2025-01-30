@@ -19,16 +19,12 @@ import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginRequest;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.domain.auth.dto.TokenResponse;
-import org.nexters.jaknaesoserver.domain.auth.service.AuthFacadeService;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestClientException;
 
 @WebMvcTest(AuthController.class)
 class AuthControllerTest extends ControllerTest {
-
-  @MockitoBean AuthFacadeService authFacadeService;
 
   ObjectMapper objectMapper = new ObjectMapper();
 
