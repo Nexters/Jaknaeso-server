@@ -6,9 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.nexters.jaknaesocore.common.support.RepositoryTest;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialProvider;
-import org.nexters.jaknaesoserver.common.support.RepositoryTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class SocialAccountRepositoryTest extends RepositoryTest {

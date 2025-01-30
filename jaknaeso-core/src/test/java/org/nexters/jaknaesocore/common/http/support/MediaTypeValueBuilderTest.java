@@ -7,6 +7,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.nexters.jaknaesocore.common.support.MediaTypeValueBuilder;
 
 public class MediaTypeValueBuilderTest {
 
