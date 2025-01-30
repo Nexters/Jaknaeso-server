@@ -3,13 +3,6 @@ name: CI Pipeline
 on:
   pull_request:
 
-env:
-  SERVICE_NAME: jaknaeso
-  BUILD_NUMBER: ${{ github.sha }}-${{ github.run_id }}
-  REGISTRY_URL: ${{ secrets.NCP_CONTAINER_REGISTRY_URL }}
-  NCP_REGISTRY_USERNAME: ${{ secrets.NCP_ACCESS_KEY }}
-  NCP_REGISTRY_PASSWORD: ${{ secrets.NCP_SECRET_KEY }}
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -23,3 +16,8 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Run Tests
+        run: ./gradlew test
