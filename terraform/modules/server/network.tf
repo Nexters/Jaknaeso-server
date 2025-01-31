@@ -24,6 +24,13 @@ resource "ncloud_access_control_group_rule" "jaknaeso_server_acg_01_rule_01" {
     description = "Backend server HTTP port"
   }
 
+  inbound {
+    protocol    = "TCP"
+    ip_block    = "0.0.0.0/0"
+    port_range  = "443"
+    description = "Backend server HTTPS port"
+  }
+
   outbound {
     protocol    = "TCP"
     ip_block    = "0.0.0.0/0"
