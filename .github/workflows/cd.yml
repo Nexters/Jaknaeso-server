@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feature/#28-https-적용
 
 env:
   NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
@@ -92,7 +91,7 @@ jobs:
           port: ${{ env.SSH_PORT }}
           source: "docker-compose.yml,.env,nginx/default.conf,scripts/server/*"
           target: "~/"
-
+          overwrite: true
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
