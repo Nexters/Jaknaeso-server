@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - feature/#28-https-적용
 
 env:
   NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
