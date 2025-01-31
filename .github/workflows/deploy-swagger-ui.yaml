@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/#28-https-적용
 
 env:
   NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
@@ -44,11 +45,8 @@ jobs:
 
       - name: Setting NCP CLI & Credentials
         run: |
-          cd ~
-          wget https://www.ncloud.com/api/support/download/5/65
-          unzip 65
-          mkdir ~/.ncloud
-          echo -e "[DEFAULT]\nncloud_access_key_id = ${{ env.NCP_ACCESS_KEY }}\nncloud_secret_access_key = ${{ env.NCP_SECRET_KEY }}\nncloud_api_url = ${{ env.NCP_API_URL }}" >> ~/.ncloud/configure
+          chmod +x ./scripts/workflows/setup-ncp-cli.sh
+          ./scripts/workflows/setup-ncp-cli.sh ${{ env.NCP_ACCESS_KEY }} ${{ env.NCP_SECRET_KEY }} ${{ env.NCP_API_URL }}
 
       - name: Add Github Action Ip to Security group
         run: |
