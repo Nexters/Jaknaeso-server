@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - feature/#28-https-적용
 
 env:
   NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
@@ -89,7 +90,7 @@ jobs:
           username: ${{ env.NCP_SERVER_USERNAME }}
           password: ${{ env.NCP_SERVER_PASSWORD }}
           port: ${{ env.SSH_PORT }}
-          source: "docker-compose.yml,.env,nginx/default.conf"
+          source: "docker-compose.yml,.env,nginx/default.conf,scripts/server/*"
           target: "~/"
 
 
@@ -105,7 +106,10 @@ jobs:
 
             docker-compose -f ~/docker-compose.yml pull
             docker-compose -f ~/docker-compose.yml up -d
-            docker exec jaknaeso-nginx nginx -s reload
+            docker-compose exec nginx nginx -s reload
+            
+            chmod +x ~/scripts/server/register-certbot-cron-job.sh
+            ~/scripts/server/register-certbot-cron-job.sh
 
       - name: Remove Github Action Ip from Security group
         if: always()
