@@ -97,7 +97,7 @@ tasks.register<Copy>("installGitHooks") {
     description = "Git hooks를 설치"
     group = "git"
 
-    from("$rootDir/scripts/")
+    from("$rootDir/scripts/git-hooks/")
     into("$rootDir/.git/hooks/")
 
     filePermissions {
