@@ -1,4 +1,4 @@
-create table social_account if not exists social_account
+create table if not exists social_account
 (
   id              bigint        auto_increment primary key,
   oauth_id        varchar(255)  not null,

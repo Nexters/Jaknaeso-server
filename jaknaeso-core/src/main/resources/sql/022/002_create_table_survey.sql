@@ -6,6 +6,5 @@ create table if not exists survey
     bundle_id   bigint,
     created_at  timestamp(6),
     updated_at  timestamp(6),
-    deleted_at  timestamp(6),
-    FOREIGN KEY (bundle_id) REFERENCES survey_bundle(id)
+    deleted_at  timestamp(6)
 );
