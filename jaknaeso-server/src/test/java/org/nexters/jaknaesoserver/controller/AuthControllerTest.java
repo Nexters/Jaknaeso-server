@@ -2,14 +2,12 @@ package org.nexters.jaknaesoserver.controller;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
-import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -18,7 +16,7 @@ import com.epages.restdocs.apispec.SimpleType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;
+import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginRequest;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.domain.auth.dto.TokenResponse;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -32,15 +30,17 @@ class AuthControllerTest extends ControllerTest {
   @DisplayName("카카오 API를 호출하여 서비스에 로그인한다.")
   @Test
   void kakaoLoginSuccess() throws Exception {
-    given(authFacadeService.kakaoLogin(new KakaoLoginCommand("authorization code")))
+    KakaoLoginRequest request = new KakaoLoginRequest("authorization code");
+
+    given(authFacadeService.kakaoLogin(request.toServiceDto()))
         .willReturn(new TokenResponse(1L, "accessToken", "refreshToken"));
 
     mockMvc
         .perform(
-            get("/api/v1/auth/kakao-login")
+            post("/api/v1/auth/kakao-login")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
-                .queryParam("code", "authorization code")
+                .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
         .andExpect(status().isOk())
         .andDo(
@@ -50,10 +50,8 @@ class AuthControllerTest extends ControllerTest {
                     ResourceSnippetParameters.builder()
                         .description("카카오 로그인 및 토큰 발급")
                         .tags("Auth Domain")
-                        .queryParameters(
-                            parameterWithName("code")
-                                .type(SimpleType.STRING)
-                                .description("카카오 인증 코드"))
+                        .requestFields(
+                            fieldWithPath("code").type(SimpleType.STRING).description("카카오 인증 코드"))
                         .responseFields(
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
@@ -75,15 +73,17 @@ class AuthControllerTest extends ControllerTest {
   @DisplayName("카카오 API 호출이 실패하여 서비스 로그인에 실패하고 서버 오류를 반환한다.")
   @Test
   void kakaoLoginFail() throws Exception {
-    given(authFacadeService.kakaoLogin(new KakaoLoginCommand("invalid authorization code")))
+    KakaoLoginRequest request = new KakaoLoginRequest("invalid authorization code");
+
+    given(authFacadeService.kakaoLogin(request.toServiceDto()))
         .willThrow(RestClientException.class);
 
     mockMvc
         .perform(
-            get("/api/v1/auth/kakao-login")
+            post("/api/v1/auth/kakao-login")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
-                .queryParam("code", "invalid authorization code")
+                .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
         .andExpect(status().is5xxServerError())
         .andDo(
@@ -93,10 +93,8 @@ class AuthControllerTest extends ControllerTest {
                     ResourceSnippetParameters.builder()
                         .description("카카오 로그인 및 토큰 발급")
                         .tags("Auth Domain")
-                        .queryParameters(
-                            parameterWithName("code")
-                                .type(SimpleType.STRING)
-                                .description("카카오 인증 코드"))
+                        .requestFields(
+                            fieldWithPath("code").type(SimpleType.STRING).description("카카오 인증 코드"))
                         .responseFields(
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
