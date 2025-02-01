@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesoserver.common.controller.PublicEndpoints;
+import org.nexters.jaknaesoserver.domain.auth.model.CustomUserDetails;
 import org.nexters.jaknaesoserver.domain.auth.service.JwtParser;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,10 +45,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
       UsernamePasswordAuthenticationToken authentication = createAuthentication(userId);
       SecurityContextHolder.getContext().setAuthentication(authentication);
     } catch (CustomException e) {
-      SecurityContextHolder.clearContext();
+      if (!e.equals(CustomException.INCORRECT_TOKEN_FORMAT)) {
+        SecurityContextHolder.clearContext();
+      }
       request.setAttribute("exception", e);
     }
-
     filterChain.doFilter(request, response);
   }
 
@@ -60,9 +62,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
   }
 
   private UsernamePasswordAuthenticationToken createAuthentication(Long userId) {
-    Long principal = userId;
+    CustomUserDetails userDetails = new CustomUserDetails(userId);
     Object credentials = null;
     List<GrantedAuthority> authorities = Collections.emptyList();
-    return new UsernamePasswordAuthenticationToken(principal, credentials, authorities);
+    return new UsernamePasswordAuthenticationToken(userDetails, credentials, authorities);
   }
 }
