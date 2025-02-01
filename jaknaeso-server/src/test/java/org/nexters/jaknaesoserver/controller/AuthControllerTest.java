@@ -2,12 +2,14 @@ package org.nexters.jaknaesoserver.controller;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
+import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -16,7 +18,7 @@ import com.epages.restdocs.apispec.SimpleType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginRequest;
+import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.domain.auth.dto.TokenResponse;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -30,17 +32,15 @@ class AuthControllerTest extends ControllerTest {
   @DisplayName("카카오 API를 호출하여 서비스에 로그인한다.")
   @Test
   void kakaoLoginSuccess() throws Exception {
-    KakaoLoginRequest request = new KakaoLoginRequest("access token");
-
-    given(authFacadeService.kakaoLogin(request.toServiceDto()))
+    given(authFacadeService.kakaoLogin(new KakaoLoginCommand("authorization code")))
         .willReturn(new TokenResponse(1L, "accessToken", "refreshToken"));
 
     mockMvc
         .perform(
-            post("/api/v1/auth/kakao-login")
+            get("/api/v1/auth/kakao-login")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                .queryParam("code", "authorization code")
                 .with(csrf()))
         .andExpect(status().isOk())
         .andDo(
@@ -50,10 +50,24 @@ class AuthControllerTest extends ControllerTest {
                     ResourceSnippetParameters.builder()
                         .description("카카오 로그인 및 토큰 발급")
                         .tags("Auth Domain")
-                        .requestFields(
-                            fieldWithPath("accessToken")
+                        .queryParameters(
+                            parameterWithName("code")
                                 .type(SimpleType.STRING)
-                                .description("카카오 로그인 액세스 토큰"))
+                                .description("카카오 인증 코드"))
+                        .responseFields(
+                            fieldWithPath("result")
+                                .type(SimpleType.STRING)
+                                .description("API 요청 결과 (성공/실패)"),
+                            fieldWithPath("data.userId")
+                                .type(SimpleType.NUMBER)
+                                .description("유저 ID"),
+                            fieldWithPath("data.accessToken")
+                                .type(SimpleType.STRING)
+                                .description("액세스 토큰"),
+                            fieldWithPath("data.refreshToken")
+                                .type(SimpleType.STRING)
+                                .description("리프레시 토큰"),
+                            fieldWithPath("error").description("에러").optional())
                         .build())));
   }
 
@@ -61,17 +75,15 @@ class AuthControllerTest extends ControllerTest {
   @DisplayName("카카오 API 호출이 실패하여 서비스 로그인에 실패하고 서버 오류를 반환한다.")
   @Test
   void kakaoLoginFail() throws Exception {
-    KakaoLoginRequest request = new KakaoLoginRequest("invalid access token");
-
-    given(authFacadeService.kakaoLogin(request.toServiceDto()))
+    given(authFacadeService.kakaoLogin(new KakaoLoginCommand("invalid authorization code")))
         .willThrow(RestClientException.class);
 
     mockMvc
         .perform(
-            post("/api/v1/auth/kakao-login")
+            get("/api/v1/auth/kakao-login")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(request))
+                .queryParam("code", "invalid authorization code")
                 .with(csrf()))
         .andExpect(status().is5xxServerError())
         .andDo(
@@ -79,11 +91,24 @@ class AuthControllerTest extends ControllerTest {
                 "kakao-login-fail",
                 resource(
                     ResourceSnippetParameters.builder()
+                        .description("카카오 로그인 및 토큰 발급")
                         .tags("Auth Domain")
-                        .requestFields(
-                            fieldWithPath("accessToken")
+                        .queryParameters(
+                            parameterWithName("code")
                                 .type(SimpleType.STRING)
-                                .description("카카오 로그인 액세스 토큰"))
+                                .description("카카오 인증 코드"))
+                        .responseFields(
+                            fieldWithPath("result")
+                                .type(SimpleType.STRING)
+                                .description("API 요청 결과 (성공/실패)"),
+                            fieldWithPath("error.code")
+                                .type(SimpleType.STRING)
+                                .description("커스텀 에러 코드"),
+                            fieldWithPath("error.message")
+                                .type(SimpleType.STRING)
+                                .description("에러 상세 메시지"),
+                            fieldWithPath("error.data").description("에러 관련 데이터").optional(),
+                            fieldWithPath("data").description("정상적인 요청의 결과 데이터").optional())
                         .build())));
   }
 

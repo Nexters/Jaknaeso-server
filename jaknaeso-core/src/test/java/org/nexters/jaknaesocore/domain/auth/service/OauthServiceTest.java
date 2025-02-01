@@ -10,6 +10,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.MediaTypeValueBuilder;
 import org.nexters.jaknaesocore.common.support.ServiceTest;
+import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoTokenCommand;
+import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoTokenResponse;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse;
 import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;
 import org.nexters.jaknaesocore.domain.member.model.Member;
@@ -33,9 +35,15 @@ class OauthServiceTest extends ServiceTest {
     Member newMember = Member.create();
     ReflectionTestUtils.setField(newMember, "id", 1L);
     SocialAccount newAccount = SocialAccount.kakaoSignup(oauthId.toString());
-    KakaoLoginCommand command = new KakaoLoginCommand("access token");
 
-    given(kakaoClient.requestUserInfo(BEARER_PREFIX + command.accessToken(), MEDIA_TYPE))
+    KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
+    KakaoTokenCommand tokenCommand =
+        KakaoTokenCommand.of(
+            "client-id", "client-secret", "redirect-uri", command.authorizationCode());
+
+    given(kakaoAuthClient.requestToken(MEDIA_TYPE, tokenCommand))
+        .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
+    given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token", MEDIA_TYPE))
         .willReturn(new KakaoUserInfoResponse(oauthId));
     given(socialAccountRepository.saveKakaoAccount(oauthId.toString())).willReturn(newAccount);
     given(memberRepository.save(any(Member.class))).willReturn(newMember);
@@ -51,21 +59,46 @@ class OauthServiceTest extends ServiceTest {
     ReflectionTestUtils.setField(member, "id", 1L);
     SocialAccount account = SocialAccount.kakaoSignup(oauthId.toString());
     ReflectionTestUtils.setField(account, "member", member);
-    KakaoLoginCommand command = new KakaoLoginCommand("access token");
 
-    given(kakaoClient.requestUserInfo(BEARER_PREFIX + command.accessToken(), MEDIA_TYPE))
+    KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
+    KakaoTokenCommand tokenCommand =
+        KakaoTokenCommand.of(
+            "client-id", "client-secret", "redirect-uri", command.authorizationCode());
+
+    given(kakaoAuthClient.requestToken(MEDIA_TYPE, tokenCommand))
+        .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
+    given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token", MEDIA_TYPE))
         .willReturn(new KakaoUserInfoResponse(oauthId));
     given(socialAccountRepository.saveKakaoAccount(oauthId.toString())).willReturn(account);
 
     then(oauthService.kakaoLogin(command)).isEqualTo(1L);
   }
 
-  @DisplayName("카카오 로그인 API 호출에 실패하면 RestClientException를 반환한다.")
+  @DisplayName("카카오 토큰 API 호출에 실패하면 RestClientException를 반환한다.")
   @Test
-  void kakaoLoginFail() {
-    KakaoLoginCommand command = new KakaoLoginCommand("access token");
+  void kakaoLoginFailByTokenApiFailure() {
+    KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
+    KakaoTokenCommand tokenCommand =
+        KakaoTokenCommand.of(
+            "client-id", "client-secret", "redirect-uri", command.authorizationCode());
 
-    given(kakaoClient.requestUserInfo(BEARER_PREFIX + command.accessToken(), MEDIA_TYPE))
+    given(kakaoAuthClient.requestToken(MEDIA_TYPE, tokenCommand))
+        .willThrow(RestClientException.class);
+
+    thenThrownBy(() -> oauthService.kakaoLogin(command)).isInstanceOf(RestClientException.class);
+  }
+
+  @DisplayName("카카오 사용자 정보 API 호출에 실패하면 RestClientException를 반환한다.")
+  @Test
+  void kakaoLoginFailByUserInfoApiFailure() {
+    KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
+    KakaoTokenCommand tokenCommand =
+        KakaoTokenCommand.of(
+            "client-id", "client-secret", "redirect-uri", command.authorizationCode());
+
+    given(kakaoAuthClient.requestToken(MEDIA_TYPE, tokenCommand))
+        .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
+    given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token", MEDIA_TYPE))
         .willThrow(RestClientException.class);
 
     thenThrownBy(() -> oauthService.kakaoLogin(command)).isInstanceOf(RestClientException.class);
