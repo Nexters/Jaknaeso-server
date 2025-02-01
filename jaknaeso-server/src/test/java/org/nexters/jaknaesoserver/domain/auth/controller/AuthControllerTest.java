@@ -1,8 +1,9 @@
-package org.nexters.jaknaesoserver.controller;
+package org.nexters.jaknaesoserver.domain.auth.controller;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static com.epages.restdocs.apispec.Schema.schema;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -18,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginRequest;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
+import org.nexters.jaknaesoserver.domain.auth.controller.dto.AppleLoginRequest;
 import org.nexters.jaknaesoserver.domain.auth.dto.TokenResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.client.RestClientException;
@@ -26,7 +28,53 @@ class AuthControllerTest extends ControllerTest {
 
   ObjectMapper objectMapper = new ObjectMapper();
 
-  @WithMockUser
+  @DisplayName("카카오 API를 호출하여 서비스에 로그인한다.")
+  @Test
+  void appleLoginSuccess() throws Exception {
+    AppleLoginRequest request = new AppleLoginRequest("123456", "홍길동");
+
+    given(authFacadeService.appleLogin(request.toServiceDto()))
+        .willReturn(new TokenResponse(1L, "accessToken", "refreshToken"));
+
+    mockMvc
+        .perform(
+            post("/api/v1/auth/apple-login")
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "apple-login-success",
+                resource(
+                    ResourceSnippetParameters.builder()
+                        .description("카카오 로그인 및 토큰 발급")
+                        .tags("Auth Domain")
+                        .requestFields(
+                            fieldWithPath("idToken")
+                                .type(SimpleType.STRING)
+                                .description("애플 idToken"),
+                            fieldWithPath("name").type(SimpleType.STRING).description("이름"))
+                        .responseFields(
+                            fieldWithPath("result")
+                                .type(SimpleType.STRING)
+                                .description("API 요청 결과 (성공/실패)"),
+                            fieldWithPath("data.memberId")
+                                .type(SimpleType.NUMBER)
+                                .description("유저 ID"),
+                            fieldWithPath("data.accessToken")
+                                .type(SimpleType.STRING)
+                                .description("액세스 토큰"),
+                            fieldWithPath("data.refreshToken")
+                                .type(SimpleType.STRING)
+                                .description("리프레시 토큰"),
+                            fieldWithPath("error").description("에러").optional())
+                        .requestSchema(schema("AppleLoginRequest"))
+                        .responseSchema(schema("TokenResponse"))
+                        .build())));
+  }
+
   @DisplayName("카카오 API를 호출하여 서비스에 로그인한다.")
   @Test
   void kakaoLoginSuccess() throws Exception {
@@ -56,7 +104,7 @@ class AuthControllerTest extends ControllerTest {
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
                                 .description("API 요청 결과 (성공/실패)"),
-                            fieldWithPath("data.userId")
+                            fieldWithPath("data.memberId")
                                 .type(SimpleType.NUMBER)
                                 .description("유저 ID"),
                             fieldWithPath("data.accessToken")
@@ -66,10 +114,11 @@ class AuthControllerTest extends ControllerTest {
                                 .type(SimpleType.STRING)
                                 .description("리프레시 토큰"),
                             fieldWithPath("error").description("에러").optional())
+                        .requestSchema(schema("KakaoLoginRequest"))
+                        .responseSchema(schema("TokenResponse"))
                         .build())));
   }
 
-  @WithMockUser
   @DisplayName("카카오 API 호출이 실패하여 서비스 로그인에 실패하고 서버 오류를 반환한다.")
   @Test
   void kakaoLoginFail() throws Exception {
@@ -133,7 +182,7 @@ class AuthControllerTest extends ControllerTest {
                         .requestHeaders(headerWithName("Refresh-Token").description("리프레시 토큰"))
                         .responseFields(
                             fieldWithPath("result").type(SimpleType.STRING).description("결과"),
-                            fieldWithPath("data.userId")
+                            fieldWithPath("data.memberId")
                                 .type(SimpleType.NUMBER)
                                 .description("유저 ID"),
                             fieldWithPath("data.accessToken")
@@ -143,6 +192,7 @@ class AuthControllerTest extends ControllerTest {
                                 .type(SimpleType.STRING)
                                 .description("리프레시 토큰"),
                             fieldWithPath("error").description("에러").optional())
+                        .responseSchema(schema("TokenResponse"))
                         .build())));
   }
 }
