@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
 import org.nexters.jaknaesocore.domain.question.dto.SurveyResponse;
 import org.nexters.jaknaesocore.domain.question.service.SurveyService;
-import org.nexters.jaknaesoserver.domain.auth.filter.CustomUserDetails;
+import org.nexters.jaknaesoserver.domain.auth.model.CustomUserDetails;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
