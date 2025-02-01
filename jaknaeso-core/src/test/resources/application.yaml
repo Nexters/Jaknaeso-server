@@ -13,3 +13,9 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+
+oauth:
+  kakao:
+    client-id: client-id
+    client-secret: client-secret
+    redirect-uri: redirect-uri
