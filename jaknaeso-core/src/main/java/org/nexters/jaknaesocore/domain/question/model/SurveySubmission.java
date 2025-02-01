@@ -3,10 +3,12 @@ package org.nexters.jaknaesocore.domain.question.model;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseTimeEntity;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 public class SurveySubmission extends BaseTimeEntity {
