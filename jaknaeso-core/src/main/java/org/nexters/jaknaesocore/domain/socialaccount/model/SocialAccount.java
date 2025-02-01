@@ -33,8 +33,19 @@ public class SocialAccount extends BaseTimeEntity {
     this.socialProvider = socialProvider;
   }
 
+  private SocialAccount(
+      final String oauthId, final SocialProvider socialProvider, final Member member) {
+    this.oauthId = oauthId;
+    this.socialProvider = socialProvider;
+    this.member = member;
+  }
+
   public static SocialAccount kakaoSignup(final String oauthId) {
     return new SocialAccount(oauthId, SocialProvider.KAKAO);
+  }
+
+  public static SocialAccount appleSignUp(final String oauthId, final Member member) {
+    return new SocialAccount(oauthId, SocialProvider.APPLE, member);
   }
 
   public void updateMember(final Member member) {

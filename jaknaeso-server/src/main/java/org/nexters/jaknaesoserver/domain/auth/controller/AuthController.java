@@ -1,9 +1,10 @@
-package org.nexters.jaknaesoserver.controller;
+package org.nexters.jaknaesoserver.domain.auth.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
 import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginRequest;
+import org.nexters.jaknaesoserver.domain.auth.controller.dto.AppleLoginRequest;
 import org.nexters.jaknaesoserver.domain.auth.dto.TokenResponse;
 import org.nexters.jaknaesoserver.domain.auth.service.AuthFacadeService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,6 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
   private final AuthFacadeService authFacadeService;
+
+  @PostMapping("/apple-login")
+  public ApiResponse<TokenResponse> appleLogin(
+      @RequestBody @Valid final AppleLoginRequest request) {
+    final TokenResponse response = authFacadeService.appleLogin(request.toServiceDto());
+    return ApiResponse.success(response);
+  }
 
   @PostMapping("/kakao-login")
   public ApiResponse<TokenResponse> kakaoLogin(@RequestBody @Valid KakaoLoginRequest request) {
