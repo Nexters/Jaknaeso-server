@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-  default void deleteMember(final Long memberId) {
-    findById(memberId).orElseThrow(() -> new CustomException(ErrorType.MEMBER_NOT_FOUND));
-    deleteById(memberId);
+  default Member findMember(final Long memberId) {
+    return findById(memberId).orElseThrow(() -> new CustomException(ErrorType.MEMBER_NOT_FOUND));
   }
 }

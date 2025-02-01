@@ -4,7 +4,9 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.nexters.jaknaesocore.domain.socialaccount.model.SocialProvider.KAKAO;
 
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.ServiceTest;
@@ -29,9 +31,8 @@ class OauthServiceTest extends ServiceTest {
   @Test
   void initialKakaoLoginSuccess() {
     Long oauthId = 1L;
-    Member newMember = Member.create();
-    ReflectionTestUtils.setField(newMember, "id", 1L);
-    SocialAccount newAccount = SocialAccount.kakaoSignup(oauthId.toString());
+    Member newMember = createMemberWithId(1L);
+    SocialAccount newAccount = SocialAccount.kakaoSignup(oauthId.toString(), newMember);
 
     KakaoLoginCommand command = new KakaoLoginCommand("authorization code", "redirect-uri");
 
@@ -39,8 +40,10 @@ class OauthServiceTest extends ServiceTest {
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willReturn(new KakaoUserInfoResponse(oauthId));
-    given(socialAccountRepository.saveKakaoAccount(oauthId.toString())).willReturn(newAccount);
+    given(socialAccountRepository.findByOauthIdAndSocialProvider(oauthId.toString(), KAKAO))
+        .willReturn(Optional.empty());
     given(memberRepository.save(any(Member.class))).willReturn(newMember);
+    given(socialAccountRepository.save(newAccount)).willReturn(newAccount);
 
     then(oauthService.kakaoLogin(command)).isEqualTo(1L);
   }
@@ -49,10 +52,8 @@ class OauthServiceTest extends ServiceTest {
   @Test
   void kakaoLoginSuccess() {
     Long oauthId = 1L;
-    Member member = Member.create();
-    ReflectionTestUtils.setField(member, "id", 1L);
-    SocialAccount account = SocialAccount.kakaoSignup(oauthId.toString());
-    ReflectionTestUtils.setField(account, "member", member);
+    Member member = createMemberWithId(1L);
+    SocialAccount account = createSocialAccountWithOauthIdAndMember(oauthId.toString(), member);
 
     KakaoLoginCommand command = new KakaoLoginCommand("authorization code", "redirect-uri");
 
@@ -60,7 +61,8 @@ class OauthServiceTest extends ServiceTest {
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willReturn(new KakaoUserInfoResponse(oauthId));
-    given(socialAccountRepository.saveKakaoAccount(oauthId.toString())).willReturn(account);
+    given(socialAccountRepository.findByOauthIdAndSocialProvider(oauthId.toString(), KAKAO))
+        .willReturn(Optional.of(account));
 
     then(oauthService.kakaoLogin(command)).isEqualTo(1L);
   }
@@ -87,6 +89,19 @@ class OauthServiceTest extends ServiceTest {
         .willThrow(RestClientException.class);
 
     thenThrownBy(() -> oauthService.kakaoLogin(command)).isInstanceOf(RestClientException.class);
+  }
+
+  private Member createMemberWithId(final Long id) {
+    Member member = Member.create();
+    ReflectionTestUtils.setField(member, "id", id);
+    return member;
+  }
+
+  private SocialAccount createSocialAccountWithOauthIdAndMember(
+      final String oauthId, final Member member) {
+    SocialAccount account = SocialAccount.kakaoSignup(oauthId, member);
+    ReflectionTestUtils.setField(account, "member", member);
+    return account;
   }
 
   private MultiValueMap<String, String> makeKakaoTokenRequestParams(
