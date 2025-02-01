@@ -1,4 +1,4 @@
-create table member if not exists member
+create table if not exists member
 (
   id              bigint        auto_increment primary key,
   created_at      timestamp(6),

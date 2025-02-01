@@ -5,6 +5,5 @@ create table if not exists survey_option
     survey_id  bigint,
     created_at timestamp(6),
     updated_at timestamp(6),
-    deleted_at timestamp(6),
-    FOREIGN KEY (survey_id) REFERENCES survey(id)
+    deleted_at timestamp(6)
 );
