@@ -81,6 +81,9 @@ jobs:
           echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
           echo "DATABASE_ROOT_PASSWORD=${{ secrets.DATABASE_ROOT_PASSWORD }}" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "KAKAO_LOGIN_CLIENT_ID=${{ secrets.KAKAO_LOGIN_CLIENT_ID }}" >> .env
+          echo "KAKAO_LOGIN_CLIENT_SECRET=${{ secrets.KAKAO_LOGIN_CLIENT_SECRET }}" >> .env
+          echo "KAKAO_LOGIN_REDIRECT_URI=${{ secrets.KAKAO_LOGIN_REDIRECT_URI }}" >> .env
 
       - name: Transfer files to Server
         uses: appleboy/scp-action@master
