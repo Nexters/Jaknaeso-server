@@ -4,7 +4,6 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.util.Optional;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.RepositoryTest;
 import org.nexters.jaknaesocore.domain.member.model.Member;
@@ -18,9 +17,8 @@ class SocialAccountRepositoryTest extends RepositoryTest {
   @Autowired SocialAccountRepository socialAccountRepository;
   @Autowired MemberRepository memberRepository;
 
-  @DisplayName("oauth_id와 social_provider에 해당하는 소셜 계정을 조회한다.")
   @Test
-  void findByOauthIdAndSocialProvider() {
+  void oauthId와_socialProvider에_해당하는_소셜_계정을_조회한다() {
     Member member = memberRepository.save(Member.create());
     socialAccountRepository.save(SocialAccount.kakaoSignup("oauthId1", member));
 
@@ -32,9 +30,8 @@ class SocialAccountRepositoryTest extends RepositoryTest {
     assertAll(() -> then(actual1).isPresent(), () -> then(actual2).isEmpty());
   }
 
-  @DisplayName("oauth_id와 social_provider에 해당하는 소셜 계정 존재 여부를 조회한다.")
   @Test
-  void existsByOauthIdAndSocialProvider() {
+  void oauthId와_socialProvider에_해당하는_소셜_계정_존재_여부를_조회한다() {
     Member member = memberRepository.save(Member.create());
     socialAccountRepository.save(SocialAccount.kakaoSignup("oauthId1", member));
 

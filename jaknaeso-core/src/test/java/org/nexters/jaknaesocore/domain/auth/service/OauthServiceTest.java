@@ -7,7 +7,6 @@ import static org.mockito.BDDMockito.given;
 import static org.nexters.jaknaesocore.domain.socialaccount.model.SocialProvider.KAKAO;
 
 import java.util.Optional;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.ServiceTest;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoTokenResponse;
@@ -27,9 +26,8 @@ class OauthServiceTest extends ServiceTest {
 
   @Autowired OauthService oauthService;
 
-  @DisplayName("처음 카카오 계정으로 로그인하면 소셜 계정과 멤버를 생성하고 생성한 멤버 아이디를 반환한다.")
   @Test
-  void initialKakaoLoginSuccess() {
+  void 처음_카카오_계정으로_로그인하면_소셜_계정과_멤버를_생성하고_생성한_멤버_아이디를_반환한다() {
     Long oauthId = 1L;
     Member newMember = createMemberWithId(1L);
     SocialAccount newAccount = SocialAccount.kakaoSignup(oauthId.toString(), newMember);
@@ -48,9 +46,8 @@ class OauthServiceTest extends ServiceTest {
     then(oauthService.kakaoLogin(command)).isEqualTo(1L);
   }
 
-  @DisplayName("카카오 계정으로 로그인하면 소셜 계정으로 멤버를 조회하고 조회한 멤버 아이디를 반환한다.")
   @Test
-  void kakaoLoginSuccess() {
+  void 카카오_계정으로_로그인하면_소셜_계정으로_멤버를_조회하고_조회한_멤버_아이디를_반환한다() {
     Long oauthId = 1L;
     Member member = createMemberWithId(1L);
     SocialAccount account = createSocialAccountWithOauthIdAndMember(oauthId.toString(), member);
@@ -67,9 +64,8 @@ class OauthServiceTest extends ServiceTest {
     then(oauthService.kakaoLogin(command)).isEqualTo(1L);
   }
 
-  @DisplayName("카카오 토큰 API 호출에 실패하면 RestClientException를 반환한다.")
   @Test
-  void kakaoLoginFailByTokenApiFailure() {
+  void 카카오_토큰_API_호출에_실패하면_RestClientException를_반환한다() {
     KakaoLoginCommand command = new KakaoLoginCommand("authorization code", "redirect-uri");
 
     given(kakaoAuthClient.requestToken(makeKakaoTokenRequestParams(command.authorizationCode())))
@@ -78,9 +74,8 @@ class OauthServiceTest extends ServiceTest {
     thenThrownBy(() -> oauthService.kakaoLogin(command)).isInstanceOf(RestClientException.class);
   }
 
-  @DisplayName("카카오 사용자 정보 API 호출에 실패하면 RestClientException를 반환한다.")
   @Test
-  void kakaoLoginFailByUserInfoApiFailure() {
+  void 카카오_사용자_정보_API_호출에_실패하면_RestClientException를_반환한다() {
     KakaoLoginCommand command = new KakaoLoginCommand("authorization code", "redirect-uri");
 
     given(kakaoAuthClient.requestToken(makeKakaoTokenRequestParams(command.authorizationCode())))
