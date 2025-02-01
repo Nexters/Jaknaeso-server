@@ -17,6 +17,16 @@ resource "ncloud_access_control_group_rule" "jaknaeso_server_acg_01_rule_01" {
     }
   }
 
+  dynamic "inbound" {
+    for_each = var.admin_ip_cidrs
+    content {
+      protocol = "TCP"
+        ip_block = inbound.value
+        port_range = "3306"
+        description = "MySQL access from ${inbound.value}"
+    }
+  }
+
   inbound {
     protocol    = "TCP"
     ip_block    = "0.0.0.0/0"
