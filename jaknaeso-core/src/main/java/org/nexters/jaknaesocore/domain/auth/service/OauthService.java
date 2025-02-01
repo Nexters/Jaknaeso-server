@@ -43,8 +43,6 @@ public class OauthService {
   @Transactional
   public Long kakaoLogin(final KakaoLoginCommand command) {
     KakaoTokenResponse token = getKakaoToken(command.authorizationCode());
-    System.out.println("token type ");
-    System.out.println(token.tokenType());
     KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.accessToken());
 
     String oauthId = userInfo.id().toString();

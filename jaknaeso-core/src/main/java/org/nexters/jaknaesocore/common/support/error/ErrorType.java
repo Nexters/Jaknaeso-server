@@ -24,9 +24,6 @@ public enum ErrorType {
   UNAUTHORIZED(HttpStatus.UNAUTHORIZED, ErrorCode.E401, "인증되지 않은 접근입니다.", LogLevel.WARN),
   FORBIDDEN(HttpStatus.FORBIDDEN, ErrorCode.E403, "접근 권한이 없습니다.", LogLevel.WARN),
 
-  // kakao-login
-  INVALID_KAKAO_CODE(HttpStatus.BAD_REQUEST, ErrorCode.E400, "유효하지 않은 카카오 인증 코드입니다", LogLevel.WARN),
-
   // sample
   SAMPLE_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "Sample not found.", LogLevel.WARN),
   ;
