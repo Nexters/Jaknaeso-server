@@ -1,9 +1,8 @@
 package org.nexters.jaknaesoserver.common.support;
 
 import org.nexters.jaknaesocore.domain.auth.service.OauthService;
+import org.nexters.jaknaesocore.domain.survey.service.SurveyService;
 import org.nexters.jaknaesoserver.config.TestSecurityConfig;
-import org.nexters.jaknaesocore.domain.question.service.SurveyService;
-import org.nexters.jaknaesocore.domain.sample.service.SampleService;
 import org.nexters.jaknaesoserver.domain.auth.service.AuthFacadeService;
 import org.nexters.jaknaesoserver.domain.auth.service.JwtParser;
 import org.nexters.jaknaesoserver.domain.auth.service.JwtProvider;
