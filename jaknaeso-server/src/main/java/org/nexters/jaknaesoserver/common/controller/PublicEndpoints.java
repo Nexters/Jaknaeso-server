@@ -7,7 +7,6 @@ import lombok.Getter;
 
 @Getter
 public enum PublicEndpoints {
-  SAMPLE("/api/samples/**"),
   AUTH("/api/v1/auth/**"),
   ;
 

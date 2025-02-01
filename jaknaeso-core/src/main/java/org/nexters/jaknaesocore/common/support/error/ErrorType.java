@@ -27,9 +27,6 @@ public enum ErrorType {
   // business
   INVALID_APPLE_ID_TOKEN(
       HttpStatus.BAD_REQUEST, ErrorCode.E400, "유효하지 않은 애플로그인입니다.", LogLevel.WARN),
-
-  // sample
-  SAMPLE_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "Sample not found.", LogLevel.WARN),
   ;
 
   private final HttpStatus status;
