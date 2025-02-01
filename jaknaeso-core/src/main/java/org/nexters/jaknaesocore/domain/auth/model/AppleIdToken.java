@@ -16,8 +16,9 @@ public class AppleIdToken {
   }
 
   public String getJwtClaims() {
-    String[] parts = idToken.split("\\.");
-    Base64.Decoder decoder = Base64.getUrlDecoder();
+    final String delimiter = "\\.";
+    final String[] parts = idToken.split(delimiter);
+    final Base64.Decoder decoder = Base64.getUrlDecoder();
 
     byte[] decodedBytes = decoder.decode(parts[1].getBytes(StandardCharsets.UTF_8));
     String decodedString = new String(decodedBytes, StandardCharsets.UTF_8);
