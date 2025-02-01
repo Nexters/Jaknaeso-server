@@ -28,9 +28,8 @@ class AuthControllerTest extends ControllerTest {
 
   ObjectMapper objectMapper = new ObjectMapper();
 
-  @DisplayName("카카오 API를 호출하여 서비스에 로그인한다.")
   @Test
-  void appleLoginSuccess() throws Exception {
+  void 애플_identityToken을_통해_서비스에_로그인한다() throws Exception {
     AppleLoginRequest request = new AppleLoginRequest("123456", "홍길동");
 
     given(authFacadeService.appleLogin(request.toServiceDto()))
@@ -75,9 +74,8 @@ class AuthControllerTest extends ControllerTest {
                         .build())));
   }
 
-  @DisplayName("카카오 API를 호출하여 서비스에 로그인한다.")
   @Test
-  void kakaoLoginSuccess() throws Exception {
+  void 카카오_API를_호출하여_서비스에_로그인한다() throws Exception {
     KakaoLoginRequest request = new KakaoLoginRequest("authorization code", "redirect-uri");
 
     given(authFacadeService.kakaoLogin(request.toServiceDto()))
@@ -122,9 +120,8 @@ class AuthControllerTest extends ControllerTest {
                         .build())));
   }
 
-  @DisplayName("카카오 API 호출이 실패하여 서비스 로그인에 실패하고 서버 오류를 반환한다.")
   @Test
-  void kakaoLoginFail() throws Exception {
+  void 카카오_API_호출이_실패하여_서비스_로그인에_실패하고_서버_예외를_반환한다() throws Exception {
     KakaoLoginRequest request = new KakaoLoginRequest("invalid authorization code", "redirect-uri");
 
     given(authFacadeService.kakaoLogin(request.toServiceDto()))

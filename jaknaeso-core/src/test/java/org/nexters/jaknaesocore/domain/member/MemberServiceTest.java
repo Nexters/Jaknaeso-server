@@ -5,7 +5,6 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willThrow;
 
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.ServiceTest;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
@@ -16,9 +15,8 @@ class MemberServiceTest extends ServiceTest {
 
   @Autowired MemberService memberService;
 
-  @DisplayName("멤버를 삭제한다.")
   @Test
-  void deleteMemberSuccess() {
+  void 멤버를_삭제한다() {
     given(memberRepository.findMember(1L)).willReturn(Member.create());
 
     memberService.deleteMember(1L);
@@ -26,9 +24,8 @@ class MemberServiceTest extends ServiceTest {
     then(memberRepository).should().deleteById(1L);
   }
 
-  @DisplayName("멤버 삭제에 실패하면 CustomException을 반환한다.")
   @Test
-  void deleteMemberFail() {
+  void 멤버_삭제에_실패하면_CustomException을_반환한다() {
     willThrow(CustomException.class).given(memberRepository).findMember(1L);
 
     thenThrownBy(() -> memberService.deleteMember(1L)).isInstanceOf(CustomException.class);

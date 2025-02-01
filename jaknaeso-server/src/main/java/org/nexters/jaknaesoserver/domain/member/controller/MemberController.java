@@ -1,4 +1,4 @@
-package org.nexters.jaknaesoserver.controller;
+package org.nexters.jaknaesoserver.domain.member.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
