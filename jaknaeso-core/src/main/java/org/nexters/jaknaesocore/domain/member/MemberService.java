@@ -13,6 +13,7 @@ public class MemberService {
 
   @Transactional
   public void deleteMember(final Long memberId) {
-    memberRepository.deleteMember(memberId);
+    memberRepository.findMember(memberId);
+    memberRepository.deleteById(memberId);
   }
 }

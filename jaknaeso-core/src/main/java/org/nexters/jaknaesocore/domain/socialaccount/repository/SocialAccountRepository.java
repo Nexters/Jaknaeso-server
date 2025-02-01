@@ -16,13 +16,4 @@ public interface SocialAccountRepository extends JpaRepository<SocialAccount, Lo
 
   boolean existsByOauthIdAndSocialProvider(
       final String oauthId, final SocialProvider socialProvider);
-
-  default boolean existsKakaoAccount(final String oauthId) {
-    return existsByOauthIdAndSocialProvider(oauthId, SocialProvider.KAKAO);
-  }
-
-  default SocialAccount saveKakaoAccount(final String oauthId) {
-    return findByOauthIdAndSocialProvider(oauthId, SocialProvider.KAKAO)
-        .orElseGet(() -> save(SocialAccount.kakaoSignup(oauthId)));
-  }
 }

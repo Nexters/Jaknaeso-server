@@ -15,20 +15,18 @@ class MemberRepositoryTest extends RepositoryTest {
 
   @Autowired MemberRepository memberRepository;
 
-  @DisplayName("아이디에 해당하는 멤버를 삭제한다.")
+  @DisplayName("아이디에 해당하는 멤버를 조회한다.")
   @Test
-  void deleteMemberSuccess() {
+  void findMemberSuccess() {
     Member member = memberRepository.save(Member.create());
 
-    memberRepository.deleteMember(member.getId());
-
-    then(memberRepository.findById(member.getId())).isEmpty();
+    then(memberRepository.findMember(member.getId())).isEqualTo(member);
   }
 
-  @DisplayName("아이디에 해당하는 멤버가 없는 경우, MEBMER_NOT_FOUND 예외를 반환하고 삭제에 실패한다.")
+  @DisplayName("아이디에 해당하는 멤버가 없는 경우, MEBMER_NOT_FOUND 예외를 반환하고 조회에 실패한다.")
   @Test
-  void deleteMemberFail() {
-    thenThrownBy(() -> memberRepository.deleteMember(1L))
+  void findMemberFail() {
+    thenThrownBy(() -> memberRepository.findMember(1L))
         .isInstanceOf(CustomException.class)
         .hasMessage(ErrorType.MEMBER_NOT_FOUND.getMessage());
   }

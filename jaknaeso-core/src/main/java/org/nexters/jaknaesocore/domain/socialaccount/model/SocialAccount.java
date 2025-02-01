@@ -28,11 +28,6 @@ public class SocialAccount extends BaseTimeEntity {
   @JoinColumn(name = "member_id")
   private Member member;
 
-  private SocialAccount(final String oauthId, final SocialProvider socialProvider) {
-    this.oauthId = oauthId;
-    this.socialProvider = socialProvider;
-  }
-
   private SocialAccount(
       final String oauthId, final SocialProvider socialProvider, final Member member) {
     this.oauthId = oauthId;
@@ -40,15 +35,11 @@ public class SocialAccount extends BaseTimeEntity {
     this.member = member;
   }
 
-  public static SocialAccount kakaoSignup(final String oauthId) {
-    return new SocialAccount(oauthId, SocialProvider.KAKAO);
+  public static SocialAccount kakaoSignup(final String oauthId, final Member member) {
+    return new SocialAccount(oauthId, SocialProvider.KAKAO, member);
   }
 
   public static SocialAccount appleSignUp(final String oauthId, final Member member) {
     return new SocialAccount(oauthId, SocialProvider.APPLE, member);
-  }
-
-  public void updateMember(final Member member) {
-    this.member = member;
   }
 }
