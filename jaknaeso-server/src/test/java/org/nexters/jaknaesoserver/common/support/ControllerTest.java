@@ -1,7 +1,6 @@
 package org.nexters.jaknaesoserver.common.support;
 
 import org.nexters.jaknaesocore.domain.auth.service.OauthService;
-import org.nexters.jaknaesocore.domain.sample.service.SampleService;
 import org.nexters.jaknaesoserver.config.TestSecurityConfig;
 import org.nexters.jaknaesoserver.domain.auth.service.AuthFacadeService;
 import org.nexters.jaknaesoserver.domain.auth.service.JwtParser;
@@ -26,8 +25,6 @@ public abstract class ControllerTest {
   @MockitoBean protected OauthService oauthService;
 
   @MockitoBean protected JwtService jwtService;
-
-  @MockitoBean protected SampleService sampleService;
 
   @MockitoBean protected JwtParser jwtParser;
 
