@@ -1,6 +1,7 @@
 package org.nexters.jaknaesocore.common.support;
 
 import org.nexters.jaknaesocore.common.http.httpinterface.HttpInterfaceFactoryBeanPostProcessor;
+import org.nexters.jaknaesocore.domain.auth.restclient.KakaoAuthClient;
 import org.nexters.jaknaesocore.domain.auth.restclient.KakaoClient;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.socialaccount.repository.SocialAccountRepository;
@@ -13,6 +14,8 @@ public abstract class ServiceTest extends IntegrationTest {
   @MockitoBean protected MemberRepository memberRepository;
 
   @MockitoBean protected KakaoClient kakaoClient;
+
+  @MockitoBean protected KakaoAuthClient kakaoAuthClient;
 
   @MockitoBean
   protected HttpInterfaceFactoryBeanPostProcessor httpInterfaceFactoryBeanPostProcessor;
