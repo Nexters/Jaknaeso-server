@@ -27,13 +27,12 @@ services:
       DATABASE_NAME: ${DATABASE_NAME}
       DATABASE_USER: ${DATABASE_USER}
       DATABASE_PASSWORD: ${DATABASE_PASSWORD}
-      LOG_PATH: /var/log/jaknaeso
       JWT_SECRET: ${JWT_SECRET}
       KAKAO_LOGIN_CLIENT_ID: ${KAKAO_LOGIN_CLIENT_ID}
       KAKAO_LOGIN_CLIENT_SECRET: ${KAKAO_LOGIN_CLIENT_SECRET}
       KAKAO_LOGIN_REDIRECT_URI: ${KAKAO_LOGIN_REDIRECT_URI}
     volumes:
-      - /var/log/jaknaeso:/var/log/jaknaeso
+      - ./logs:/var/log/jaknaeso
     depends_on:
       - mysql
     networks:
@@ -72,6 +71,3 @@ services:
 networks:
   jaknaeso-network:
     driver: bridge
-
-volumes:
-  mysql-data:
