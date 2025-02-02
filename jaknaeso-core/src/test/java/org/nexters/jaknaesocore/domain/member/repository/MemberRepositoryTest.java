@@ -27,4 +27,15 @@ class MemberRepositoryTest extends RepositoryTest {
         .isInstanceOf(CustomException.class)
         .hasMessage(ErrorType.MEMBER_NOT_FOUND.getMessage());
   }
+
+  @Test
+  void 아이디에_해당하는_멤버를_soft_delete한다() {
+    Member member = memberRepository.save(Member.create());
+
+    memberRepository.softDeleteById(member.getId());
+
+    thenThrownBy(() -> memberRepository.findMember(1L))
+        .isInstanceOf(CustomException.class)
+        .hasMessage(ErrorType.MEMBER_NOT_FOUND.getMessage());
+  }
 }
