@@ -1,9 +1,10 @@
 package org.nexters.jaknaesocore.domain.survey.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ThreadLocalRandom;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,9 +22,9 @@ public class SurveyBundle extends BaseTimeEntity {
     surveys.add(survey);
   }
 
-  public Survey getUnSubmittedSurvey(Set<Long> submittedSurveyIds) {
+  public Survey getUnSubmittedSurvey(List<Survey> submittedSurvey) {
     List<Survey> list =
-        surveys.stream().filter(survey -> !submittedSurveyIds.contains(survey.getId())).toList();
+        surveys.stream().filter(survey -> !submittedSurvey.contains(survey)).toList();
 
     if (list.isEmpty()) {
       throw new IllegalStateException("모든 설문을 완료하셨습니다.");
