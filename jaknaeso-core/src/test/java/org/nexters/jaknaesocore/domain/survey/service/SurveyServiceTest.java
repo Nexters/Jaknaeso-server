@@ -11,7 +11,7 @@ import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
 import org.nexters.jaknaesocore.domain.survey.model.*;
-import org.nexters.jaknaesocore.domain.survey.repository.BundleRepository;
+import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,18 +22,18 @@ class SurveyServiceTest extends IntegrationTest {
   @Autowired private SurveyService surveyService;
 
   @Autowired private MemberRepository memberRepository;
-  @Autowired private BundleRepository bundleRepository;
+  @Autowired private SurveyBundleRepository surveyBundleRepository;
   @Autowired private SurveyRepository surveyRepository;
   @Autowired private SurveyOptionRepository surveyOptionRepository;
 
   @DisplayName("설문을 조회한다.")
   @Test
-  void getSurvey() {
+  void getNextSurvey() {
     // given
     Member member = Member.create();
     memberRepository.save(member);
     SurveyBundle surveyBundle = new SurveyBundle();
-    bundleRepository.save(surveyBundle);
+    surveyBundleRepository.save(surveyBundle);
     BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
     surveyRepository.save(balanceSurvey);
     List<KeywordScore> scores =
@@ -45,7 +45,7 @@ class SurveyServiceTest extends IntegrationTest {
     surveyOptionRepository.save(option);
 
     // when
-    SurveyResponse survey = surveyService.getSurvey(surveyBundle.getId(), member.getId());
+    SurveyResponse survey = surveyService.getNextSurvey(surveyBundle.getId(), member.getId());
     // then
     then(survey)
         .extracting("id", "contents", "surveyType")
