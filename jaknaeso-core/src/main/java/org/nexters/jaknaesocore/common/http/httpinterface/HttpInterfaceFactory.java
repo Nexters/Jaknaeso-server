@@ -4,6 +4,7 @@ import java.util.Map;
 import org.nexters.jaknaesocore.common.http.errorhandler.RestClientErrorHandler;
 import org.nexters.jaknaesocore.domain.auth.restclient.errorhandler.KakaoAuthClientErrorHandler;
 import org.nexters.jaknaesocore.domain.auth.restclient.errorhandler.KakaoClientErrorHandler;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -18,6 +19,7 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+@Profile("!test")
 @Component
 public class HttpInterfaceFactory {
 

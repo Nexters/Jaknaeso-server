@@ -91,7 +91,7 @@ public class OauthService {
   @Transactional
   public Long appleLogin(final AppleLoginCommand command) {
     AppleIdToken appleIdToken = AppleIdToken.of(command.idToken());
-    final String jwtClaims = appleIdToken.getJwtClaims();
+    final String jwtClaims = appleIdToken.decodePayload();
     final AppleAuthorization authorization = decodeAppleIdTokenPayload(jwtClaims);
 
     return socialAccountRepository

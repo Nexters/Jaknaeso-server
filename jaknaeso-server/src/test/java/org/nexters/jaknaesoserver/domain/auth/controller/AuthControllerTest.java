@@ -14,7 +14,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.SimpleType;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
@@ -25,8 +24,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.client.RestClientException;
 
 class AuthControllerTest extends ControllerTest {
-
-  ObjectMapper objectMapper = new ObjectMapper();
 
   @Test
   void 애플_identityToken을_통해_서비스에_로그인한다() throws Exception {
@@ -48,7 +45,7 @@ class AuthControllerTest extends ControllerTest {
                 "apple-login-success",
                 resource(
                     ResourceSnippetParameters.builder()
-                        .description("카카오 로그인 및 토큰 발급")
+                        .description("애플 로그인 및 토큰 발급")
                         .tags("Auth Domain")
                         .requestFields(
                             fieldWithPath("idToken")

@@ -1,5 +1,6 @@
 package org.nexters.jaknaesoserver.common.support;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.nexters.jaknaesocore.domain.auth.service.OauthService;
 import org.nexters.jaknaesocore.domain.member.service.MemberService;
 import org.nexters.jaknaesocore.domain.survey.service.SurveyService;
@@ -21,6 +22,7 @@ import org.springframework.test.web.servlet.MockMvc;
 public abstract class ControllerTest {
 
   @Autowired protected MockMvc mockMvc;
+  @Autowired protected ObjectMapper objectMapper;
 
   @MockitoBean protected AuthFacadeService authFacadeService;
 
