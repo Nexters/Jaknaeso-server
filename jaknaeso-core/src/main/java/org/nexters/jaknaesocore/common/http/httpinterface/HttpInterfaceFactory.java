@@ -1,8 +1,8 @@
 package org.nexters.jaknaesocore.common.http.httpinterface;
 
 import java.util.Map;
-import lombok.extern.slf4j.Slf4j;
 import org.nexters.jaknaesocore.common.http.errorhandler.RestClientErrorHandler;
+import org.nexters.jaknaesocore.domain.auth.restclient.errorhandler.KakaoAuthClientErrorHandler;
 import org.nexters.jaknaesocore.domain.auth.restclient.errorhandler.KakaoClientErrorHandler;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatusCode;
@@ -18,7 +18,6 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
-@Slf4j
 @Component
 public class HttpInterfaceFactory {
 
@@ -27,7 +26,7 @@ public class HttpInterfaceFactory {
           "https://kapi.kakao.com",
           new KakaoClientErrorHandler(),
           "https://kauth.kakao.com",
-          new KakaoClientErrorHandler());
+          new KakaoAuthClientErrorHandler());
 
   public <S> S create(final Class<S> httpClient) {
     HttpExchange httpExchange = AnnotationUtils.getAnnotation(httpClient, HttpExchange.class);
