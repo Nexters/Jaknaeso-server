@@ -38,7 +38,9 @@ class OauthServiceTest extends ServiceTest {
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willReturn(new KakaoUserInfoResponse(oauthId));
-    given(socialAccountRepository.findByOauthIdAndSocialProvider(oauthId.toString(), KAKAO))
+    given(
+            socialAccountRepository.findByOauthIdAndSocialProviderAndDeletedAtIsNull(
+                oauthId.toString(), KAKAO))
         .willReturn(Optional.empty());
     given(memberRepository.save(any(Member.class))).willReturn(newMember);
     given(socialAccountRepository.save(newAccount)).willReturn(newAccount);
@@ -58,7 +60,9 @@ class OauthServiceTest extends ServiceTest {
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willReturn(new KakaoUserInfoResponse(oauthId));
-    given(socialAccountRepository.findByOauthIdAndSocialProvider(oauthId.toString(), KAKAO))
+    given(
+            socialAccountRepository.findByOauthIdAndSocialProviderAndDeletedAtIsNull(
+                oauthId.toString(), KAKAO))
         .willReturn(Optional.of(account));
 
     then(oauthService.kakaoLogin(command)).isEqualTo(1L);
