@@ -31,8 +31,9 @@ services:
       KAKAO_LOGIN_CLIENT_ID: ${KAKAO_LOGIN_CLIENT_ID}
       KAKAO_LOGIN_CLIENT_SECRET: ${KAKAO_LOGIN_CLIENT_SECRET}
       KAKAO_LOGIN_REDIRECT_URI: ${KAKAO_LOGIN_REDIRECT_URI}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
     volumes:
-      - /var/log/jaknaeso:./log
+      - /var/log/jaknaeso:/var/log/jaknaeso
     depends_on:
       - mysql
     networks:
