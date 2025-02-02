@@ -4,13 +4,10 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.common.support.MediaTypeValueBuilder;
 import org.nexters.jaknaesocore.common.support.ServiceTest;
-import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoTokenCommand;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoTokenResponse;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse;
 import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;
@@ -23,8 +20,6 @@ import org.springframework.web.client.RestClientException;
 class OauthServiceTest extends ServiceTest {
 
   static final String BEARER_PREFIX = "Bearer ";
-  static final String MEDIA_TYPE =
-      MediaTypeValueBuilder.builder(APPLICATION_FORM_URLENCODED_VALUE).charset("utf-8").build();
 
   @Autowired OauthService oauthService;
 
@@ -37,11 +32,14 @@ class OauthServiceTest extends ServiceTest {
     SocialAccount newAccount = SocialAccount.kakaoSignup(oauthId.toString());
 
     KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
-    KakaoTokenCommand tokenCommand =
-        KakaoTokenCommand.of(
-            "client-id", "client-secret", "redirect-uri", command.authorizationCode());
 
-    given(kakaoAuthClient.requestToken(tokenCommand))
+    given(
+            kakaoAuthClient.requestToken(
+                "authorization_code",
+                "client-id",
+                "client-secret",
+                command.authorizationCode(),
+                "redirect-uri"))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willReturn(new KakaoUserInfoResponse(oauthId));
@@ -61,11 +59,14 @@ class OauthServiceTest extends ServiceTest {
     ReflectionTestUtils.setField(account, "member", member);
 
     KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
-    KakaoTokenCommand tokenCommand =
-        KakaoTokenCommand.of(
-            "client-id", "client-secret", "redirect-uri", command.authorizationCode());
 
-    given(kakaoAuthClient.requestToken(tokenCommand))
+    given(
+            kakaoAuthClient.requestToken(
+                "authorization_code",
+                "client-id",
+                "client-secret",
+                command.authorizationCode(),
+                "redirect-uri"))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willReturn(new KakaoUserInfoResponse(oauthId));
@@ -78,11 +79,15 @@ class OauthServiceTest extends ServiceTest {
   @Test
   void kakaoLoginFailByTokenApiFailure() {
     KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
-    KakaoTokenCommand tokenCommand =
-        KakaoTokenCommand.of(
-            "client-id", "client-secret", "redirect-uri", command.authorizationCode());
 
-    given(kakaoAuthClient.requestToken(tokenCommand)).willThrow(RestClientException.class);
+    given(
+            kakaoAuthClient.requestToken(
+                "authorization_code",
+                "client-id",
+                "client-secret",
+                command.authorizationCode(),
+                "redirect-uri"))
+        .willThrow(RestClientException.class);
 
     thenThrownBy(() -> oauthService.kakaoLogin(command)).isInstanceOf(RestClientException.class);
   }
@@ -91,11 +96,14 @@ class OauthServiceTest extends ServiceTest {
   @Test
   void kakaoLoginFailByUserInfoApiFailure() {
     KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
-    KakaoTokenCommand tokenCommand =
-        KakaoTokenCommand.of(
-            "client-id", "client-secret", "redirect-uri", command.authorizationCode());
 
-    given(kakaoAuthClient.requestToken(tokenCommand))
+    given(
+            kakaoAuthClient.requestToken(
+                "authorization_code",
+                "client-id",
+                "client-secret",
+                command.authorizationCode(),
+                "redirect-uri"))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willThrow(RestClientException.class);
