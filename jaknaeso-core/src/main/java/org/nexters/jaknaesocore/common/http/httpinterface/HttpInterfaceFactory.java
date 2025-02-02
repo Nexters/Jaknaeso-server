@@ -23,7 +23,11 @@ import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 public class HttpInterfaceFactory {
 
   Map<String, RestClientErrorHandler> errorHandlers =
-      Map.of("https://kapi.kakao.com", new KakaoClientErrorHandler());
+      Map.of(
+          "https://kapi.kakao.com",
+          new KakaoClientErrorHandler(),
+          "https://kauth.kakao.com",
+          new KakaoClientErrorHandler());
 
   public <S> S create(final Class<S> httpClient) {
     HttpExchange httpExchange = AnnotationUtils.getAnnotation(httpClient, HttpExchange.class);
