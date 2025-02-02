@@ -45,20 +45,31 @@ public class OauthService {
 
   @Transactional
   public Long kakaoLogin(final KakaoLoginCommand command) {
-    KakaoTokenResponse token = getKakaoToken(command.authorizationCode(), command.redirectUri());
+    final KakaoTokenResponse token = getKakaoToken(command.authorizationCode(), command.redirectUri());
     log.info("kakao 토큰 받아오기 완료");
-    KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.getAccessToken());
+    final KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.getAccessToken());
     log.info("kakao 사용자 정보 받아오기 완료");
 
-    String oauthId = userInfo.getId().toString();
-    SocialAccount socialAccount = socialAccountRepository.saveKakaoAccount(oauthId);
-
-    Member member = socialAccount.getMember();
+    final String oauthId = userInfo.getId().toString();
+    final Member member = findKakaoMember(oauthId);
     if (member == null) {
-      member = memberRepository.save(Member.create());
-      socialAccount.updateMember(member);
+      return signupKakaoMember(command.authorizationCode()).getId();
     }
     return member.getId();
+  }
+
+  private Member signupKakaoMember(final String oauthId) {
+    final Member member = memberRepository.save(Member.create());
+    socialAccountRepository.save(SocialAccount.kakaoSignup(oauthId, member));
+    return member;
+  }
+
+  private Member findKakaoMember(final String oauthId) {
+    return socialAccountRepository
+        .findByOauthIdAndSocialProvider(oauthId, SocialProvider.KAKAO)
+        .map(SocialAccount::getMember)
+        .filter(member -> member.getDeletedAt() == null)
+        .orElse(null);
   }
 
   private KakaoUserInfoResponse getKakaoUserInfo(final String accessToken) {

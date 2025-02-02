@@ -1,4 +1,4 @@
-package org.nexters.jaknaesocore.domain.member;
+package org.nexters.jaknaesocore.domain.member.service;
 
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 import static org.mockito.BDDMockito.given;
@@ -21,7 +21,7 @@ class MemberServiceTest extends ServiceTest {
 
     memberService.deleteMember(1L);
 
-    then(memberRepository).should().deleteById(1L);
+    then(memberRepository).should().softDeleteById(1L);
   }
 
   @Test

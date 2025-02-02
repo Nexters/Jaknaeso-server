@@ -1,4 +1,4 @@
-package org.nexters.jaknaesocore.domain.member;
+package org.nexters.jaknaesocore.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
@@ -14,6 +14,6 @@ public class MemberService {
   @Transactional
   public void deleteMember(final Long memberId) {
     memberRepository.findMember(memberId);
-    memberRepository.deleteById(memberId);
+    memberRepository.softDeleteById(memberId);
   }
 }
