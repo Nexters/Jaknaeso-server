@@ -2,9 +2,9 @@ package org.nexters.jaknaesocore.domain.survey.repository;
 
 import static org.assertj.core.api.BDDAssertions.*;
 
-import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
@@ -13,7 +13,6 @@ import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Transactional
 class SurveySubmissionRepositoryTest extends IntegrationTest {
 
   @Autowired private SurveySubmissionRepository surveySubmissionRepository;
@@ -22,6 +21,15 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
   @Autowired private SurveyBundleRepository surveyBundleRepository;
   @Autowired private SurveyRepository surveyRepository;
   @Autowired private SurveyOptionRepository surveyOptionRepository;
+
+  @AfterEach
+  void tearDown() {
+    surveySubmissionRepository.deleteAll();
+    surveyOptionRepository.deleteAll();
+    surveyRepository.deleteAll();
+    surveyBundleRepository.deleteAll();
+    memberRepository.deleteAll();
+  }
 
   @DisplayName("회원이 제출한 설문 ID를 가져온다.")
   @Test
