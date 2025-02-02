@@ -13,14 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/survey")
+@RequestMapping("/api/v1/surveys")
 public class SurveyController {
 
   private final SurveyService surveyService;
 
-  @GetMapping("/my/{bundleId}")
-  public ApiResponse<SurveyResponse> getSurvey(
+  @GetMapping("/{bundleId}")
+  public ApiResponse<SurveyResponse> getNextSurvey(
       @AuthenticationPrincipal CustomUserDetails member, @PathVariable Long bundleId) {
-    return ApiResponse.success(surveyService.getSurvey(bundleId, member.getMemberId()));
+    return ApiResponse.success(surveyService.getNextSurvey(bundleId, member.getMemberId()));
   }
 }

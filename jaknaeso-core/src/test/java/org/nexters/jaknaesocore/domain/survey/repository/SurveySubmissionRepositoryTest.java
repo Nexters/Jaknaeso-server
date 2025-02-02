@@ -18,7 +18,7 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
   @Autowired private SurveySubmissionRepository surveySubmissionRepository;
 
   @Autowired private MemberRepository memberRepository;
-  @Autowired private BundleRepository bundleRepository;
+  @Autowired private SurveyBundleRepository surveyBundleRepository;
   @Autowired private SurveyRepository surveyRepository;
   @Autowired private SurveyOptionRepository surveyOptionRepository;
 
@@ -28,7 +28,7 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
     Member member = Member.create();
     memberRepository.save(member);
     SurveyBundle surveyBundle = new SurveyBundle();
-    bundleRepository.save(surveyBundle);
+    surveyBundleRepository.save(surveyBundle);
     BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
     surveyRepository.save(balanceSurvey);
     List<KeywordScore> scores =

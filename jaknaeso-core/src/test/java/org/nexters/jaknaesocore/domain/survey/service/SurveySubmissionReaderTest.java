@@ -11,7 +11,7 @@ import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.model.*;
-import org.nexters.jaknaesocore.domain.survey.repository.BundleRepository;
+import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
@@ -23,7 +23,7 @@ class SurveySubmissionReaderTest extends IntegrationTest {
   @Autowired private SurveySubmissionReader surveySubmissionReader;
 
   @Autowired private MemberRepository memberRepository;
-  @Autowired private BundleRepository bundleRepository;
+  @Autowired private SurveyBundleRepository surveyBundleRepository;
   @Autowired private SurveyRepository surveyRepository;
   @Autowired private SurveyOptionRepository surveyOptionRepository;
   @Autowired private SurveySubmissionRepository surveySubmissionRepository;
@@ -34,7 +34,7 @@ class SurveySubmissionReaderTest extends IntegrationTest {
     Member member = Member.create();
     memberRepository.save(member);
     SurveyBundle surveyBundle = new SurveyBundle();
-    bundleRepository.save(surveyBundle);
+    surveyBundleRepository.save(surveyBundle);
     BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
     MultipleChoiceSurvey multipleChoiceSurvey = new MultipleChoiceSurvey("질문내용", surveyBundle);
     surveyRepository.saveAll(List.of(balanceSurvey, multipleChoiceSurvey));

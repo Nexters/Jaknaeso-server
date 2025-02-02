@@ -26,7 +26,7 @@ class SurveyControllerTest extends ControllerTest {
   @WithMockCustomUser
   @DisplayName("번들을 통해 번들 내부의 랜덤한 설문지를 가져온다.")
   @Test
-  void getSurvey() throws Exception {
+  void getNextSurvey() throws Exception {
 
     SurveyResponse response =
         new SurveyResponse(
@@ -40,10 +40,10 @@ class SurveyControllerTest extends ControllerTest {
                 new SurveyOptionsResponse(4L, "4점"),
                 new SurveyOptionsResponse(5L, "5점")));
 
-    given(surveyService.getSurvey(anyLong(), anyLong())).willReturn(response);
+    given(surveyService.getNextSurvey(anyLong(), anyLong())).willReturn(response);
 
     mockMvc
-        .perform(get("/api/v1/survey/my/{bundleId}", 1L).with(csrf()))
+        .perform(get("/api/v1/surveys/{bundleId}", 1L).with(csrf()))
         .andExpect(status().isOk())
         .andDo(
             document(

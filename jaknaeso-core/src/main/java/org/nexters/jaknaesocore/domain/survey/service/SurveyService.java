@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
 import org.nexters.jaknaesocore.domain.survey.model.Survey;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
-import org.nexters.jaknaesocore.domain.survey.repository.BundleRepository;
+import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,13 +13,13 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class SurveyService {
 
-  private final BundleRepository bundleRepository;
+  private final SurveyBundleRepository surveyBundleRepository;
   private final SurveySubmissionReader surveySubmissionReader;
 
   @Transactional(readOnly = true)
-  public SurveyResponse getSurvey(Long bundleId, Long memberId) {
+  public SurveyResponse getNextSurvey(Long bundleId, Long memberId) {
     SurveyBundle bundle =
-        bundleRepository
+        surveyBundleRepository
             .findById(bundleId)
             .orElseThrow(() -> new IllegalArgumentException("설문 번들을 찾을 수 없습니다."));
 
