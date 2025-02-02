@@ -2,9 +2,9 @@ package org.nexters.jaknaesocore.domain.survey.service;
 
 import static org.assertj.core.api.BDDAssertions.*;
 
-import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
@@ -17,15 +17,21 @@ import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Transactional
 class SurveyServiceTest extends IntegrationTest {
-
   @Autowired private SurveyService surveyService;
 
   @Autowired private MemberRepository memberRepository;
   @Autowired private SurveyBundleRepository surveyBundleRepository;
   @Autowired private SurveyRepository surveyRepository;
   @Autowired private SurveyOptionRepository surveyOptionRepository;
+
+  @AfterEach
+  void tearDown() {
+    surveyOptionRepository.deleteAll();
+    surveyRepository.deleteAll();
+    surveyBundleRepository.deleteAll();
+    memberRepository.deleteAll();
+  }
 
   @DisplayName("설문을 조회한다.")
   @Test
