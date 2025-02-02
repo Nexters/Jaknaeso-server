@@ -21,6 +21,8 @@ import org.nexters.jaknaesocore.domain.socialaccount.repository.SocialAccountRep
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -46,10 +48,7 @@ public class OauthService {
 
   @Transactional
   public Long kakaoLogin(final KakaoLoginCommand command) {
-    Object response = getKakaoToken(command.authorizationCode());
-    System.out.println(response.toString());
-    KakaoTokenResponse token = (KakaoTokenResponse) response;
-    //    KakaoTokenResponse token = getKakaoToken(command.authorizationCode());
+    KakaoTokenResponse token = getKakaoToken(command.authorizationCode());
     log.info("kakao 토큰 받아오기 완료");
     KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.getAccessToken());
     log.info("kakao 사용자 정보 받아오기 완료");
@@ -69,9 +68,14 @@ public class OauthService {
     return kakaoClient.requestUserInfo(BEARER_PREFIX + accessToken);
   }
 
-  private Object getKakaoToken(final String authorizationCode) {
-    return kakaoAuthClient.requestToken(
-        "authorization_code", clientId, clientSecret, authorizationCode, redirectUri);
+  private KakaoTokenResponse getKakaoToken(final String authorizationCode) {
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("grant_type", "authorization_code");
+    params.add("client_id", clientId);
+    params.add("client_secret", clientSecret);
+    params.add("code", authorizationCode);
+    params.add("redirect_uri", redirectUri);
+    return kakaoAuthClient.requestToken(params);
   }
 
   @Transactional
