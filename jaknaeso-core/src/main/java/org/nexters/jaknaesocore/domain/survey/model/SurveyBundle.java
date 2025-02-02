@@ -18,11 +18,11 @@ public class SurveyBundle extends BaseTimeEntity {
   @OneToMany(mappedBy = "surveyBundle", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<Survey> surveys = new ArrayList<>();
 
-  public void addSurvey(Survey survey) {
+  public void addSurvey(final Survey survey) {
     surveys.add(survey);
   }
 
-  public Survey getUnSubmittedSurvey(List<Survey> submittedSurvey) {
+  public Survey getUnSubmittedSurvey(final List<Survey> submittedSurvey) {
     List<Survey> list =
         surveys.stream().filter(survey -> !submittedSurvey.contains(survey)).toList();
 

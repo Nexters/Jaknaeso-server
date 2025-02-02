@@ -23,13 +23,13 @@ public abstract class Survey extends BaseTimeEntity {
   @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<SurveyOption> options = new ArrayList<>();
 
-  public Survey(String content, SurveyBundle surveyBundle) {
+  public Survey(final String content, final SurveyBundle surveyBundle) {
     this.content = content;
     this.surveyBundle = surveyBundle;
     surveyBundle.addSurvey(this);
   }
 
-  public void addOption(SurveyOption option) {
+  public void addOption(final SurveyOption option) {
     options.add(option);
   }
 

@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @DiscriminatorValue("MULTIPLE_CHOICE")
 public class MultipleChoiceSurvey extends Survey {
 
-  public MultipleChoiceSurvey(String content, SurveyBundle surveyBundle) {
+  public MultipleChoiceSurvey(final String content, final SurveyBundle surveyBundle) {
     super(content, surveyBundle);
   }
 

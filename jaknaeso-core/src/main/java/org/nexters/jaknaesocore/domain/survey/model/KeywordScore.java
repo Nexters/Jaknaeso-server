@@ -1,8 +1,10 @@
 package org.nexters.jaknaesocore.domain.survey.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
@@ -14,10 +16,11 @@ public class KeywordScore {
   @Enumerated(EnumType.STRING)
   private Keyword keyword;
 
-  private double score;
+  @Column(precision = 5, scale = 2)
+  private BigDecimal score;
 
   @Builder
-  private KeywordScore(Keyword keyword, double score) {
+  private KeywordScore(final Keyword keyword, final BigDecimal score) {
     this.keyword = keyword;
     this.score = score;
   }

@@ -25,14 +25,14 @@ public class SurveySubmission extends BaseTimeEntity {
   @JoinColumn(name = "option_id")
   private SurveyOption selectedOption;
 
-  private String additionalComment;
+  private String comment;
 
   @Builder
   private SurveySubmission(
-      Member member, Survey survey, SurveyOption selectedOption, String additionalComment) {
+      Member member, Survey survey, SurveyOption selectedOption, String comment) {
     this.member = member;
     this.survey = survey;
     this.selectedOption = selectedOption;
-    this.additionalComment = additionalComment;
+    this.comment = comment;
   }
 }

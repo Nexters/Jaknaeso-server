@@ -3,6 +3,7 @@ package org.nexters.jaknaesocore.domain.survey.repository;
 import static org.assertj.core.api.BDDAssertions.*;
 
 import jakarta.transaction.Transactional;
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,8 +34,8 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
     surveyRepository.save(balanceSurvey);
     List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(1).build(),
-            KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(2).build());
+            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
     SurveyOption option =
         SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
     surveyOptionRepository.save(option);

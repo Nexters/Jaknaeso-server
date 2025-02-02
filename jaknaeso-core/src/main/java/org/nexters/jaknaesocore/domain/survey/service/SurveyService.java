@@ -20,7 +20,7 @@ public class SurveyService {
   private final SurveySubmissionRepository surveySubmissionRepository;
 
   @Transactional(readOnly = true)
-  public SurveyResponse getNextSurvey(Long bundleId, Long memberId) {
+  public SurveyResponse getNextSurvey(final Long bundleId, final Long memberId) {
     SurveyBundle bundle =
         surveyBundleRepository
             .findById(bundleId)
@@ -31,7 +31,7 @@ public class SurveyService {
     return SurveyResponse.of(unSubmittedSurvey);
   }
 
-  private List<Survey> getSubmittedSurvey(Long memberId) {
+  private List<Survey> getSubmittedSurvey(final Long memberId) {
     List<SurveySubmission> surveySubmissionsByMember =
         surveySubmissionRepository.findByMember_IdAndDeletedAtIsNull(memberId);
     return new SurveySubscriptions(surveySubmissionsByMember).getSubmittedSurvey(memberId);

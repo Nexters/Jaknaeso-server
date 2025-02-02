@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @DiscriminatorValue("BALANCE")
 public class BalanceSurvey extends Survey {
 
-  public BalanceSurvey(String content, SurveyBundle surveyBundle) {
+  public BalanceSurvey(final String content, final SurveyBundle surveyBundle) {
     super(content, surveyBundle);
   }
 
