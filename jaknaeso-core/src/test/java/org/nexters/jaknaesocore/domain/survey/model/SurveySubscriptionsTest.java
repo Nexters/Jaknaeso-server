@@ -2,6 +2,7 @@ package org.nexters.jaknaesocore.domain.survey.model;
 
 import static org.assertj.core.api.BDDAssertions.then;
 
+import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,8 +24,8 @@ class SurveySubscriptionsTest {
 
     List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(1.0).build(),
-            KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(2.0).build());
+            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
 
     SurveyOption option1 =
         SurveyOption.builder().survey(survey1).scores(scores).content("옵션1").build();
@@ -62,8 +63,8 @@ class SurveySubscriptionsTest {
 
     List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(1.0).build(),
-            KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(2.0).build());
+            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
 
     SurveyOption option1 =
         SurveyOption.builder().survey(survey1).scores(scores).content("옵션1").build();

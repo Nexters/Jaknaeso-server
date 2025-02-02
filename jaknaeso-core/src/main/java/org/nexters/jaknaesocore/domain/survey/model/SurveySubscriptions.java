@@ -9,7 +9,7 @@ public class SurveySubscriptions {
 
   private final List<SurveySubmission> submissions;
 
-  public List<Survey> getSubmittedSurvey(Long memberId) {
+  public List<Survey> getSubmittedSurvey(final Long memberId) {
     return submissions.stream()
         .filter(submission -> submission.getMember().getId().equals(memberId))
         .map(SurveySubmission::getSurvey)

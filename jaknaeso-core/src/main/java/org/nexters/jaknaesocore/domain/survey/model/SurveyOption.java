@@ -25,7 +25,7 @@ public class SurveyOption extends BaseTimeEntity {
   private List<KeywordScore> scores = new ArrayList<>();
 
   @Builder
-  private SurveyOption(Survey survey, String content, List<KeywordScore> scores) {
+  private SurveyOption(final Survey survey, final String content, final List<KeywordScore> scores) {
     this.survey = survey;
     this.content = content;
     this.scores = scores;
