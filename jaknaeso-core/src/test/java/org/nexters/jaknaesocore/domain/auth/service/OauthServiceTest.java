@@ -41,9 +41,9 @@ class OauthServiceTest extends ServiceTest {
         KakaoTokenCommand.of(
             "client-id", "client-secret", "redirect-uri", command.authorizationCode());
 
-    given(kakaoAuthClient.requestToken(MEDIA_TYPE, tokenCommand))
+    given(kakaoAuthClient.requestToken(tokenCommand))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
-    given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token", MEDIA_TYPE))
+    given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willReturn(new KakaoUserInfoResponse(oauthId));
     given(socialAccountRepository.saveKakaoAccount(oauthId.toString())).willReturn(newAccount);
     given(memberRepository.save(any(Member.class))).willReturn(newMember);
@@ -65,9 +65,9 @@ class OauthServiceTest extends ServiceTest {
         KakaoTokenCommand.of(
             "client-id", "client-secret", "redirect-uri", command.authorizationCode());
 
-    given(kakaoAuthClient.requestToken(MEDIA_TYPE, tokenCommand))
+    given(kakaoAuthClient.requestToken(tokenCommand))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
-    given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token", MEDIA_TYPE))
+    given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willReturn(new KakaoUserInfoResponse(oauthId));
     given(socialAccountRepository.saveKakaoAccount(oauthId.toString())).willReturn(account);
 
@@ -82,8 +82,7 @@ class OauthServiceTest extends ServiceTest {
         KakaoTokenCommand.of(
             "client-id", "client-secret", "redirect-uri", command.authorizationCode());
 
-    given(kakaoAuthClient.requestToken(MEDIA_TYPE, tokenCommand))
-        .willThrow(RestClientException.class);
+    given(kakaoAuthClient.requestToken(tokenCommand)).willThrow(RestClientException.class);
 
     thenThrownBy(() -> oauthService.kakaoLogin(command)).isInstanceOf(RestClientException.class);
   }
@@ -96,9 +95,9 @@ class OauthServiceTest extends ServiceTest {
         KakaoTokenCommand.of(
             "client-id", "client-secret", "redirect-uri", command.authorizationCode());
 
-    given(kakaoAuthClient.requestToken(MEDIA_TYPE, tokenCommand))
+    given(kakaoAuthClient.requestToken(tokenCommand))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
-    given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token", MEDIA_TYPE))
+    given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willThrow(RestClientException.class);
 
     thenThrownBy(() -> oauthService.kakaoLogin(command)).isInstanceOf(RestClientException.class);

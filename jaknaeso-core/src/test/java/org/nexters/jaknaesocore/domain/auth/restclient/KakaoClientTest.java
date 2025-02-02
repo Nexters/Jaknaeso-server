@@ -20,7 +20,6 @@ class KakaoClientTest extends IntegrationTest {
     String mediaType =
         MediaTypeValueBuilder.builder(APPLICATION_FORM_URLENCODED_VALUE).charset("utf-8").build();
 
-    thenThrownBy(() -> kakaoClient.requestUserInfo("", mediaType))
-        .isInstanceOf(RestClientException.class);
+    thenThrownBy(() -> kakaoClient.requestUserInfo("")).isInstanceOf(RestClientException.class);
   }
 }
