@@ -1,6 +1,5 @@
 package org.nexters.jaknaesocore.domain.member.model;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -17,10 +16,17 @@ import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
 @Entity
 public class Member extends BaseTimeEntity {
 
-  @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "member")
   private List<SocialAccount> socialAccounts;
 
   public static Member create() {
     return new Member();
+  }
+
+  public void softDelete() {
+    if (this.socialAccounts != null) {
+      this.socialAccounts.forEach(SocialAccount::softDelete);
+    }
+    super.softDelete();
   }
 }
