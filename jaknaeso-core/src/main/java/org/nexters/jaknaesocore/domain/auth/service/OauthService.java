@@ -66,7 +66,7 @@ public class OauthService {
 
   private Member findKakaoMember(final String oauthId) {
     return socialAccountRepository
-        .findByOauthIdAndSocialProvider(oauthId, SocialProvider.KAKAO)
+        .findByOauthIdAndSocialProviderAndDeletedAtIsNull(oauthId, SocialProvider.KAKAO)
         .map(SocialAccount::getMember)
         .filter(member -> member.getDeletedAt() == null)
         .orElse(null);
@@ -94,7 +94,8 @@ public class OauthService {
     final AppleAuthorization authorization = decodeAppleIdTokenPayload(jwtClaims);
 
     return socialAccountRepository
-        .findByOauthIdAndSocialProvider(authorization.getSub(), SocialProvider.APPLE)
+        .findByOauthIdAndSocialProviderAndDeletedAtIsNull(
+            authorization.getSub(), SocialProvider.APPLE)
         .map(account -> account.getMember().getId())
         .orElseGet(
             () -> {

@@ -23,9 +23,11 @@ class SocialAccountRepositoryTest extends RepositoryTest {
     socialAccountRepository.save(SocialAccount.kakaoSignup("oauthId1", member));
 
     Optional<SocialAccount> actual1 =
-        socialAccountRepository.findByOauthIdAndSocialProvider("oauthId1", SocialProvider.KAKAO);
+        socialAccountRepository.findByOauthIdAndSocialProviderAndDeletedAtIsNull(
+            "oauthId1", SocialProvider.KAKAO);
     Optional<SocialAccount> actual2 =
-        socialAccountRepository.findByOauthIdAndSocialProvider("oauthId2", SocialProvider.KAKAO);
+        socialAccountRepository.findByOauthIdAndSocialProviderAndDeletedAtIsNull(
+            "oauthId2", SocialProvider.KAKAO);
 
     assertAll(() -> then(actual1).isPresent(), () -> then(actual2).isEmpty());
   }
