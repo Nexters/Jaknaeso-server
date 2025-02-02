@@ -1,7 +1,7 @@
 package org.nexters.jaknaesoserver.common.support;
 
 import org.nexters.jaknaesocore.domain.auth.service.OauthService;
-import org.nexters.jaknaesocore.domain.member.MemberService;
+import org.nexters.jaknaesocore.domain.member.service.MemberService;
 import org.nexters.jaknaesocore.domain.survey.service.SurveyService;
 import org.nexters.jaknaesoserver.config.TestSecurityConfig;
 import org.nexters.jaknaesoserver.domain.auth.service.AuthFacadeService;
