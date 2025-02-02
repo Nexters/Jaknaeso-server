@@ -27,6 +27,10 @@ public enum ErrorType {
   // member
   MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "존재하지 않는 멤버입니다.", LogLevel.WARN),
 
+  // social account
+  SOCIAL_ACCOUNT_NOT_FOUND(
+      HttpStatus.NOT_FOUND, ErrorCode.E404, "존재하지 않는 소셜 계정입니다.", LogLevel.WARN),
+
   // business
   INVALID_APPLE_ID_TOKEN(
       HttpStatus.BAD_REQUEST, ErrorCode.E400, "유효하지 않은 애플로그인입니다.", LogLevel.WARN),
