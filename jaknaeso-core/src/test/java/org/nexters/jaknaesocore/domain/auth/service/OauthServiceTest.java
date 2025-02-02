@@ -15,6 +15,8 @@ import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestClientException;
 
 class OauthServiceTest extends ServiceTest {
@@ -33,13 +35,7 @@ class OauthServiceTest extends ServiceTest {
 
     KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
 
-    given(
-            kakaoAuthClient.requestToken(
-                "authorization_code",
-                "client-id",
-                "client-secret",
-                command.authorizationCode(),
-                "redirect-uri"))
+    given(kakaoAuthClient.requestToken(makeKakaoTokenRequestParams(command.authorizationCode())))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willReturn(new KakaoUserInfoResponse(oauthId));
@@ -60,13 +56,7 @@ class OauthServiceTest extends ServiceTest {
 
     KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
 
-    given(
-            kakaoAuthClient.requestToken(
-                "authorization_code",
-                "client-id",
-                "client-secret",
-                command.authorizationCode(),
-                "redirect-uri"))
+    given(kakaoAuthClient.requestToken(makeKakaoTokenRequestParams(command.authorizationCode())))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willReturn(new KakaoUserInfoResponse(oauthId));
@@ -80,13 +70,7 @@ class OauthServiceTest extends ServiceTest {
   void kakaoLoginFailByTokenApiFailure() {
     KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
 
-    given(
-            kakaoAuthClient.requestToken(
-                "authorization_code",
-                "client-id",
-                "client-secret",
-                command.authorizationCode(),
-                "redirect-uri"))
+    given(kakaoAuthClient.requestToken(makeKakaoTokenRequestParams(command.authorizationCode())))
         .willThrow(RestClientException.class);
 
     thenThrownBy(() -> oauthService.kakaoLogin(command)).isInstanceOf(RestClientException.class);
@@ -97,17 +81,22 @@ class OauthServiceTest extends ServiceTest {
   void kakaoLoginFailByUserInfoApiFailure() {
     KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
 
-    given(
-            kakaoAuthClient.requestToken(
-                "authorization_code",
-                "client-id",
-                "client-secret",
-                command.authorizationCode(),
-                "redirect-uri"))
+    given(kakaoAuthClient.requestToken(makeKakaoTokenRequestParams(command.authorizationCode())))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
         .willThrow(RestClientException.class);
 
     thenThrownBy(() -> oauthService.kakaoLogin(command)).isInstanceOf(RestClientException.class);
+  }
+
+  private MultiValueMap<String, String> makeKakaoTokenRequestParams(
+      final String authorizationCode) {
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+    params.add("grant_type", "authorization_code");
+    params.add("client_id", "client-id");
+    params.add("client_secret", "client-secret");
+    params.add("code", authorizationCode);
+    params.add("redirect_uri", "redirect-uri");
+    return params;
   }
 }
