@@ -1,10 +1,15 @@
 package org.nexters.jaknaesocore.common.http.httpinterface;
 
 import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
 import org.nexters.jaknaesocore.common.http.errorhandler.RestClientErrorHandler;
 import org.nexters.jaknaesocore.domain.auth.restclient.errorhandler.KakaoClientErrorHandler;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.FormHttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
@@ -13,6 +18,7 @@ import org.springframework.web.client.support.RestClientAdapter;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.invoker.HttpServiceProxyFactory;
 
+@Slf4j
 @Component
 public class HttpInterfaceFactory {
 
@@ -29,6 +35,13 @@ public class HttpInterfaceFactory {
     RestClient restClient =
         RestClient.builder()
             .baseUrl(url)
+            .messageConverters(
+                converters -> {
+                  converters.add(new ByteArrayHttpMessageConverter());
+                  converters.add(new StringHttpMessageConverter());
+                  converters.add(new FormHttpMessageConverter());
+                  converters.add(new MappingJackson2HttpMessageConverter());
+                })
             .defaultStatusHandler(
                 HttpStatusCode::isError,
                 (request, response) ->
