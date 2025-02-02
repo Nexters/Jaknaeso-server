@@ -53,7 +53,9 @@ public class OauthService {
   @Transactional
   public Long kakaoLogin(final KakaoLoginCommand command) {
     KakaoTokenResponse token = getKakaoToken(command.authorizationCode());
+    log.info("kakao 토큰 받아오기 성공");
     KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.accessToken());
+    log.info("kakao 사용자 정보 받아오기 성공");
 
     String oauthId = userInfo.id().toString();
     SocialAccount socialAccount = socialAccountRepository.saveKakaoAccount(oauthId);
@@ -67,13 +69,13 @@ public class OauthService {
   }
 
   private KakaoUserInfoResponse getKakaoUserInfo(final String accessToken) {
-    return kakaoClient.requestUserInfo(BEARER_PREFIX + accessToken, FORM_URLENCODED_MEDIA_TYPE);
+    return kakaoClient.requestUserInfo(BEARER_PREFIX + accessToken);
   }
 
   private KakaoTokenResponse getKakaoToken(final String authorizationCode) {
     KakaoTokenCommand command =
         KakaoTokenCommand.of(clientId, clientSecret, redirectUri, authorizationCode);
-    return kakaoAuthClient.requestToken(FORM_URLENCODED_MEDIA_TYPE, command);
+    return kakaoAuthClient.requestToken(command);
   }
 
   @Transactional
