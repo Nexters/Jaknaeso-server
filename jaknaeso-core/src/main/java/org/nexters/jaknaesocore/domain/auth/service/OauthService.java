@@ -1,18 +1,14 @@
 package org.nexters.jaknaesocore.domain.auth.service;
 
-import static org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.nexters.jaknaesocore.common.support.MediaTypeValueBuilder;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.auth.model.AppleAuthorization;
 import org.nexters.jaknaesocore.domain.auth.model.AppleIdToken;
 import org.nexters.jaknaesocore.domain.auth.restclient.KakaoAuthClient;
 import org.nexters.jaknaesocore.domain.auth.restclient.KakaoClient;
-import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoTokenCommand;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoTokenResponse;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse;
 import org.nexters.jaknaesocore.domain.auth.service.dto.AppleLoginCommand;
@@ -32,8 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class OauthService {
 
   private static final String BEARER_PREFIX = "Bearer ";
-  private static String FORM_URLENCODED_MEDIA_TYPE =
-      MediaTypeValueBuilder.builder(APPLICATION_FORM_URLENCODED_VALUE).charset("utf-8").build();
 
   private final SocialAccountRepository socialAccountRepository;
   private final MemberRepository memberRepository;
@@ -53,11 +47,11 @@ public class OauthService {
   @Transactional
   public Long kakaoLogin(final KakaoLoginCommand command) {
     KakaoTokenResponse token = getKakaoToken(command.authorizationCode());
-    log.info("kakao 토큰 받아오기 성공");
-    KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.accessToken());
-    log.info("kakao 사용자 정보 받아오기 성공");
+    log.info("kakao 토큰 받아오기 완료");
+    KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.getAccessToken());
+    log.info("kakao 사용자 정보 받아오기 완료");
 
-    String oauthId = userInfo.id().toString();
+    String oauthId = userInfo.getId().toString();
     SocialAccount socialAccount = socialAccountRepository.saveKakaoAccount(oauthId);
 
     Member member = socialAccount.getMember();
@@ -73,9 +67,8 @@ public class OauthService {
   }
 
   private KakaoTokenResponse getKakaoToken(final String authorizationCode) {
-    KakaoTokenCommand command =
-        KakaoTokenCommand.of(clientId, clientSecret, redirectUri, authorizationCode);
-    return kakaoAuthClient.requestToken(command);
+    return kakaoAuthClient.requestToken(
+        "authorization_code", clientId, clientSecret, authorizationCode, redirectUri);
   }
 
   @Transactional
