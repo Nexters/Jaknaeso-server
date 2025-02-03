@@ -8,6 +8,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
+import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
@@ -159,7 +160,61 @@ class SurveyServiceTest extends IntegrationTest {
     // given
     Member member = Member.create();
     memberRepository.save(member);
+    SurveyBundle surveyBundle1 = new SurveyBundle();
+    SurveyBundle surveyBundle2 = new SurveyBundle();
+
+    surveyBundleRepository.saveAll(List.of(surveyBundle1, surveyBundle2));
+
+    BalanceSurvey survey1 = new BalanceSurvey("대학 동기 모임에서 나의 승진 이야기가 나왔습니다", surveyBundle1);
+    BalanceSurvey survey2 = new BalanceSurvey("회사에서 팀 리더로 뽑혔습니다", surveyBundle1);
+    MultipleChoiceSurvey survey3 = new MultipleChoiceSurvey("나의 행복 지수는", surveyBundle1);
+    MultipleChoiceSurvey survey4 = new MultipleChoiceSurvey("나는 노는게 좋다.", surveyBundle1);
+
+    surveyRepository.saveAll(List.of(survey1, survey2, survey3, survey4));
+
+    List<KeywordScore> scores =
+        List.of(
+            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
+
+    SurveyOption option1 =
+        SurveyOption.builder().survey(survey1).scores(scores).content("한다.").build();
+    SurveyOption option2 =
+        SurveyOption.builder().survey(survey2).scores(scores).content("한다.").build();
+    SurveyOption option3 =
+        SurveyOption.builder().survey(survey3).scores(scores).content("3점").build();
+    SurveyOption option4 =
+        SurveyOption.builder().survey(survey4).scores(scores).content("4점").build();
+
+    surveyOptionRepository.saveAll(List.of(option1, option2, option3, option4));
+
+    SurveySubmission submission1 =
+        SurveySubmission.builder().member(member).selectedOption(option1).survey(survey1).build();
+    SurveySubmission submission2 =
+        SurveySubmission.builder().member(member).selectedOption(option2).survey(survey2).build();
+    SurveySubmission submission3 =
+        SurveySubmission.builder().member(member).selectedOption(option3).survey(survey3).build();
+    SurveySubmission submission4 =
+        SurveySubmission.builder().member(member).selectedOption(option4).survey(survey4).build();
+
+    surveySubmissionRepository.saveAll(List.of(submission1, submission2, submission3, submission4));
+
+    // when
+    SurveyHistoryResponse response = surveyService.getSurveyHistory(member.getId());
+
+    // then
+    then(response)
+        .extracting("bundleId", "nextSurveyIndex", "surveyHistoryDetails")
+        .containsExactly(surveyBundle1.getId() + 1L, 1, List.of());
+  }
+
+  @Test
+  void 진행할_다음_설문_번들이_존재하지_않으면_예외를_발생한다() {
+    // given
+    Member member = Member.create();
+    memberRepository.save(member);
     SurveyBundle surveyBundle = new SurveyBundle();
+
     surveyBundleRepository.save(surveyBundle);
 
     BalanceSurvey survey1 = new BalanceSurvey("대학 동기 모임에서 나의 승진 이야기가 나왔습니다", surveyBundle);
@@ -185,7 +240,6 @@ class SurveyServiceTest extends IntegrationTest {
 
     surveyOptionRepository.saveAll(List.of(option1, option2, option3, option4));
 
-    // 모든 설문에 대한 제출 생성
     SurveySubmission submission1 =
         SurveySubmission.builder().member(member).selectedOption(option1).survey(survey1).build();
     SurveySubmission submission2 =
@@ -196,13 +250,10 @@ class SurveyServiceTest extends IntegrationTest {
         SurveySubmission.builder().member(member).selectedOption(option4).survey(survey4).build();
 
     surveySubmissionRepository.saveAll(List.of(submission1, submission2, submission3, submission4));
-
     // when
-    SurveyHistoryResponse response = surveyService.getSurveyHistory(member.getId());
-
     // then
-    then(response)
-        .extracting("bundleId", "nextSurveyIndex", "surveyHistoryDetails")
-        .containsExactly(surveyBundle.getId() + 1L, 1, List.of());
+    thenThrownBy(() -> surveyService.getSurveyHistory(member.getId()))
+        .isInstanceOf(CustomException.class)
+        .isEqualTo(CustomException.NOT_READY_FOR_NEXT_BUNDLE);
   }
 }

@@ -2,6 +2,7 @@ package org.nexters.jaknaesocore.domain.survey.service;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryDetailResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
@@ -50,7 +51,12 @@ public class SurveyService {
     List<SurveySubmission> submissions = findSubmissionsForBundle(memberId, currentBundleId);
 
     if (bundle.isAllSubmitted(submissions)) {
-      return createNextBundleSurveyHistory(currentBundleId);
+      Long nextBundleId =
+          surveyBundleRepository
+              .findFirstByIdGreaterThanOrderByIdAsc(currentBundleId)
+              .map(SurveyBundle::getId)
+              .orElseThrow(() -> CustomException.NOT_READY_FOR_NEXT_BUNDLE);
+      return createNextBundleSurveyHistory(nextBundleId);
     }
     return createCurrentBundleSurveyHistory(currentBundleId, submissions);
   }
@@ -70,8 +76,8 @@ public class SurveyService {
     return new SurveyHistoryResponse(1L, List.of(), 1);
   }
 
-  private SurveyHistoryResponse createNextBundleSurveyHistory(final Long currentBundleId) {
-    return new SurveyHistoryResponse(currentBundleId + 1, List.of(), 1);
+  private SurveyHistoryResponse createNextBundleSurveyHistory(final Long bundleId) {
+    return new SurveyHistoryResponse(bundleId, List.of(), 1);
   }
 
   private SurveyHistoryResponse createCurrentBundleSurveyHistory(

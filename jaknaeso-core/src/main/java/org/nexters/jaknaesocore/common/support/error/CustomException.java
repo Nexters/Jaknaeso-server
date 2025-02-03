@@ -15,6 +15,8 @@ public class CustomException extends RuntimeException {
       new CustomException(ErrorType.INCORRECT_TOKEN_FORMAT);
   public static final CustomException INVALID_APPLE_ID_TOKEN =
       new CustomException(ErrorType.INVALID_APPLE_ID_TOKEN);
+  public static final CustomException NOT_READY_FOR_NEXT_BUNDLE =
+      new CustomException(ErrorType.NOT_READY_FOR_NEXT_BUNDLE);
 
   private final ErrorType errorType;
 
