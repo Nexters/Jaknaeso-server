@@ -2,18 +2,12 @@ package org.nexters.jaknaesocore.domain.auth.restclient.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Setter
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class KakaoUserInfoResponse {
+public record KakaoUserInfoResponse(
+    @JsonProperty("id") Long id, @JsonProperty("kakao_account") KakaoAccount kakaoAccount) {
 
-  @JsonProperty("id")
-  Long id;
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public record KakaoAccount(
+      @JsonProperty("name") String name, @JsonProperty("email") String email) {}
 }
