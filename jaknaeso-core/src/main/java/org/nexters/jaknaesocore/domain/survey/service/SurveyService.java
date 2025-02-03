@@ -55,13 +55,14 @@ public class SurveyService {
     return createCurrentBundleSurveyHistory(currentBundleId, submissions);
   }
 
-  private SurveySubmission findLatestSubmission(Long memberId) {
+  private SurveySubmission findLatestSubmission(final Long memberId) {
     return surveySubmissionRepository
         .findTopByMember_IdAndDeletedAtIsNullOrderByCreatedAtDesc(memberId)
         .orElse(null);
   }
 
-  private List<SurveySubmission> findSubmissionsForBundle(Long memberId, Long bundleId) {
+  private List<SurveySubmission> findSubmissionsForBundle(
+      final Long memberId, final Long bundleId) {
     return surveySubmissionRepository.findByMember_IdAndSurvey_SurveyBundle_Id(memberId, bundleId);
   }
 
@@ -69,7 +70,7 @@ public class SurveyService {
     return new SurveyHistoryResponse(1L, List.of(), 1);
   }
 
-  private SurveyHistoryResponse createNextBundleSurveyHistory(Long currentBundleId) {
+  private SurveyHistoryResponse createNextBundleSurveyHistory(final Long currentBundleId) {
     return new SurveyHistoryResponse(currentBundleId + 1, List.of(), 1);
   }
 
