@@ -19,8 +19,17 @@ public class Member extends BaseTimeEntity {
   @OneToMany(mappedBy = "member")
   private List<SocialAccount> socialAccounts;
 
-  public static Member create() {
-    return new Member();
+  private String name;
+
+  private String email;
+
+  private Member(final String name, final String email) {
+    this.name = name;
+    this.email = email;
+  }
+
+  public static Member create(final String name, final String email) {
+    return new Member(name, email);
   }
 
   public void softDelete() {
@@ -28,5 +37,10 @@ public class Member extends BaseTimeEntity {
       this.socialAccounts.forEach(SocialAccount::softDelete);
     }
     super.softDelete();
+  }
+
+  public void updateUserInfo(final String name, final String email) {
+    this.name = name;
+    this.email = email;
   }
 }
