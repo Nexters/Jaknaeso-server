@@ -4,6 +4,7 @@ import java.nio.file.AccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
 import org.nexters.jaknaesocore.domain.member.service.MemberService;
+import org.nexters.jaknaesoserver.domain.auth.model.CustomUserDetails;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -22,9 +23,9 @@ public class MemberController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @DeleteMapping("/{memberId}")
   public ApiResponse<?> deleteMember(
-      @PathVariable Long memberId, @AuthenticationPrincipal Long userId)
+      @PathVariable Long memberId, @AuthenticationPrincipal CustomUserDetails member)
       throws AccessDeniedException {
-    if (!memberId.equals(userId)) {
+    if (!memberId.equals(member.getMemberId())) {
       throw new AccessDeniedException("본인의 계정만 삭제할 수 있습니다.");
     }
     memberService.deleteMember(memberId);

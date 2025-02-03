@@ -45,7 +45,8 @@ public class OauthService {
 
   @Transactional
   public Long kakaoLogin(final KakaoLoginCommand command) {
-    final KakaoTokenResponse token = getKakaoToken(command.authorizationCode(), command.redirectUri());
+    final KakaoTokenResponse token =
+        getKakaoToken(command.authorizationCode(), command.redirectUri());
     log.info("kakao 토큰 받아오기 완료");
     final KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.getAccessToken());
     log.info("kakao 사용자 정보 받아오기 완료");
