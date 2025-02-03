@@ -13,6 +13,7 @@ import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoTokenResponse;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse;
 import org.nexters.jaknaesocore.domain.auth.service.dto.AppleLoginCommand;
 import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;
+import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginWithTokenCommand;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
@@ -62,6 +63,22 @@ public class OauthService {
             () ->
                 kakaoSignUp(
                     oauthId, userInfo.kakaoAccount().name(), userInfo.kakaoAccount().email()));
+  }
+
+  @Transactional
+  public Long kakaoLoginWithToken(final KakaoLoginWithTokenCommand command) {
+    final KakaoUserInfoResponse userInfo = getKakaoUserInfo(command.accessToken());
+
+    final String oauthId = userInfo.id().toString();
+    final Member member = findMemberWithSocialProvider(oauthId, SocialProvider.KAKAO);
+    if (member == null) {
+      final Member newMember =
+          memberRepository.save(
+              Member.create(userInfo.kakaoAccount().name(), userInfo.kakaoAccount().email()));
+      socialAccountRepository.save(SocialAccount.kakaoSignup(oauthId, newMember));
+      return newMember.getId();
+    }
+    return member.getId();
   }
 
   private KakaoUserInfoResponse getKakaoUserInfo(final String accessToken) {

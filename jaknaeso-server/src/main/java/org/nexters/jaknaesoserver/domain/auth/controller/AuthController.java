@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
 import org.nexters.jaknaesoserver.domain.auth.controller.dto.AppleLoginRequest;
 import org.nexters.jaknaesoserver.domain.auth.controller.dto.KakaoLoginRequest;
+import org.nexters.jaknaesoserver.domain.auth.controller.dto.KakaoLoginWithTokenRequest;
 import org.nexters.jaknaesoserver.domain.auth.dto.TokenResponse;
 import org.nexters.jaknaesoserver.domain.auth.service.AuthFacadeService;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,6 +31,13 @@ public class AuthController {
   @PostMapping("/kakao-login")
   public ApiResponse<TokenResponse> kakaoLogin(@RequestBody @Valid KakaoLoginRequest request) {
     TokenResponse response = authFacadeService.kakaoLogin(request.toServiceDto());
+    return ApiResponse.success(response);
+  }
+
+  @PostMapping("/kakao-login-with-token")
+  public ApiResponse<TokenResponse> kakaoLoginWithToken(
+      @RequestBody @Valid KakaoLoginWithTokenRequest request) {
+    TokenResponse response = authFacadeService.kakaoLoginWithToken(request.toServiceDto());
     return ApiResponse.success(response);
   }
 
