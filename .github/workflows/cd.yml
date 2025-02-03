@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - fix/#46-카카오-api-호출-오류
 
 env:
   NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
