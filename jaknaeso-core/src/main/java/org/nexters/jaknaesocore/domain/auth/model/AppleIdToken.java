@@ -2,14 +2,12 @@ package org.nexters.jaknaesocore.domain.auth.model;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import lombok.Builder;
 
 public class AppleIdToken {
 
   private final String idToken;
 
-  @Builder // test only
-  private AppleIdToken(final String idToken) {
+  AppleIdToken(final String idToken) {
     this.idToken = idToken;
   }
 

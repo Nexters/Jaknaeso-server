@@ -37,7 +37,7 @@ class AppleIdTokenTest {
   }
 
   private AppleIdToken createAppleIdToken() {
-    return AppleIdToken.builder()
+    return AppleIdTokenFixture.builder()
         .idToken(
             "eyJraWQiOiJBSURPRkZDTzJDM05EUVBGQUJDVEFDT1VDU1ZZQUdTR09ZUEJNVU5KS1FEUVFBQUEyTVE2USIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiIwMDEyMzQ1Njc4OTAxMjM0NTY3ODkwMTIiLCJhdF9oYXNoIjoiUlZfdkZKZnFhdDBGMmFZdHVQUlNlZyIsImF1ZCI6ImNvbS5leGFtcGxlLmFwcGxpbmUud2ViIiwiYXV0aF90aW1lIjoxNjA1MzcxNTU5LCJpc3MiOiJodHRwczovL2lkLmFwcGxlLmNvbSIsImV4cCI6MTYwNTM3NTE1OSwiaWF0IjoxNjA1MzcxNTU5LCJub25jZSI6Ijc5NDc5NTg4MzA1NDQ2OTQzNiIsImVtYWlsIjoidGVzdEBleGFtcGxlLmNvbSIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlfQ.VkmD8KcTtCmN65DPwhAPoOeRuXmsLqnm1z8pWa_qHG3xD2LBJgj9YOZPUKseOlfrOz5e5JgIR1qPdWiL2QFuyjCQZ0PSG0hV1xtQ_yYbVHeqLaID0AgcV8Hxldg9hFvF_jvM8G_mo0S9-D8gOR4kbQ")
         .build();

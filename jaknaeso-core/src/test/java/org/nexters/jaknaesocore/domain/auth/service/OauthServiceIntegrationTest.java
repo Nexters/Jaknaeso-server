@@ -12,6 +12,7 @@ import org.nexters.jaknaesocore.domain.auth.service.dto.AppleLoginCommand;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
+import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccountFixture;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialProvider;
 import org.nexters.jaknaesocore.domain.socialaccount.repository.SocialAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +76,7 @@ class OauthServiceIntegrationTest extends IntegrationTest {
 
   private SocialAccount createSocialAccount(
       final Member member, final String oauthId, final SocialProvider socialProvider) {
-    return SocialAccount.builder()
+    return SocialAccountFixture.builder()
         .member(member)
         .oauthId(oauthId)
         .socialProvider(socialProvider)
