@@ -16,6 +16,8 @@ import com.epages.restdocs.apispec.SimpleType;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryDetailResponse;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyOptionsResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
@@ -73,6 +75,44 @@ class SurveyControllerTest extends ControllerTest {
                                 .description("설문지 옵션 내용"),
                             fieldWithPath("error").description("에러").optional())
                         .responseSchema(Schema.schema("surveyResponse"))
+                        .build())));
+  }
+
+  @WithMockCustomUser
+  @DisplayName("회원의 설문 이력을 가져온다.")
+  @Test
+  void getSurveyHistory() throws Exception {
+    SurveyHistoryResponse response =
+        new SurveyHistoryResponse(
+            1L,
+            List.of(new SurveyHistoryDetailResponse(1L), new SurveyHistoryDetailResponse(2L)),
+            3);
+
+    given(surveyService.getSurveyHistory(anyLong())).willReturn(response);
+
+    mockMvc
+        .perform(get("/api/v1/surveys/history").with(csrf()))
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "survey-get-history",
+                resource(
+                    ResourceSnippetParameters.builder()
+                        .description("회원의 설문 이력을 조회")
+                        .tag("Survey Domain")
+                        .responseFields(
+                            fieldWithPath("result").type(SimpleType.STRING).description("결과"),
+                            fieldWithPath("data.bundleId")
+                                .type(SimpleType.NUMBER)
+                                .description("번들 ID"),
+                            fieldWithPath("data.surveyHistoryDetails[].submissionId")
+                                .type(SimpleType.NUMBER)
+                                .description("제출 ID"),
+                            fieldWithPath("data.nextSurveyIndex")
+                                .type(SimpleType.NUMBER)
+                                .description("다음 설문 인덱스"),
+                            fieldWithPath("error").description("에러").optional())
+                        .responseSchema(Schema.schema("surveyHistoryResponse"))
                         .build())));
   }
 }
