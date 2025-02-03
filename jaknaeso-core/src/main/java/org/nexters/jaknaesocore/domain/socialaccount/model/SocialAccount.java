@@ -30,8 +30,7 @@ public class SocialAccount extends BaseTimeEntity {
   @JoinColumn(name = "member_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
   private Member member;
 
-  private SocialAccount(
-      final String oauthId, final SocialProvider socialProvider, final Member member) {
+  SocialAccount(final String oauthId, final SocialProvider socialProvider, final Member member) {
     this.oauthId = oauthId;
     this.socialProvider = socialProvider;
     this.member = member;
