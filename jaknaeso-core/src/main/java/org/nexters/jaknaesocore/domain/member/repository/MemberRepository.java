@@ -18,9 +18,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     return findByIdAndDeletedAtIsNull(memberId)
         .orElseThrow(() -> new CustomException(ErrorType.MEMBER_NOT_FOUND));
   }
-
-  default void softDeleteById(final Long memberId) {
-    Member member = findMember(memberId);
-    member.softDelete();
-  }
 }
