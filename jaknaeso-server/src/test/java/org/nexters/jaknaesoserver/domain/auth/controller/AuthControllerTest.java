@@ -17,9 +17,9 @@ import com.epages.restdocs.apispec.SimpleType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.domain.auth.dto.KakaoLoginRequest;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.domain.auth.controller.dto.AppleLoginRequest;
+import org.nexters.jaknaesoserver.domain.auth.controller.dto.KakaoLoginRequest;
 import org.nexters.jaknaesoserver.domain.auth.dto.TokenResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.web.client.RestClientException;
@@ -78,7 +78,7 @@ class AuthControllerTest extends ControllerTest {
   @DisplayName("카카오 API를 호출하여 서비스에 로그인한다.")
   @Test
   void kakaoLoginSuccess() throws Exception {
-    KakaoLoginRequest request = new KakaoLoginRequest("authorization code");
+    KakaoLoginRequest request = new KakaoLoginRequest("authorization code", "redirect-uri");
 
     given(authFacadeService.kakaoLogin(request.toServiceDto()))
         .willReturn(new TokenResponse(1L, "accessToken", "refreshToken"));
@@ -122,7 +122,7 @@ class AuthControllerTest extends ControllerTest {
   @DisplayName("카카오 API 호출이 실패하여 서비스 로그인에 실패하고 서버 오류를 반환한다.")
   @Test
   void kakaoLoginFail() throws Exception {
-    KakaoLoginRequest request = new KakaoLoginRequest("invalid authorization code");
+    KakaoLoginRequest request = new KakaoLoginRequest("invalid authorization code", "redirect-uri");
 
     given(authFacadeService.kakaoLogin(request.toServiceDto()))
         .willThrow(RestClientException.class);

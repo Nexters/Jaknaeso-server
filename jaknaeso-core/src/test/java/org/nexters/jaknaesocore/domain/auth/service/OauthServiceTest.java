@@ -33,7 +33,7 @@ class OauthServiceTest extends ServiceTest {
     ReflectionTestUtils.setField(newMember, "id", 1L);
     SocialAccount newAccount = SocialAccount.kakaoSignup(oauthId.toString());
 
-    KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
+    KakaoLoginCommand command = new KakaoLoginCommand("authorization code", "redirect-uri");
 
     given(kakaoAuthClient.requestToken(makeKakaoTokenRequestParams(command.authorizationCode())))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
@@ -54,7 +54,7 @@ class OauthServiceTest extends ServiceTest {
     SocialAccount account = SocialAccount.kakaoSignup(oauthId.toString());
     ReflectionTestUtils.setField(account, "member", member);
 
-    KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
+    KakaoLoginCommand command = new KakaoLoginCommand("authorization code", "redirect-uri");
 
     given(kakaoAuthClient.requestToken(makeKakaoTokenRequestParams(command.authorizationCode())))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
@@ -68,7 +68,7 @@ class OauthServiceTest extends ServiceTest {
   @DisplayName("카카오 토큰 API 호출에 실패하면 RestClientException를 반환한다.")
   @Test
   void kakaoLoginFailByTokenApiFailure() {
-    KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
+    KakaoLoginCommand command = new KakaoLoginCommand("authorization code", "redirect-uri");
 
     given(kakaoAuthClient.requestToken(makeKakaoTokenRequestParams(command.authorizationCode())))
         .willThrow(RestClientException.class);
@@ -79,7 +79,7 @@ class OauthServiceTest extends ServiceTest {
   @DisplayName("카카오 사용자 정보 API 호출에 실패하면 RestClientException를 반환한다.")
   @Test
   void kakaoLoginFailByUserInfoApiFailure() {
-    KakaoLoginCommand command = new KakaoLoginCommand("authorization code");
+    KakaoLoginCommand command = new KakaoLoginCommand("authorization code", "redirect-uri");
 
     given(kakaoAuthClient.requestToken(makeKakaoTokenRequestParams(command.authorizationCode())))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));

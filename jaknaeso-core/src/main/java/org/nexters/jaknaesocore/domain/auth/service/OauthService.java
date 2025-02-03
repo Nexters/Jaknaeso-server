@@ -43,12 +43,9 @@ public class OauthService {
   @Value("${oauth.kakao.client-secret}")
   private String clientSecret;
 
-  @Value("${oauth.kakao.redirect-uri}")
-  private String redirectUri;
-
   @Transactional
   public Long kakaoLogin(final KakaoLoginCommand command) {
-    KakaoTokenResponse token = getKakaoToken(command.authorizationCode());
+    KakaoTokenResponse token = getKakaoToken(command.authorizationCode(), command.redirectUri());
     log.info("kakao 토큰 받아오기 완료");
     KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.getAccessToken());
     log.info("kakao 사용자 정보 받아오기 완료");
@@ -68,7 +65,8 @@ public class OauthService {
     return kakaoClient.requestUserInfo(BEARER_PREFIX + accessToken);
   }
 
-  private KakaoTokenResponse getKakaoToken(final String authorizationCode) {
+  private KakaoTokenResponse getKakaoToken(
+      final String authorizationCode, final String redirectUri) {
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
     params.add("grant_type", "authorization_code");
     params.add("client_id", clientId);
