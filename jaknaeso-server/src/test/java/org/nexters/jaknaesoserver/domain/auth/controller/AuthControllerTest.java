@@ -99,7 +99,10 @@ class AuthControllerTest extends ControllerTest {
                         .description("카카오 로그인 및 토큰 발급")
                         .tags("Auth Domain")
                         .requestFields(
-                            fieldWithPath("code").type(SimpleType.STRING).description("카카오 인증 코드"))
+                            fieldWithPath("code").type(SimpleType.STRING).description("카카오 인증 코드"),
+                            fieldWithPath("redirectUri")
+                                .type(SimpleType.STRING)
+                                .description("카카오 로그인 리다이렉트 URI"))
                         .responseFields(
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
@@ -143,7 +146,10 @@ class AuthControllerTest extends ControllerTest {
                         .description("카카오 로그인 및 토큰 발급")
                         .tags("Auth Domain")
                         .requestFields(
-                            fieldWithPath("code").type(SimpleType.STRING).description("카카오 인증 코드"))
+                            fieldWithPath("code").type(SimpleType.STRING).description("카카오 인증 코드"),
+                            fieldWithPath("redirectUri")
+                                .type(SimpleType.STRING)
+                                .description("카카오 로그인 리다이렉트 URI"))
                         .responseFields(
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
