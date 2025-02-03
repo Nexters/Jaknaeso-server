@@ -19,7 +19,7 @@ class SocialAccountRepositoryTest extends RepositoryTest {
 
   @Test
   void oauthId와_socialProvider에_해당하는_소셜_계정을_조회한다() {
-    Member member = memberRepository.save(Member.create());
+    Member member = memberRepository.save(Member.create("name", "email"));
     socialAccountRepository.save(SocialAccount.kakaoSignup("oauthId1", member));
 
     Optional<SocialAccount> actual1 =
@@ -34,7 +34,7 @@ class SocialAccountRepositoryTest extends RepositoryTest {
 
   @Test
   void oauthId와_socialProvider에_해당하는_소셜_계정_존재_여부를_조회한다() {
-    Member member = memberRepository.save(Member.create());
+    Member member = memberRepository.save(Member.create("name", "email"));
     socialAccountRepository.save(SocialAccount.kakaoSignup("oauthId1", member));
 
     boolean actual1 =

@@ -16,7 +16,7 @@ class MemberRepositoryTest extends RepositoryTest {
 
   @Test
   void 아이디에_해당하는_멤버를_조회한다() {
-    Member member = memberRepository.save(Member.create());
+    Member member = memberRepository.save(Member.create("name", "email"));
 
     then(memberRepository.findMember(member.getId())).isEqualTo(member);
   }

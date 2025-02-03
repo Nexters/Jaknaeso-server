@@ -1,6 +1,7 @@
 package org.nexters.jaknaesocore.domain.survey.service;
 
-import static org.assertj.core.api.BDDAssertions.*;
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.tuple;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -11,13 +12,18 @@ import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
-import org.nexters.jaknaesocore.domain.survey.model.*;
+import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
+import org.nexters.jaknaesocore.domain.survey.model.Keyword;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
+import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
+import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class SurveyServiceTest extends IntegrationTest {
+
   @Autowired private SurveyService surveyService;
 
   @Autowired private MemberRepository memberRepository;
@@ -37,7 +43,7 @@ class SurveyServiceTest extends IntegrationTest {
   @Test
   void getNextSurvey() {
     // given
-    Member member = Member.create();
+    Member member = Member.create("name", "email");
     memberRepository.save(member);
     SurveyBundle surveyBundle = new SurveyBundle();
     surveyBundleRepository.save(surveyBundle);
