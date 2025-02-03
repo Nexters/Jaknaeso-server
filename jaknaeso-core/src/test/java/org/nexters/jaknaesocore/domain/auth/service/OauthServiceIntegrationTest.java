@@ -17,6 +17,7 @@ import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse.KakaoAccount;
 import org.nexters.jaknaesocore.domain.auth.service.dto.AppleLoginCommand;
 import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;
+import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginWithTokenCommand;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
@@ -53,6 +54,10 @@ class OauthServiceIntegrationTest extends IntegrationTest {
 
   private KakaoLoginCommand createKakaoLoginCommand(String authorizationCode, String redirectUri) {
     return new KakaoLoginCommand(authorizationCode, redirectUri);
+  }
+
+  private KakaoLoginWithTokenCommand createKakaoLoginWithTokenCommand(String accessToken) {
+    return new KakaoLoginWithTokenCommand(accessToken);
   }
 
   @Nested
@@ -149,6 +154,59 @@ class OauthServiceIntegrationTest extends IntegrationTest {
         socialAccountRepository.save(createSocialAccount(member, oauthId, SocialProvider.KAKAO));
 
         sut.kakaoLogin(createKakaoLoginCommand("카카오 인가 코드", "카카오 로그인 리다이렉트 URI"));
+
+        assertAll(
+            () -> then(memberRepository.findAll()).hasSize(1),
+            () -> then(socialAccountRepository.findAll()).hasSize(1));
+      }
+    }
+  }
+
+  @Nested
+  @DisplayName("kakaoLoginWithToken 메소드는")
+  class kakaoLoginToken {
+
+    @BeforeEach
+    void setUp() {
+      given(kakaoClient.requestUserInfo("Bearer access token"))
+          .willReturn(new KakaoUserInfoResponse(1L, new KakaoAccount("홍길동", "test@example.com")));
+    }
+
+    @Nested
+    @DisplayName("유저를 찾지 못하면")
+    class whenMemberNotFound {
+
+      @Test
+      @DisplayName("회원가입을 진행한다.")
+      void shouldSignUp() {
+        sut.kakaoLoginWithToken(createKakaoLoginWithTokenCommand("access token"));
+
+        assertAll(
+            () ->
+                then(memberRepository.findAll())
+                    .hasSize(1)
+                    .extracting("name", "email")
+                    .containsExactly(tuple("홍길동", "test@example.com")),
+            () ->
+                then(socialAccountRepository.findAll())
+                    .hasSize(1)
+                    .extracting("oauthId", "socialProvider")
+                    .containsExactlyInAnyOrder(tuple("1", SocialProvider.KAKAO)));
+      }
+    }
+
+    @Nested
+    @DisplayName("유저를 찾으면")
+    class whenMemberFound {
+
+      @Test
+      @DisplayName("로그인을 진행한다.")
+      void shouldSignIn() {
+        final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+        final String oauthId = "1";
+        socialAccountRepository.save(createSocialAccount(member, oauthId, SocialProvider.KAKAO));
+
+        sut.kakaoLoginWithToken(createKakaoLoginWithTokenCommand("access token"));
 
         assertAll(
             () -> then(memberRepository.findAll()).hasSize(1),

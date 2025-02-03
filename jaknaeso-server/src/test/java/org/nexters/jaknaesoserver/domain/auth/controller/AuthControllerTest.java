@@ -19,9 +19,9 @@ import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.domain.auth.controller.dto.AppleLoginRequest;
 import org.nexters.jaknaesoserver.domain.auth.controller.dto.KakaoLoginRequest;
+import org.nexters.jaknaesoserver.domain.auth.controller.dto.KakaoLoginWithTokenRequest;
 import org.nexters.jaknaesoserver.domain.auth.dto.TokenResponse;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.web.client.RestClientException;
 
 class AuthControllerTest extends ControllerTest {
 
@@ -72,7 +72,7 @@ class AuthControllerTest extends ControllerTest {
   }
 
   @Test
-  void 카카오_API를_호출하여_서비스에_로그인한다() throws Exception {
+  void 인가_코드로_카카오_API를_호출하여_서비스에_로그인한다() throws Exception {
     KakaoLoginRequest request = new KakaoLoginRequest("authorization code", "redirect-uri");
 
     given(authFacadeService.kakaoLogin(request.toServiceDto()))
@@ -118,44 +118,47 @@ class AuthControllerTest extends ControllerTest {
   }
 
   @Test
-  void 카카오_API_호출이_실패하여_서비스_로그인에_실패하고_서버_예외를_반환한다() throws Exception {
-    KakaoLoginRequest request = new KakaoLoginRequest("invalid authorization code", "redirect-uri");
+  void 토큰으로_카카오_API를_호출하여_서비스에_로그인한다() throws Exception {
+    KakaoLoginWithTokenRequest request = new KakaoLoginWithTokenRequest("access token");
 
-    given(authFacadeService.kakaoLogin(request.toServiceDto()))
-        .willThrow(RestClientException.class);
+    given(authFacadeService.kakaoLoginWithToken(request.toServiceDto()))
+        .willReturn(new TokenResponse(1L, "accessToken", "refreshToken"));
 
     mockMvc
         .perform(
-            post("/api/v1/auth/kakao-login")
+            post("/api/v1/auth/kakao-login-with-token")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
-        .andExpect(status().is5xxServerError())
+        .andExpect(status().isOk())
         .andDo(
             document(
-                "kakao-login-fail",
+                "kakao-login-with-token-success",
                 resource(
                     ResourceSnippetParameters.builder()
-                        .description("카카오 로그인 및 토큰 발급")
+                        .description("카카오 로그인 (for 안드로이드)")
                         .tags("Auth Domain")
                         .requestFields(
-                            fieldWithPath("code").type(SimpleType.STRING).description("카카오 인증 코드"),
-                            fieldWithPath("redirectUri")
+                            fieldWithPath("accessToken")
                                 .type(SimpleType.STRING)
-                                .description("카카오 로그인 리다이렉트 URI"))
+                                .description("카카오 액세스 토큰"))
                         .responseFields(
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
                                 .description("API 요청 결과 (성공/실패)"),
-                            fieldWithPath("error.code")
+                            fieldWithPath("data.memberId")
+                                .type(SimpleType.NUMBER)
+                                .description("유저 ID"),
+                            fieldWithPath("data.accessToken")
                                 .type(SimpleType.STRING)
-                                .description("커스텀 에러 코드"),
-                            fieldWithPath("error.message")
+                                .description("액세스 토큰"),
+                            fieldWithPath("data.refreshToken")
                                 .type(SimpleType.STRING)
-                                .description("에러 상세 메시지"),
-                            fieldWithPath("error.data").description("에러 관련 데이터").optional(),
-                            fieldWithPath("data").description("정상적인 요청의 결과 데이터").optional())
+                                .description("리프레시 토큰"),
+                            fieldWithPath("error").description("에러").optional())
+                        .requestSchema(schema("KakaoLoginWithTokenRequest"))
+                        .responseSchema(schema("TokenResponse"))
                         .build())));
   }
 
