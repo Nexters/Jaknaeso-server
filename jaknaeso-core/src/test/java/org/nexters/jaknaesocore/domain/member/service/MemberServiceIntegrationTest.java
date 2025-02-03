@@ -28,7 +28,7 @@ class MemberServiceIntegrationTest extends IntegrationTest {
 
   @Test
   void 멤버를_삭제한다() {
-    Member member = memberRepository.save(Member.create());
+    Member member = memberRepository.save(Member.create("name", "email"));
 
     sut.deleteMember(member.getId());
 
@@ -39,7 +39,7 @@ class MemberServiceIntegrationTest extends IntegrationTest {
 
   @Test
   void 멤버_삭제_시_멤버의_소셜_계정도_함께_삭제한다() {
-    Member member = memberRepository.save(Member.create());
+    Member member = memberRepository.save(Member.create("name", "email"));
     SocialAccount account =
         socialAccountRepository.save(SocialAccount.kakaoSignup("oauthId1", member));
 

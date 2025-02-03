@@ -15,7 +15,7 @@ class SurveySubscriptionsTest {
   @Test
   void getSubmittedSurvey() {
     // given
-    Member member = Member.create();
+    Member member = Member.create("name", "email");
     ReflectionTestUtils.setField(member, "id", 1L);
 
     SurveyBundle surveyBundle = new SurveyBundle();
@@ -51,10 +51,10 @@ class SurveySubscriptionsTest {
   @Test
   void getSubmittedSurvey_OtherMember() {
     // given
-    Member member1 = Member.create();
+    Member member1 = Member.create("name", "email");
     ReflectionTestUtils.setField(member1, "id", 1L);
 
-    Member member2 = Member.create();
+    Member member2 = Member.create("name", "email");
     ReflectionTestUtils.setField(member2, "id", 2L);
 
     SurveyBundle surveyBundle = new SurveyBundle();
@@ -90,7 +90,7 @@ class SurveySubscriptionsTest {
   @Test
   void getSubmittedSurvey_Empty() {
     // given
-    Member member = Member.create();
+    Member member = Member.create("name", "email");
     ReflectionTestUtils.setField(member, "id", 1L);
 
     // when

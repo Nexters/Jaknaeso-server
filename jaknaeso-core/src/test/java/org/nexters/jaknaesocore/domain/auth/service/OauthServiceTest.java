@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.ServiceTest;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoTokenResponse;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse;
+import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse.KakaoAccount;
 import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
@@ -37,7 +38,7 @@ class OauthServiceTest extends ServiceTest {
     given(kakaoAuthClient.requestToken(makeKakaoTokenRequestParams(command.authorizationCode())))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
-        .willReturn(new KakaoUserInfoResponse(oauthId));
+        .willReturn(new KakaoUserInfoResponse(oauthId, new KakaoAccount("name", "email")));
     given(
             socialAccountRepository.findByOauthIdAndSocialProviderAndDeletedAtIsNull(
                 oauthId.toString(), KAKAO))
@@ -59,7 +60,7 @@ class OauthServiceTest extends ServiceTest {
     given(kakaoAuthClient.requestToken(makeKakaoTokenRequestParams(command.authorizationCode())))
         .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
     given(kakaoClient.requestUserInfo(BEARER_PREFIX + "access token"))
-        .willReturn(new KakaoUserInfoResponse(oauthId));
+        .willReturn(new KakaoUserInfoResponse(oauthId, new KakaoAccount("name", "email")));
     given(
             socialAccountRepository.findByOauthIdAndSocialProviderAndDeletedAtIsNull(
                 oauthId.toString(), KAKAO))
@@ -91,7 +92,7 @@ class OauthServiceTest extends ServiceTest {
   }
 
   private Member createMemberWithId(final Long id) {
-    Member member = Member.create();
+    Member member = Member.create("name", "email");
     ReflectionTestUtils.setField(member, "id", id);
     return member;
   }

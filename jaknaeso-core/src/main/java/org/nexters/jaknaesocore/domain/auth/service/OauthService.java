@@ -48,21 +48,20 @@ public class OauthService {
     final KakaoTokenResponse token =
         getKakaoToken(command.authorizationCode(), command.redirectUri());
     log.info("kakao 토큰 받아오기 완료");
-    final KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.getAccessToken());
+    final KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.accessToken());
     log.info("kakao 사용자 정보 받아오기 완료");
 
-    final String oauthId = userInfo.getId().toString();
+    final String oauthId = userInfo.id().toString();
     final Member member = findKakaoMember(oauthId);
     if (member == null) {
-      return signupKakaoMember(command.authorizationCode()).getId();
+      final Member newMember =
+          memberRepository.save(
+              Member.create(userInfo.kakaoAccount().name(), userInfo.kakaoAccount().email()));
+      socialAccountRepository.save(SocialAccount.kakaoSignup(oauthId, newMember));
+      return newMember.getId();
     }
+    member.updateUserInfo(userInfo.kakaoAccount().name(), userInfo.kakaoAccount().email());
     return member.getId();
-  }
-
-  private Member signupKakaoMember(final String oauthId) {
-    final Member member = memberRepository.save(Member.create());
-    socialAccountRepository.save(SocialAccount.kakaoSignup(oauthId, member));
-    return member;
   }
 
   private Member findKakaoMember(final String oauthId) {
@@ -100,7 +99,8 @@ public class OauthService {
         .map(account -> account.getMember().getId())
         .orElseGet(
             () -> {
-              final Member member = memberRepository.save(Member.create());
+              final Member member =
+                  memberRepository.save(Member.create("TODO: name", "TODO: email"));
               socialAccountRepository.save(
                   SocialAccount.appleSignUp(authorization.getSub(), member));
               return member.getId();
