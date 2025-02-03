@@ -2,6 +2,7 @@ package org.nexters.jaknaesoserver.domain.survey.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
 import org.nexters.jaknaesocore.domain.survey.service.SurveyService;
 import org.nexters.jaknaesoserver.domain.auth.model.CustomUserDetails;
@@ -22,5 +23,11 @@ public class SurveyController {
   public ApiResponse<SurveyResponse> getNextSurvey(
       @AuthenticationPrincipal CustomUserDetails member, @PathVariable Long bundleId) {
     return ApiResponse.success(surveyService.getNextSurvey(bundleId, member.getMemberId()));
+  }
+
+  @GetMapping("/history")
+  public ApiResponse<SurveyHistoryResponse> getSurveyHistory(
+      @AuthenticationPrincipal CustomUserDetails member) {
+    return ApiResponse.success(surveyService.getSurveyHistory(member.getMemberId()));
   }
 }
