@@ -18,4 +18,3 @@ oauth:
   kakao:
     client-id: client-id
     client-secret: client-secret
-    redirect-uri: redirect-uri
