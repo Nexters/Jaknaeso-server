@@ -83,7 +83,6 @@ jobs:
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
           echo "KAKAO_LOGIN_CLIENT_ID=${{ secrets.KAKAO_LOGIN_CLIENT_ID }}" >> .env
           echo "KAKAO_LOGIN_CLIENT_SECRET=${{ secrets.KAKAO_LOGIN_CLIENT_SECRET }}" >> .env
-          echo "KAKAO_LOGIN_REDIRECT_URI=${{ secrets.KAKAO_LOGIN_REDIRECT_URI }}" >> .env
           echo "SPRING_PROFILES_ACTIVE=${{ env.SPRING_PROFILES_ACTIVE }}" >> .env
 
       - name: Transfer files to Server
