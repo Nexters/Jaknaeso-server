@@ -18,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class SurveyService {
 
-  private static final int DEFAULT_SIZE_OF_BUNDLE = 15;
   private final SurveyBundleRepository surveyBundleRepository;
   private final SurveySubmissionRepository surveySubmissionRepository;
 
@@ -46,10 +45,11 @@ public class SurveyService {
     if (latestSubmission == null) {
       return createInitialSurveyHistory();
     }
-    Long currentBundleId = latestSubmission.getSurvey().getSurveyBundle().getId();
+    SurveyBundle bundle = latestSubmission.getSurvey().getSurveyBundle();
+    Long currentBundleId = bundle.getId();
     List<SurveySubmission> submissions = findSubmissionsForBundle(memberId, currentBundleId);
 
-    if (hasReachedSubmissionLimit(submissions)) {
+    if (bundle.isAllSubmitted(submissions)) {
       return createNextBundleSurveyHistory(currentBundleId);
     }
     return createCurrentBundleSurveyHistory(currentBundleId, submissions);
@@ -63,10 +63,6 @@ public class SurveyService {
 
   private List<SurveySubmission> findSubmissionsForBundle(Long memberId, Long bundleId) {
     return surveySubmissionRepository.findByMember_IdAndSurvey_SurveyBundle_Id(memberId, bundleId);
-  }
-
-  private boolean hasReachedSubmissionLimit(List<SurveySubmission> submissions) {
-    return submissions.size() >= DEFAULT_SIZE_OF_BUNDLE;
   }
 
   private SurveyHistoryResponse createInitialSurveyHistory() {

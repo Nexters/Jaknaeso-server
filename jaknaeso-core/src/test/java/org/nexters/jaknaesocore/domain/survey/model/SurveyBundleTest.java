@@ -50,6 +50,52 @@ class SurveyBundleTest {
         .hasMessage("모든 설문을 완료하셨습니다.");
   }
 
+  @Test
+  void 모든_설문을_제출했는지_확인한다() {
+    // given
+    SurveyBundle surveyBundle = new SurveyBundle();
+
+    BalanceSurvey survey1 = createBalanceSurvey("대학 동기 모임에서 나의 승진 이야기가 나왔습니다", surveyBundle, 1L);
+    BalanceSurvey survey2 = createBalanceSurvey("회사에서 팀 리더로 뽑혔습니다", surveyBundle, 2L);
+    MultipleChoiceSurvey survey3 = createMultipleChoiceSurvey("나의 행복 지수는", surveyBundle, 3L);
+    MultipleChoiceSurvey survey4 = createMultipleChoiceSurvey("나는 노는게 좋다.", surveyBundle, 4L);
+
+    surveyBundle.getSurveys().addAll(List.of(survey1, survey2, survey3, survey4));
+
+    SurveySubmission submission1 = SurveySubmission.builder().survey(survey1).build();
+
+    SurveySubmission submission2 = SurveySubmission.builder().survey(survey2).build();
+
+    SurveySubmission submission3 = SurveySubmission.builder().survey(survey3).build();
+
+    SurveySubmission submission4 = SurveySubmission.builder().survey(survey4).build();
+
+    // when
+    boolean result =
+        surveyBundle.isAllSubmitted(List.of(submission1, submission2, submission3, submission4));
+    // then
+    then(result).isTrue();
+  }
+
+  @Test
+  void 모든_설문을_제출했는지_확인한다2() {
+    // given
+    SurveyBundle surveyBundle = new SurveyBundle();
+
+    BalanceSurvey survey1 = createBalanceSurvey("대학 동기 모임에서 나의 승진 이야기가 나왔습니다", surveyBundle, 1L);
+    BalanceSurvey survey2 = createBalanceSurvey("회사에서 팀 리더로 뽑혔습니다", surveyBundle, 2L);
+    MultipleChoiceSurvey survey3 = createMultipleChoiceSurvey("나의 행복 지수는", surveyBundle, 3L);
+    MultipleChoiceSurvey survey4 = createMultipleChoiceSurvey("나는 노는게 좋다.", surveyBundle, 4L);
+
+    surveyBundle.getSurveys().addAll(List.of(survey1, survey2, survey3, survey4));
+
+    SurveySubmission submission1 = SurveySubmission.builder().survey(survey1).build();
+    // when
+    boolean result = surveyBundle.isAllSubmitted(List.of(submission1));
+    // then
+    then(result).isFalse();
+  }
+
   private BalanceSurvey createBalanceSurvey(String content, SurveyBundle surveyBundle, Long id) {
     BalanceSurvey survey = new BalanceSurvey(content, surveyBundle);
     ReflectionTestUtils.setField(survey, "id", id);

@@ -32,4 +32,13 @@ public class SurveyBundle extends BaseTimeEntity {
     int randomNum = ThreadLocalRandom.current().nextInt(list.size());
     return list.get(randomNum);
   }
+
+  public boolean isAllSubmitted(final List<SurveySubmission> submissions) {
+    return surveys.stream()
+        .allMatch(
+            survey ->
+                submissions.stream()
+                    .map(SurveySubmission::getSurvey)
+                    .anyMatch(submittedSurvey -> submittedSurvey.equals(survey)));
+  }
 }
