@@ -126,7 +126,7 @@ class AuthControllerTest extends ControllerTest {
 
     mockMvc
         .perform(
-            post("/api/v1/auth/kakao-login-with-token")
+            post("/api/v1/auth/kakao-login/token")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
