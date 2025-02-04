@@ -25,30 +25,30 @@ public class SurveySubmission extends BaseTimeEntity {
   @JoinColumn(name = "option_id")
   private SurveyOption selectedOption;
 
-  private String comment;
+  private String retrospective;
 
   @Builder
   private SurveySubmission(
       final Member member,
       final Survey survey,
       final SurveyOption selectedOption,
-      final String comment) {
+      final String retrospective) {
     this.member = member;
     this.survey = survey;
     this.selectedOption = selectedOption;
-    this.comment = comment;
+    this.retrospective = retrospective;
   }
 
   public static SurveySubmission create(
       final Member member,
       final Survey survey,
       final SurveyOption selectedOption,
-      final String comment) {
+      final String retrospective) {
     return SurveySubmission.builder()
         .member(member)
         .survey(survey)
         .selectedOption(selectedOption)
-        .comment(comment)
+        .retrospective(retrospective)
         .build();
   }
 }
