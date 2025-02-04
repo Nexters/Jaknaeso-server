@@ -94,12 +94,7 @@ public class OauthService {
     return socialAccountRepository
         .findByOauthIdAndSocialProviderAndDeletedAtIsNull(
             authorization.getSub(), SocialProvider.APPLE)
-        .map(SocialAccount::getMember)
-        .map(
-            it -> {
-              it.updateUserInfo(authorization.getEmail());
-              return it.getId();
-            })
+        .map(account -> account.getMember().getId())
         .orElseGet(
             () -> appleSignup(authorization.getSub(), command.name(), authorization.getEmail()));
   }
