@@ -32,7 +32,7 @@ public class SurveyController {
   }
 
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  @PostMapping("/submit/{surveyId}")
+  @PostMapping("/{surveyId}/submission")
   public ApiResponse<?> submitSurvey(
       @AuthenticationPrincipal CustomUserDetails member,
       @PathVariable Long surveyId,

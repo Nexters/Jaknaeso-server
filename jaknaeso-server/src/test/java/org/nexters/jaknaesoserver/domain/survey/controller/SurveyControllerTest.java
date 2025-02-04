@@ -132,7 +132,7 @@ class SurveyControllerTest extends ControllerTest {
 
     mockMvc
         .perform(
-            post("/api/v1/surveys/submit/{surveyId}", 1L)
+            post("/api/v1/surveys/{surveyId}/submission", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
                 .with(csrf()))
