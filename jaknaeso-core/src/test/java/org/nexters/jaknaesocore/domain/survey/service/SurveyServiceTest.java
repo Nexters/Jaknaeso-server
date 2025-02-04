@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
@@ -14,6 +15,8 @@ import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionServiceRequest;
+import org.nexters.jaknaesocore.domain.survey.model.*;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
@@ -30,6 +33,7 @@ class SurveyServiceTest extends IntegrationTest {
   @Autowired private SurveyService surveyService;
 
   @Autowired private MemberRepository memberRepository;
+  @Autowired private SurveySubmissionRepository surveySubmissionRepository;
   @Autowired private SurveyBundleRepository surveyBundleRepository;
   @Autowired private SurveyRepository surveyRepository;
   @Autowired private SurveyOptionRepository surveyOptionRepository;
@@ -71,6 +75,107 @@ class SurveyServiceTest extends IntegrationTest {
     then(survey.options())
         .extracting("id", "optionContents")
         .containsExactly(tuple(option.getId(), "질문 옵션 내용"));
+  }
+
+  @DisplayName("submitSurvey 메서드는")
+  @Nested
+  class submitSurvey {
+
+    @DisplayName("회원이 존재하지 않으면")
+    @Nested
+    class whenMemberNotFound {
+      @Test
+      @DisplayName("예외를 발생시킨다")
+      void throwMemberNotFoundException() {
+        // given
+        Member member = Member.create();
+        memberRepository.save(member);
+        SurveyBundle surveyBundle = new SurveyBundle();
+        surveyBundleRepository.save(surveyBundle);
+        BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
+        surveyRepository.save(balanceSurvey);
+        List<KeywordScore> scores =
+            List.of(
+                KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+                KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
+        SurveyOption option =
+            SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
+        surveyOptionRepository.save(option);
+
+        SurveySubmissionServiceRequest request =
+            new SurveySubmissionServiceRequest(option.getId(), "나는 행복한게 좋으니까");
+
+        // when
+        // then
+        thenThrownBy(() -> surveyService.submitSurvey(balanceSurvey.getId(), 0L, request))
+            .isEqualTo(CustomException.MEMBER_NOT_FOUND);
+      }
+    }
+
+    @DisplayName("설문을 저장한다")
+    @Nested
+    class shouldSubmitted {
+      @Test
+      void 설문에_응답을_제출한다() {
+        // given
+        Member member = Member.create();
+        memberRepository.save(member);
+        SurveyBundle surveyBundle = new SurveyBundle();
+        surveyBundleRepository.save(surveyBundle);
+        BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
+        surveyRepository.save(balanceSurvey);
+        List<KeywordScore> scores =
+            List.of(
+                KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+                KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
+        SurveyOption option =
+            SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
+        surveyOptionRepository.save(option);
+
+        SurveySubmissionServiceRequest request =
+            new SurveySubmissionServiceRequest(option.getId(), "나는 행복한게 좋으니까");
+
+        // when
+        surveyService.submitSurvey(balanceSurvey.getId(), member.getId(), request);
+        // then
+        List<SurveySubmission> submissions = surveySubmissionRepository.findAll();
+        then(submissions).hasSize(1);
+        then(submissions.getFirst())
+            .extracting("member.id", "survey.id", "selectedOption.id", "comment")
+            .containsExactly(member.getId(), balanceSurvey.getId(), option.getId(), "나는 행복한게 좋으니까");
+      }
+    }
+
+    @DisplayName("설문이 존재하지 않으면")
+    @Nested
+    class whenSurveyNotFound {
+      @Test
+      @DisplayName("예외를 발생시킨다")
+      void throwSurveyNotFoundException() {
+        // given
+        Member member = Member.create();
+        memberRepository.save(member);
+        SurveyBundle surveyBundle = new SurveyBundle();
+        surveyBundleRepository.save(surveyBundle);
+        BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
+        surveyRepository.save(balanceSurvey);
+        List<KeywordScore> scores =
+            List.of(
+                KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+                KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
+        SurveyOption option =
+            SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
+        surveyOptionRepository.save(option);
+
+        SurveySubmissionServiceRequest request =
+            new SurveySubmissionServiceRequest(option.getId(), "나는 행복한게 좋으니까");
+
+        // when
+        // then
+        thenThrownBy(() -> surveyService.submitSurvey(0L, member.getId(), request))
+            .isEqualTo(CustomException.SURVEY_NOT_FOUND);
+      }
+    }
   }
 
   @Test

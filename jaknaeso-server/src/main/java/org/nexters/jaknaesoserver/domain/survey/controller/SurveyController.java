@@ -1,16 +1,16 @@
 package org.nexters.jaknaesoserver.domain.survey.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
 import org.nexters.jaknaesocore.domain.survey.service.SurveyService;
 import org.nexters.jaknaesoserver.domain.auth.model.CustomUserDetails;
+import org.nexters.jaknaesoserver.domain.survey.controller.dto.SurveySubmissionRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,5 +29,15 @@ public class SurveyController {
   public ApiResponse<SurveyHistoryResponse> getSurveyHistory(
       @AuthenticationPrincipal CustomUserDetails member) {
     return ApiResponse.success(surveyService.getSurveyHistory(member.getMemberId()));
+  }
+
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PostMapping("/submit/{surveyId}")
+  public ApiResponse<?> submitSurvey(
+      @AuthenticationPrincipal CustomUserDetails member,
+      @PathVariable Long surveyId,
+      @Valid @RequestBody SurveySubmissionRequest request) {
+    surveyService.submitSurvey(surveyId, member.getMemberId(), request.toServiceRequest());
+    return ApiResponse.success();
   }
 }

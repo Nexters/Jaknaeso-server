@@ -3,9 +3,12 @@ package org.nexters.jaknaesoserver.domain.survey.controller;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -20,8 +23,11 @@ import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryDetailResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyOptionsResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionServiceRequest;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.common.support.WithMockCustomUser;
+import org.nexters.jaknaesoserver.domain.survey.controller.dto.SurveySubmissionRequest;
+import org.springframework.http.MediaType;
 
 class SurveyControllerTest extends ControllerTest {
 
@@ -113,6 +119,48 @@ class SurveyControllerTest extends ControllerTest {
                                 .description("다음 설문 인덱스"),
                             fieldWithPath("error").description("에러").optional())
                         .responseSchema(Schema.schema("surveyHistoryResponse"))
+                        .build())));
+  }
+
+  @WithMockCustomUser
+  @Test
+  void 설문에_응답을_제출한다() throws Exception {
+    SurveySubmissionRequest request = new SurveySubmissionRequest(1L, "나는 행복해요");
+    willDoNothing()
+        .given(surveyService)
+        .submitSurvey(anyLong(), anyLong(), any(SurveySubmissionServiceRequest.class));
+
+    mockMvc
+        .perform(
+            post("/api/v1/surveys/submit/{surveyId}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
+        .andExpect(status().isNoContent())
+        .andDo(
+            document(
+                "survey-submit",
+                resource(
+                    ResourceSnippetParameters.builder()
+                        .description("설문에 응답을 제출")
+                        .tag("Survey Domain")
+                        .pathParameters(
+                            parameterWithName("surveyId")
+                                .type(SimpleType.NUMBER)
+                                .description("설문 ID"))
+                        .requestFields(
+                            fieldWithPath("optionId")
+                                .type(SimpleType.NUMBER)
+                                .description("설문지 옵션 ID"),
+                            fieldWithPath("comment")
+                                .type(SimpleType.STRING)
+                                .description("추가 응답 내용"))
+                        .responseFields(
+                            fieldWithPath("result").type(SimpleType.STRING).description("결과"),
+                            fieldWithPath("data").description("데이터").optional(),
+                            fieldWithPath("error").description("에러").optional())
+                        .requestSchema(Schema.schema("surveySubmissionRequest"))
+                        .responseSchema(Schema.schema("surveyResponse"))
                         .build())));
   }
 }

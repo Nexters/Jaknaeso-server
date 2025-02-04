@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseTimeEntity;
+import org.nexters.jaknaesocore.common.support.error.CustomException;
 
 @Getter
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -34,4 +35,11 @@ public abstract class Survey extends BaseTimeEntity {
   }
 
   public abstract SurveyType getSurveyType();
+
+  public SurveyOption getOptionById(final Long optionId) {
+    return options.stream()
+        .filter(option -> option.getId().equals(optionId))
+        .findFirst()
+        .orElseThrow(() -> CustomException.SURVEY_OPTION_NOT_FOUND);
+  }
 }

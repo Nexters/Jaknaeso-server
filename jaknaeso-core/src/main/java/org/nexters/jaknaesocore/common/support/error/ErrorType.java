@@ -35,6 +35,10 @@ public enum ErrorType {
   INVALID_APPLE_ID_TOKEN(
       HttpStatus.BAD_REQUEST, ErrorCode.E400, "유효하지 않은 애플로그인입니다.", LogLevel.WARN),
 
+  SURVEY_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "존재하지 않는 설문 옵션입니다.", LogLevel.WARN),
+
+  SURVEY_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "존재하지 않는 설문입니다.", LogLevel.WARN),
+
   // survey
   NOT_READY_FOR_NEXT_BUNDLE(
       HttpStatus.BAD_REQUEST, ErrorCode.E400, "다음 번들을 진행할 준비가 되지 않았습니다.", LogLevel.WARN),

@@ -29,10 +29,26 @@ public class SurveySubmission extends BaseTimeEntity {
 
   @Builder
   private SurveySubmission(
-      Member member, Survey survey, SurveyOption selectedOption, String comment) {
+      final Member member,
+      final Survey survey,
+      final SurveyOption selectedOption,
+      final String comment) {
     this.member = member;
     this.survey = survey;
     this.selectedOption = selectedOption;
     this.comment = comment;
+  }
+
+  public static SurveySubmission create(
+      final Member member,
+      final Survey survey,
+      final SurveyOption selectedOption,
+      final String comment) {
+    return SurveySubmission.builder()
+        .member(member)
+        .survey(survey)
+        .selectedOption(selectedOption)
+        .comment(comment)
+        .build();
   }
 }
