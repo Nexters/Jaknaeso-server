@@ -141,7 +141,7 @@ class SurveyServiceTest extends IntegrationTest {
         List<SurveySubmission> submissions = surveySubmissionRepository.findAll();
         then(submissions).hasSize(1);
         then(submissions.getFirst())
-            .extracting("member.id", "survey.id", "selectedOption.id", "comment")
+            .extracting("member.id", "survey.id", "selectedOption.id", "retrospective")
             .containsExactly(member.getId(), balanceSurvey.getId(), option.getId(), "나는 행복한게 좋으니까");
       }
     }
