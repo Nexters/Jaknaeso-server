@@ -39,10 +39,6 @@ public class Member extends BaseTimeEntity {
     super.softDelete();
   }
 
-  public void updateUserInfo(final String email) {
-    this.email = email;
-  }
-
   public void updateUserInfo(final String name, final String email) {
     this.name = name;
     this.email = email;
