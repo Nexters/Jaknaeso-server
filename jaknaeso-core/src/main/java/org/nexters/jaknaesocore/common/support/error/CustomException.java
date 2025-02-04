@@ -15,6 +15,12 @@ public class CustomException extends RuntimeException {
       new CustomException(ErrorType.INCORRECT_TOKEN_FORMAT);
   public static final CustomException INVALID_APPLE_ID_TOKEN =
       new CustomException(ErrorType.INVALID_APPLE_ID_TOKEN);
+  public static final CustomException MEMBER_NOT_FOUND =
+      new CustomException(ErrorType.MEMBER_NOT_FOUND);
+  public static final CustomException SURVEY_OPTION_NOT_FOUND =
+      new CustomException(ErrorType.SURVEY_OPTION_NOT_FOUND);
+  public static final CustomException SURVEY_NOT_FOUND =
+      new CustomException(ErrorType.SURVEY_NOT_FOUND);
   public static final CustomException NOT_READY_FOR_NEXT_BUNDLE =
       new CustomException(ErrorType.NOT_READY_FOR_NEXT_BUNDLE);
 
