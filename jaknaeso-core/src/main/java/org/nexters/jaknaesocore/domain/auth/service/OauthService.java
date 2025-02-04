@@ -1,5 +1,7 @@
 package org.nexters.jaknaesocore.domain.auth.service;
 
+import static org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse.KakaoAccount;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -51,18 +53,7 @@ public class OauthService {
     final KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.accessToken());
 
     final String oauthId = userInfo.id().toString();
-    return socialAccountRepository
-        .findByOauthIdAndSocialProviderAndDeletedAtIsNull(oauthId, SocialProvider.KAKAO)
-        .map(SocialAccount::getMember)
-        .map(
-            it -> {
-              it.updateUserInfo(userInfo.kakaoAccount().name(), userInfo.kakaoAccount().email());
-              return it.getId();
-            })
-        .orElseGet(
-            () ->
-                kakaoSignUp(
-                    oauthId, userInfo.kakaoAccount().name(), userInfo.kakaoAccount().email()));
+    return kakaoSignInOrSignUp(oauthId, userInfo.kakaoAccount());
   }
 
   @Transactional
@@ -70,15 +61,7 @@ public class OauthService {
     final KakaoUserInfoResponse userInfo = getKakaoUserInfo(command.accessToken());
 
     final String oauthId = userInfo.id().toString();
-    final Member member = findMemberWithSocialProvider(oauthId, SocialProvider.KAKAO);
-    if (member == null) {
-      final Member newMember =
-          memberRepository.save(
-              Member.create(userInfo.kakaoAccount().name(), userInfo.kakaoAccount().email()));
-      socialAccountRepository.save(SocialAccount.kakaoSignup(oauthId, newMember));
-      return newMember.getId();
-    }
-    return member.getId();
+    return kakaoSignInOrSignUp(oauthId, userInfo.kakaoAccount());
   }
 
   private KakaoUserInfoResponse getKakaoUserInfo(final String accessToken) {
@@ -94,6 +77,18 @@ public class OauthService {
     params.add("code", authorizationCode);
     params.add("redirect_uri", redirectUri);
     return kakaoAuthClient.requestToken(params);
+  }
+
+  private Long kakaoSignInOrSignUp(final String oauthId, final KakaoAccount kakaoAccount) {
+    return socialAccountRepository
+        .findByOauthIdAndSocialProviderAndDeletedAtIsNull(oauthId, SocialProvider.KAKAO)
+        .map(SocialAccount::getMember)
+        .map(
+            it -> {
+              it.updateUserInfo(kakaoAccount.name(), kakaoAccount.email());
+              return it.getId();
+            })
+        .orElseGet(() -> kakaoSignUp(oauthId, kakaoAccount.name(), kakaoAccount.email()));
   }
 
   private Long kakaoSignUp(final String oauthId, final String name, final String email) {
