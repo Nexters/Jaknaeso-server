@@ -34,7 +34,7 @@ public class AuthController {
     return ApiResponse.success(response);
   }
 
-  @PostMapping("/kakao-login-with-token")
+  @PostMapping("/kakao-login/token")
   public ApiResponse<TokenResponse> kakaoLoginWithToken(
       @RequestBody @Valid KakaoLoginWithTokenRequest request) {
     TokenResponse response = authFacadeService.kakaoLoginWithToken(request.toServiceDto());
