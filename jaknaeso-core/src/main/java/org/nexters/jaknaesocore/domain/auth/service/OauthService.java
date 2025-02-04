@@ -50,16 +50,18 @@ public class OauthService {
     final KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.accessToken());
 
     final String oauthId = userInfo.id().toString();
-    final Member member = findMemberWithSocialProvider(oauthId, SocialProvider.KAKAO);
-    if (member == null) {
-      final Member newMember =
-          memberRepository.save(
-              Member.create(userInfo.kakaoAccount().name(), userInfo.kakaoAccount().email()));
-      socialAccountRepository.save(SocialAccount.kakaoSignup(oauthId, newMember));
-      return newMember.getId();
-    }
-    member.updateUserInfo(userInfo.kakaoAccount().name(), userInfo.kakaoAccount().email());
-    return member.getId();
+    return socialAccountRepository
+        .findByOauthIdAndSocialProviderAndDeletedAtIsNull(oauthId, SocialProvider.KAKAO)
+        .map(SocialAccount::getMember)
+        .map(
+            it -> {
+              it.updateUserInfo(userInfo.kakaoAccount().name(), userInfo.kakaoAccount().email());
+              return it.getId();
+            })
+        .orElseGet(
+            () ->
+                kakaoSignUp(
+                    oauthId, userInfo.kakaoAccount().name(), userInfo.kakaoAccount().email()));
   }
 
   private KakaoUserInfoResponse getKakaoUserInfo(final String accessToken) {
@@ -77,13 +79,10 @@ public class OauthService {
     return kakaoAuthClient.requestToken(params);
   }
 
-  private Member findMemberWithSocialProvider(
-      final String oauthId, final SocialProvider socialProvider) {
-    return socialAccountRepository
-        .findByOauthIdAndSocialProviderAndDeletedAtIsNull(oauthId, socialProvider)
-        .map(SocialAccount::getMember)
-        .filter(member -> member.getDeletedAt() == null)
-        .orElse(null);
+  private Long kakaoSignUp(final String oauthId, final String name, final String email) {
+    final Member member = memberRepository.save(Member.create(name, email));
+    socialAccountRepository.save(SocialAccount.kakaoSignup(oauthId, member));
+    return member.getId();
   }
 
   @Transactional
@@ -92,16 +91,17 @@ public class OauthService {
     final String jwtClaims = appleIdToken.decodePayload();
     final AppleAuthorization authorization = decodeAppleIdTokenPayload(jwtClaims);
 
-    final Member member =
-        findMemberWithSocialProvider(authorization.getSub(), SocialProvider.APPLE);
-    if (member == null) {
-      final Member newMember =
-          memberRepository.save(Member.create(command.name(), authorization.getEmail()));
-      socialAccountRepository.save(SocialAccount.appleSignUp(authorization.getSub(), newMember));
-      return newMember.getId();
-    }
-    member.updateUserInfo(command.name(), authorization.getEmail());
-    return member.getId();
+    return socialAccountRepository
+        .findByOauthIdAndSocialProviderAndDeletedAtIsNull(
+            authorization.getSub(), SocialProvider.APPLE)
+        .map(SocialAccount::getMember)
+        .map(
+            it -> {
+              it.updateUserInfo(authorization.getEmail());
+              return it.getId();
+            })
+        .orElseGet(
+            () -> appleSignup(authorization.getSub(), command.name(), authorization.getEmail()));
   }
 
   private AppleAuthorization decodeAppleIdTokenPayload(final String appleJwtClaims) {
@@ -112,5 +112,11 @@ public class OauthService {
           "decodeJwtToken: {}-{} / jwtToken: {}", e.getMessage(), e.getCause(), appleJwtClaims);
       throw CustomException.INVALID_APPLE_ID_TOKEN;
     }
+  }
+
+  private Long appleSignup(final String oauthId, final String name, final String email) {
+    final Member member = memberRepository.save(Member.create(name, email));
+    socialAccountRepository.save(SocialAccount.appleSignUp(oauthId, member));
+    return member.getId();
   }
 }
