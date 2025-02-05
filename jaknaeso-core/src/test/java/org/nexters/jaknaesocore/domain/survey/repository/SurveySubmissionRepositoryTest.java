@@ -13,12 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
-import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
-import org.nexters.jaknaesocore.domain.survey.model.Keyword;
-import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
-import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
-import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
-import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
+import org.nexters.jaknaesocore.domain.survey.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class SurveySubmissionRepositoryTest extends IntegrationTest {
@@ -76,7 +71,7 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
   @Test
   void 회원이_제출한_가장_마지막_설문을_조회한다() {
     // given
-    Member member = Member.create();
+    Member member = Member.create("나민혁", "test@test.com");
     memberRepository.save(member);
     SurveyBundle surveyBundle = new SurveyBundle();
     surveyBundleRepository.save(surveyBundle);
@@ -125,7 +120,7 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
   @Test
   void 번들에서_제출한_설문을_조회한다() {
     // given
-    Member member = Member.create();
+    Member member = Member.create("나민혁", "test@test.com");
     memberRepository.save(member);
     SurveyBundle surveyBundle = new SurveyBundle();
     surveyBundleRepository.save(surveyBundle);
