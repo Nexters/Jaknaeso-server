@@ -1,7 +1,6 @@
 package org.nexters.jaknaesocore.domain.survey.service;
 
-import static org.assertj.core.api.BDDAssertions.then;
-import static org.assertj.core.api.BDDAssertions.tuple;
+import static org.assertj.core.api.BDDAssertions.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -37,7 +36,6 @@ class SurveyServiceTest extends IntegrationTest {
   @Autowired private SurveyBundleRepository surveyBundleRepository;
   @Autowired private SurveyRepository surveyRepository;
   @Autowired private SurveyOptionRepository surveyOptionRepository;
-  @Autowired private SurveySubmissionRepository surveySubmissionRepository;
 
   @AfterEach
   void tearDown() {
@@ -88,7 +86,7 @@ class SurveyServiceTest extends IntegrationTest {
       @DisplayName("예외를 발생시킨다")
       void throwMemberNotFoundException() {
         // given
-        Member member = Member.create();
+        Member member = Member.create("나민혁", "test@test.com");
         memberRepository.save(member);
         SurveyBundle surveyBundle = new SurveyBundle();
         surveyBundleRepository.save(surveyBundle);
@@ -118,7 +116,7 @@ class SurveyServiceTest extends IntegrationTest {
       @Test
       void 설문에_응답을_제출한다() {
         // given
-        Member member = Member.create();
+        Member member = Member.create("나민혁", "test@test.com");
         memberRepository.save(member);
         SurveyBundle surveyBundle = new SurveyBundle();
         surveyBundleRepository.save(surveyBundle);
@@ -153,7 +151,7 @@ class SurveyServiceTest extends IntegrationTest {
       @DisplayName("예외를 발생시킨다")
       void throwSurveyNotFoundException() {
         // given
-        Member member = Member.create();
+        Member member = Member.create("나민혁", "test@test.com");
         memberRepository.save(member);
         SurveyBundle surveyBundle = new SurveyBundle();
         surveyBundleRepository.save(surveyBundle);
@@ -181,7 +179,7 @@ class SurveyServiceTest extends IntegrationTest {
   @Test
   void 설문_기록이_없으면_1번_번들을_제공한다() {
     // given
-    Member member = Member.create();
+    Member member = Member.create("나민혁", "test@test.com");
     memberRepository.save(member);
     SurveyBundle surveyBundle = new SurveyBundle();
     surveyBundleRepository.save(surveyBundle);
@@ -220,7 +218,7 @@ class SurveyServiceTest extends IntegrationTest {
   @Test
   void 설문_기록이_일정_개수_이하이면_기록과_함께_번들ID를_제공한다() {
     // given
-    Member member = Member.create();
+    Member member = Member.create("나민혁", "test@test.com");
     memberRepository.save(member);
     SurveyBundle surveyBundle = new SurveyBundle();
     surveyBundleRepository.save(surveyBundle);
@@ -269,7 +267,7 @@ class SurveyServiceTest extends IntegrationTest {
   @Test
   void 설문_기록이_번들_크기만큼_있으면_다음_번들ID를_제공한다() {
     // given
-    Member member = Member.create();
+    Member member = Member.create("나민혁", "test@test.com");
     memberRepository.save(member);
     SurveyBundle surveyBundle1 = new SurveyBundle();
     SurveyBundle surveyBundle2 = new SurveyBundle();
@@ -322,7 +320,7 @@ class SurveyServiceTest extends IntegrationTest {
   @Test
   void 진행할_다음_설문_번들이_존재하지_않으면_예외를_발생한다() {
     // given
-    Member member = Member.create();
+    Member member = Member.create("나민혁", "test@test.com");
     memberRepository.save(member);
     SurveyBundle surveyBundle = new SurveyBundle();
 
