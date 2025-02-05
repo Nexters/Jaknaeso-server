@@ -1,10 +1,10 @@
 package org.nexters.jaknaesoserver.domain.survey.controller.dto;
 
 import jakarta.validation.constraints.NotNull;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionServiceRequest;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionCommand;
 
 public record SurveySubmissionRequest(@NotNull Long optionId, String comment) {
-  public SurveySubmissionServiceRequest toServiceRequest() {
-    return new SurveySubmissionServiceRequest(optionId(), comment());
+  public SurveySubmissionCommand toServiceRequest() {
+    return new SurveySubmissionCommand(optionId(), comment());
   }
 }

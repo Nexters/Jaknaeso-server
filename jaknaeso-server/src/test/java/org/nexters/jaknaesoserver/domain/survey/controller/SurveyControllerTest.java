@@ -23,7 +23,7 @@ import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryDetailResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyOptionsResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionServiceRequest;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionCommand;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.common.support.WithMockCustomUser;
 import org.nexters.jaknaesoserver.domain.survey.controller.dto.SurveySubmissionRequest;
@@ -128,7 +128,7 @@ class SurveyControllerTest extends ControllerTest {
     SurveySubmissionRequest request = new SurveySubmissionRequest(1L, "나는 행복해요");
     willDoNothing()
         .given(surveyService)
-        .submitSurvey(anyLong(), anyLong(), any(SurveySubmissionServiceRequest.class));
+        .submitSurvey(anyLong(), anyLong(), any(SurveySubmissionCommand.class));
 
     mockMvc
         .perform(
