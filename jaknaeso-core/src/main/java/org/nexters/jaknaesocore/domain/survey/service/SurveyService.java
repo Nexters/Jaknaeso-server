@@ -8,7 +8,7 @@ import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryDetailResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionServiceRequest;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionCommand;
 import org.nexters.jaknaesocore.domain.survey.model.*;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
@@ -94,7 +94,7 @@ public class SurveyService {
   }
 
   @Transactional
-  public void submitSurvey(Long surveyId, Long memberId, SurveySubmissionServiceRequest request) {
+  public void submitSurvey(Long surveyId, Long memberId, SurveySubmissionCommand request) {
     Survey survey =
         surveyRepository.findById(surveyId).orElseThrow(() -> CustomException.SURVEY_NOT_FOUND);
     SurveyOption surveyOption = survey.getOptionById(request.optionId());

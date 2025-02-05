@@ -14,7 +14,7 @@ import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionServiceRequest;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionCommand;
 import org.nexters.jaknaesocore.domain.survey.model.*;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
@@ -100,8 +100,8 @@ class SurveyServiceTest extends IntegrationTest {
             SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
         surveyOptionRepository.save(option);
 
-        SurveySubmissionServiceRequest request =
-            new SurveySubmissionServiceRequest(option.getId(), "나는 행복한게 좋으니까");
+        SurveySubmissionCommand request =
+            new SurveySubmissionCommand(option.getId(), "나는 행복한게 좋으니까");
 
         // when
         // then
@@ -130,8 +130,8 @@ class SurveyServiceTest extends IntegrationTest {
             SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
         surveyOptionRepository.save(option);
 
-        SurveySubmissionServiceRequest request =
-            new SurveySubmissionServiceRequest(option.getId(), "나는 행복한게 좋으니까");
+        SurveySubmissionCommand request =
+            new SurveySubmissionCommand(option.getId(), "나는 행복한게 좋으니까");
 
         // when
         surveyService.submitSurvey(balanceSurvey.getId(), member.getId(), request);
@@ -165,8 +165,8 @@ class SurveyServiceTest extends IntegrationTest {
             SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
         surveyOptionRepository.save(option);
 
-        SurveySubmissionServiceRequest request =
-            new SurveySubmissionServiceRequest(option.getId(), "나는 행복한게 좋으니까");
+        SurveySubmissionCommand request =
+            new SurveySubmissionCommand(option.getId(), "나는 행복한게 좋으니까");
 
         // when
         // then
