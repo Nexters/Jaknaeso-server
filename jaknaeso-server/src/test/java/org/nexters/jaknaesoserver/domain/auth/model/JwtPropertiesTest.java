@@ -1,5 +1,6 @@
 package org.nexters.jaknaesoserver.domain.auth.model;
 
+import java.time.Duration;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,8 +12,8 @@ class JwtPropertiesTest {
   void 액세스_토큰_만료시간은_0보다_커야_한다() {
     // given
     String secret = "thisIsTestSecretKeyShouldBeLongEnoughForHS512";
-    Long accessTokenExpiration = 0L;
-    Long refreshTokenExpiration = 36000000000L;
+    Duration accessTokenExpiration = Duration.ZERO;
+    Duration refreshTokenExpiration = Duration.ofDays(1);
     // when & then
     Assertions.assertThatIllegalArgumentException()
         .isThrownBy(() -> new JwtProperties(secret, accessTokenExpiration, refreshTokenExpiration))
@@ -24,8 +25,8 @@ class JwtPropertiesTest {
   void 리프레시_토큰_만료시간은_0보다_커야_한다() {
     // given
     String secret = "thisIsTestSecretKeyShouldBeLongEnoughForHS512";
-    Long accessTokenExpiration = 0L;
-    Long refreshTokenExpiration = 0L;
+    Duration accessTokenExpiration = Duration.ZERO;
+    Duration refreshTokenExpiration = Duration.ZERO;
     // when & then
     Assertions.assertThatIllegalArgumentException()
         .isThrownBy(() -> new JwtProperties(secret, accessTokenExpiration, refreshTokenExpiration))
@@ -37,8 +38,8 @@ class JwtPropertiesTest {
   void 액세스_토큰_만료시간은_리프레시_토큰_만료시간보다_짧아야_한다() {
     // given
     String secret = "thisIsTestSecretKeyShouldBeLongEnoughForHS512";
-    Long accessTokenExpiration = 1000L;
-    Long refreshTokenExpiration = 999L;
+    Duration accessTokenExpiration = Duration.ofHours(1);
+    Duration refreshTokenExpiration = Duration.ofHours(1);
     // when & then
     Assertions.assertThatIllegalArgumentException()
         .isThrownBy(() -> new JwtProperties(secret, accessTokenExpiration, refreshTokenExpiration))

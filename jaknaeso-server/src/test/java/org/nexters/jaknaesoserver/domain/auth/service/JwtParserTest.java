@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 
 import io.jsonwebtoken.Jwts;
+import java.time.Duration;
 import java.util.Date;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +14,8 @@ import org.nexters.jaknaesoserver.domain.auth.model.JwtProperties;
 
 class JwtParserTest {
   private static final String SECRET = "thisIsTestSecretKeyShouldBeLongEnoughForHS512";
-  private static final Long ACCESS_TOKEN_EXPIRATION = 3600000L;
-  private static final Long REFRESH_TOKEN_EXPIRATION = 1209600000L;
+  private static final Duration ACCESS_TOKEN_EXPIRATION = Duration.ofDays(1);
+  private static final Duration REFRESH_TOKEN_EXPIRATION = Duration.ofDays(30);
 
   private JwtParser jwtParser;
   private JwtProperties jwtProperties;
