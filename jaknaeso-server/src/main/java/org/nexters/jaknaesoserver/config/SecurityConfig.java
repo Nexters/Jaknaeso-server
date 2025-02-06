@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -20,6 +21,7 @@ public class SecurityConfig {
 
   private final SecurityExceptionHandler securityExceptionHandler;
   private final JwtAuthFilter jwtAuthFilter;
+  private final CorsConfigurationSource corsConfigurationSource;
 
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
@@ -32,6 +34,7 @@ public class SecurityConfig {
                     .permitAll()
                     .anyRequest()
                     .authenticated())
+        .cors(corsConfigurer -> corsConfigurer.configurationSource(corsConfigurationSource))
         .formLogin(AbstractHttpConfigurer::disable)
         .logout(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
