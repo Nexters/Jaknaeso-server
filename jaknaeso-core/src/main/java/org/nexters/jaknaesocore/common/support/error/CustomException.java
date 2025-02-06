@@ -23,6 +23,8 @@ public class CustomException extends RuntimeException {
       new CustomException(ErrorType.SURVEY_NOT_FOUND);
   public static final CustomException NOT_READY_FOR_NEXT_BUNDLE =
       new CustomException(ErrorType.NOT_READY_FOR_NEXT_BUNDLE);
+  public static final CustomException ALREADY_COMPLETED_SURVEY_BUNDLE =
+      new CustomException(ErrorType.ALREADY_COMPLETED_SURVEY_BUNDLE);
 
   private final ErrorType errorType;
 

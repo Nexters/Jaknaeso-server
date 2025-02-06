@@ -32,9 +32,9 @@ public class SurveyService {
             .findById(bundleId)
             .orElseThrow(() -> new IllegalArgumentException("설문 번들을 찾을 수 없습니다."));
     List<Survey> submittedSurvey = getSubmittedSurvey(memberId);
-    Survey unSubmittedSurvey = bundle.getUnSubmittedSurvey(submittedSurvey);
+    Survey nextSurvey = bundle.getNextSurvey(submittedSurvey);
 
-    return SurveyResponse.of(unSubmittedSurvey);
+    return SurveyResponse.of(nextSurvey);
   }
 
   private List<Survey> getSubmittedSurvey(final Long memberId) {

@@ -42,6 +42,9 @@ public enum ErrorType {
   // survey
   NOT_READY_FOR_NEXT_BUNDLE(
       HttpStatus.BAD_REQUEST, ErrorCode.E400, "다음 번들을 진행할 준비가 되지 않았습니다.", LogLevel.WARN),
+
+  ALREADY_COMPLETED_SURVEY_BUNDLE(
+      HttpStatus.BAD_REQUEST, ErrorCode.E400, "이미 완료된 설문 번들입니다.", LogLevel.WARN),
   ;
 
   private final HttpStatus status;
