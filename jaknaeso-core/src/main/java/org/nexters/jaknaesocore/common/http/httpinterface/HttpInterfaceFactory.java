@@ -6,7 +6,6 @@ import org.nexters.jaknaesocore.domain.auth.restclient.errorhandler.KakaoAuthCli
 import org.nexters.jaknaesocore.domain.auth.restclient.errorhandler.KakaoClientErrorHandler;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.AnnotationUtils;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -47,10 +46,11 @@ public class HttpInterfaceFactory {
                   converters.add(new FormHttpMessageConverter());
                   converters.add(new MappingJackson2HttpMessageConverter());
                 })
-            .defaultStatusHandler(
-                HttpStatusCode::isError,
-                (request, response) ->
-                    errorHandler.handleError(response.getStatusCode(), request, response))
+            //            .defaultStatusHandler(
+            //                HttpStatusCode::isError,
+            //                (request, response) ->
+            //                    errorHandler.handleError(response.getStatusCode(), request,
+            // response))
             .build();
 
     return HttpServiceProxyFactory.builderFor(RestClientAdapter.create(restClient))
