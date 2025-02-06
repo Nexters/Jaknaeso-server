@@ -93,7 +93,8 @@ class SurveyControllerTest extends ControllerTest {
         new SurveyHistoryResponse(
             1L,
             List.of(new SurveyHistoryDetailResponse(1L), new SurveyHistoryDetailResponse(2L)),
-            3);
+            3,
+            false);
 
     given(surveyService.getSurveyHistory(anyLong())).willReturn(response);
 
@@ -118,6 +119,9 @@ class SurveyControllerTest extends ControllerTest {
                             fieldWithPath("data.nextSurveyIndex")
                                 .type(SimpleType.NUMBER)
                                 .description("다음 설문 인덱스"),
+                            fieldWithPath("data.isCompleted")
+                                .type(SimpleType.BOOLEAN)
+                                .description("설문 완료 여부"),
                             fieldWithPath("error").description("에러").optional())
                         .responseSchema(Schema.schema("surveyHistoryResponse"))
                         .build())));

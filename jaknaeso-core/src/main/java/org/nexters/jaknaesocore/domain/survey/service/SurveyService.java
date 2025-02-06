@@ -1,8 +1,11 @@
 package org.nexters.jaknaesocore.domain.survey.service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.nexters.jaknaesocore.common.model.BaseEntity;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
@@ -46,29 +49,30 @@ public class SurveyService {
 
   @Transactional(readOnly = true)
   public SurveyHistoryResponse getSurveyHistory(final Long memberId) {
-    SurveySubmission latestSubmission = findLatestSubmission(memberId);
-    if (latestSubmission == null) {
-      return createInitialSurveyHistory();
-    }
-    SurveyBundle bundle = latestSubmission.getSurvey().getSurveyBundle();
-    Long currentBundleId = bundle.getId();
-    List<SurveySubmission> submissions = findSubmissionsForBundle(memberId, currentBundleId);
-
-    if (bundle.isAllSubmitted(submissions)) {
-      Long nextBundleId =
-          surveyBundleRepository
-              .findFirstByIdGreaterThanOrderByIdAsc(currentBundleId)
-              .map(SurveyBundle::getId)
-              .orElseThrow(() -> CustomException.NOT_READY_FOR_NEXT_BUNDLE);
-      return createNextBundleSurveyHistory(nextBundleId);
-    }
-    return createCurrentBundleSurveyHistory(currentBundleId, submissions);
+    return findLatestSubmission(memberId)
+        .map(this::classifySubmission)
+        .orElseGet(this::createInitialSurveyHistory);
   }
 
-  private SurveySubmission findLatestSubmission(final Long memberId) {
-    return surveySubmissionRepository
-        .findTopByMember_IdAndDeletedAtIsNullOrderByCreatedAtDesc(memberId)
-        .orElse(null);
+  private Optional<SurveySubmission> findLatestSubmission(final Long memberId) {
+    return surveySubmissionRepository.findTopByMember_IdAndDeletedAtIsNullOrderByCreatedAtDesc(
+        memberId);
+  }
+
+  private SurveyHistoryResponse classifySubmission(SurveySubmission latestSubmission) {
+    SurveyBundle bundle = latestSubmission.getSurvey().getSurveyBundle();
+    List<SurveySubmission> submissions =
+        findSubmissionsForBundle(latestSubmission.getMember().getId(), bundle.getId());
+
+    boolean isSubmittedToday = latestSubmission.isSubmittedByDate(LocalDate.now());
+    if (isSubmittedToday) {
+      return createCurrentBundleSurveyHistory(bundle.getId(), submissions, isSubmittedToday);
+    }
+
+    if (bundle.isAllSubmitted(submissions)) {
+      return getNextBundleHistory(bundle.getId());
+    }
+    return createCurrentBundleSurveyHistory(bundle.getId(), submissions, isSubmittedToday);
   }
 
   private List<SurveySubmission> findSubmissionsForBundle(
@@ -77,21 +81,30 @@ public class SurveyService {
   }
 
   private SurveyHistoryResponse createInitialSurveyHistory() {
-    return new SurveyHistoryResponse(1L, List.of(), 1);
+    return new SurveyHistoryResponse(1L, List.of(), 1, false);
   }
 
   private SurveyHistoryResponse createNextBundleSurveyHistory(final Long bundleId) {
-    return new SurveyHistoryResponse(bundleId, List.of(), 1);
+    return new SurveyHistoryResponse(bundleId, List.of(), 1, false);
   }
 
   private SurveyHistoryResponse createCurrentBundleSurveyHistory(
-      Long bundleId, List<SurveySubmission> submissions) {
+      Long bundleId, List<SurveySubmission> submissions, boolean isSubmittedToday) {
     List<SurveyHistoryDetailResponse> historyDetails =
-        submissions.stream()
-            .map(submission -> new SurveyHistoryDetailResponse(submission.getId()))
-            .toList();
+        submissions.stream().map(BaseEntity::getId).map(SurveyHistoryDetailResponse::of).toList();
+    if (isSubmittedToday) {
+      return new SurveyHistoryResponse(
+          bundleId, historyDetails, historyDetails.size(), isSubmittedToday);
+    }
+    return new SurveyHistoryResponse(
+        bundleId, historyDetails, historyDetails.size() + 1, isSubmittedToday);
+  }
 
-    return new SurveyHistoryResponse(bundleId, historyDetails, submissions.size() + 1);
+  private SurveyHistoryResponse getNextBundleHistory(Long currentBundleId) {
+    return surveyBundleRepository
+        .findFirstByIdGreaterThanOrderByIdAsc(currentBundleId)
+        .map(bundle -> createNextBundleSurveyHistory(bundle.getId()))
+        .orElseThrow(() -> CustomException.NOT_READY_FOR_NEXT_BUNDLE);
   }
 
   @Transactional

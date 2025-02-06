@@ -5,4 +5,5 @@ import java.util.List;
 public record SurveyHistoryResponse(
     Long bundleId,
     List<SurveyHistoryDetailResponse> surveyHistoryDetails,
-    Integer nextSurveyIndex) {}
+    Integer nextSurveyIndex,
+    boolean isCompleted) {}

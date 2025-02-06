@@ -1,6 +1,7 @@
 package org.nexters.jaknaesocore.domain.survey.model;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,7 +29,7 @@ public class SurveySubmission extends BaseTimeEntity {
 
   private String retrospective;
 
-  private LocalDateTime submissionAt;
+  private LocalDateTime submittedAt;
 
   @Builder
   public SurveySubmission(
@@ -36,12 +37,12 @@ public class SurveySubmission extends BaseTimeEntity {
       Survey survey,
       SurveyOption selectedOption,
       String retrospective,
-      LocalDateTime submissionAt) {
+      LocalDateTime submittedAt) {
     this.member = member;
     this.survey = survey;
     this.selectedOption = selectedOption;
     this.retrospective = retrospective;
-    this.submissionAt = submissionAt;
+    this.submittedAt = submittedAt;
   }
 
   public static SurveySubmission create(
@@ -55,7 +56,11 @@ public class SurveySubmission extends BaseTimeEntity {
         .survey(survey)
         .selectedOption(selectedOption)
         .retrospective(retrospective)
-        .submissionAt(currentDate)
+        .submittedAt(currentDate)
         .build();
+  }
+
+  public boolean isSubmittedByDate(LocalDate date) {
+    return submittedAt.toLocalDate().isEqual(date);
   }
 }
