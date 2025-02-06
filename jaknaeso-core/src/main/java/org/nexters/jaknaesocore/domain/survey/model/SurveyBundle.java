@@ -9,6 +9,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseTimeEntity;
+import org.nexters.jaknaesocore.common.support.error.CustomException;
 
 @Getter
 @NoArgsConstructor
@@ -27,10 +28,20 @@ public class SurveyBundle extends BaseTimeEntity {
         surveys.stream().filter(survey -> !submittedSurvey.contains(survey)).toList();
 
     if (list.isEmpty()) {
-      throw new IllegalStateException("모든 설문을 완료하셨습니다.");
+      throw CustomException.ALREADY_COMPLETED_SURVEY_BUNDLE;
     }
     int randomNum = ThreadLocalRandom.current().nextInt(list.size());
     return list.get(randomNum);
+  }
+
+  public Survey getNextSurvey(final List<Survey> submittedSurvey) {
+    List<Survey> list =
+        surveys.stream().filter(survey -> !submittedSurvey.contains(survey)).toList();
+
+    if (list.isEmpty()) {
+      throw CustomException.ALREADY_COMPLETED_SURVEY_BUNDLE;
+    }
+    return list.getFirst();
   }
 
   public boolean isAllSubmitted(final List<SurveySubmission> submissions) {

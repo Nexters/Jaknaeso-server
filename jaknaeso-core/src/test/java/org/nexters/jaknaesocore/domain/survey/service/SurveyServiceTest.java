@@ -56,14 +56,19 @@ class SurveyServiceTest extends IntegrationTest {
     SurveyBundle surveyBundle = new SurveyBundle();
     surveyBundleRepository.save(surveyBundle);
     BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
-    surveyRepository.save(balanceSurvey);
+    MultipleChoiceSurvey multipleSurvey = new MultipleChoiceSurvey("다음 질문내용", surveyBundle);
+    surveyRepository.saveAll(List.of(balanceSurvey, multipleSurvey));
     List<KeywordScore> scores =
         List.of(
             KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
             KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
     SurveyOption option =
         SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
-    surveyOptionRepository.save(option);
+    SurveyOption multipleOption1 =
+        SurveyOption.builder().survey(multipleSurvey).scores(scores).content("1점").build();
+    SurveyOption multipleOption2 =
+        SurveyOption.builder().survey(multipleSurvey).scores(scores).content("2점").build();
+    surveyOptionRepository.saveAll(List.of(option, multipleOption1, multipleOption2));
 
     // when
     SurveyResponse survey = surveyService.getNextSurvey(surveyBundle.getId(), member.getId());
