@@ -253,21 +253,106 @@ class SurveyServiceTest extends IntegrationTest {
     surveyOptionRepository.saveAll(List.of(option1, option2, option3, option4, option5, option6));
 
     SurveySubmission submission1 =
-        SurveySubmission.builder().member(member).selectedOption(option1).survey(survey1).build();
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option1)
+            .survey(survey1)
+            .submittedAt(LocalDateTime.of(2025, 1, 1, 12, 0, 0))
+            .build();
     SurveySubmission submission2 =
-        SurveySubmission.builder().member(member).selectedOption(option4).survey(survey2).build();
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option4)
+            .survey(survey2)
+            .submittedAt(LocalDateTime.of(2025, 1, 2, 12, 0, 0))
+            .build();
     surveySubmissionRepository.save(submission1);
     surveySubmissionRepository.save(submission2);
     // when
     SurveyHistoryResponse response = surveyService.getSurveyHistory(member.getId());
     // then
     then(response)
-        .extracting("bundleId", "nextSurveyIndex")
-        .containsExactly(surveyBundle.getId(), 3);
+        .extracting("bundleId", "nextSurveyIndex", "isCompleted")
+        .containsExactly(surveyBundle.getId(), 3, false);
 
     then(response.surveyHistoryDetails())
         .extracting("submissionId")
         .containsExactly(submission1.getId(), submission2.getId());
+  }
+
+  @Test
+  void 오늘_설문을_이미_제출_했다면_제출완료_상태이다() {
+    // given
+    LocalDateTime now = LocalDateTime.now();
+    Member member = Member.create("나민혁", "test@test.com");
+    memberRepository.save(member);
+    SurveyBundle surveyBundle = new SurveyBundle();
+    surveyBundleRepository.save(surveyBundle);
+    BalanceSurvey survey1 = new BalanceSurvey("대학 동기 모임에서 나의 승진 이야기가 나왔습니다", surveyBundle);
+    BalanceSurvey survey2 = new BalanceSurvey("회사에서 팀 리더로 뽑혔습니다", surveyBundle);
+    MultipleChoiceSurvey survey3 = new MultipleChoiceSurvey("나의 행복 지수는", surveyBundle);
+    MultipleChoiceSurvey survey4 = new MultipleChoiceSurvey("나는 노는게 좋다.", surveyBundle);
+
+    surveyRepository.saveAll(List.of(survey1, survey2, survey3, survey4));
+    List<KeywordScore> scores =
+        List.of(
+            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
+    SurveyOption option1 =
+        SurveyOption.builder().survey(survey1).scores(scores).content("한다.").build();
+    SurveyOption option2 =
+        SurveyOption.builder().survey(survey1).scores(scores).content("안한다.").build();
+    SurveyOption option3 =
+        SurveyOption.builder().survey(survey2).scores(scores).content("한다.").build();
+    SurveyOption option4 =
+        SurveyOption.builder().survey(survey2).scores(scores).content("안한다.").build();
+    SurveyOption option5 =
+        SurveyOption.builder().survey(survey3).scores(scores).content("3점").build();
+    SurveyOption option6 =
+        SurveyOption.builder().survey(survey4).scores(scores).content("4점").build();
+    surveyOptionRepository.saveAll(List.of(option1, option2, option3, option4, option5, option6));
+
+    SurveySubmission submission1 =
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option1)
+            .survey(survey1)
+            .submittedAt(LocalDateTime.of(2025, 1, 1, 12, 0, 0))
+            .build();
+    SurveySubmission submission2 =
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option2)
+            .survey(survey2)
+            .submittedAt(LocalDateTime.of(2025, 1, 2, 12, 0, 0))
+            .build();
+    SurveySubmission submission3 =
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option3)
+            .survey(survey3)
+            .submittedAt(LocalDateTime.of(2025, 1, 3, 12, 0, 0))
+            .build();
+    SurveySubmission submission4 =
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option4)
+            .survey(survey4)
+            .submittedAt(now)
+            .build();
+
+    surveySubmissionRepository.saveAll(List.of(submission1, submission2, submission3, submission4));
+    // when
+    SurveyHistoryResponse response = surveyService.getSurveyHistory(member.getId());
+    // then
+    then(response)
+        .extracting("bundleId", "nextSurveyIndex", "isCompleted")
+        .containsExactly(surveyBundle.getId(), 4, true);
+
+    then(response.surveyHistoryDetails())
+        .extracting("submissionId")
+        .containsExactly(
+            submission1.getId(), submission2.getId(), submission3.getId(), submission4.getId());
   }
 
   @Test
@@ -304,13 +389,33 @@ class SurveyServiceTest extends IntegrationTest {
     surveyOptionRepository.saveAll(List.of(option1, option2, option3, option4));
 
     SurveySubmission submission1 =
-        SurveySubmission.builder().member(member).selectedOption(option1).survey(survey1).build();
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option1)
+            .survey(survey1)
+            .submittedAt(LocalDateTime.of(2025, 1, 1, 12, 0, 0))
+            .build();
     SurveySubmission submission2 =
-        SurveySubmission.builder().member(member).selectedOption(option2).survey(survey2).build();
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option2)
+            .survey(survey2)
+            .submittedAt(LocalDateTime.of(2025, 1, 2, 12, 0, 0))
+            .build();
     SurveySubmission submission3 =
-        SurveySubmission.builder().member(member).selectedOption(option3).survey(survey3).build();
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option3)
+            .survey(survey3)
+            .submittedAt(LocalDateTime.of(2025, 1, 3, 12, 0, 0))
+            .build();
     SurveySubmission submission4 =
-        SurveySubmission.builder().member(member).selectedOption(option4).survey(survey4).build();
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option4)
+            .survey(survey4)
+            .submittedAt(LocalDateTime.of(2025, 1, 4, 12, 0, 0))
+            .build();
 
     surveySubmissionRepository.saveAll(List.of(submission1, submission2, submission3, submission4));
 
@@ -319,8 +424,8 @@ class SurveyServiceTest extends IntegrationTest {
 
     // then
     then(response)
-        .extracting("bundleId", "nextSurveyIndex", "surveyHistoryDetails")
-        .containsExactly(surveyBundle1.getId() + 1L, 1, List.of());
+        .extracting("bundleId", "nextSurveyIndex", "surveyHistoryDetails", "isCompleted")
+        .containsExactly(surveyBundle1.getId() + 1L, 1, List.of(), false);
   }
 
   @Test
@@ -356,13 +461,33 @@ class SurveyServiceTest extends IntegrationTest {
     surveyOptionRepository.saveAll(List.of(option1, option2, option3, option4));
 
     SurveySubmission submission1 =
-        SurveySubmission.builder().member(member).selectedOption(option1).survey(survey1).build();
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option1)
+            .survey(survey1)
+            .submittedAt(LocalDateTime.of(2025, 1, 1, 12, 0, 0))
+            .build();
     SurveySubmission submission2 =
-        SurveySubmission.builder().member(member).selectedOption(option2).survey(survey2).build();
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option2)
+            .survey(survey2)
+            .submittedAt(LocalDateTime.of(2025, 1, 2, 12, 0, 0))
+            .build();
     SurveySubmission submission3 =
-        SurveySubmission.builder().member(member).selectedOption(option3).survey(survey3).build();
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option3)
+            .survey(survey3)
+            .submittedAt(LocalDateTime.of(2025, 1, 3, 12, 0, 0))
+            .build();
     SurveySubmission submission4 =
-        SurveySubmission.builder().member(member).selectedOption(option4).survey(survey4).build();
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option4)
+            .survey(survey4)
+            .submittedAt(LocalDateTime.of(2025, 1, 4, 12, 0, 0))
+            .build();
 
     surveySubmissionRepository.saveAll(List.of(submission1, submission2, submission3, submission4));
     // when
