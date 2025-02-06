@@ -34,7 +34,7 @@ jobs:
         id: ip
         run: |
           PUBLIC_IP=$(curl -s https://ifconfig.me)
-          echo "::set-output name=public_ip::$PUBLIC_IP"
+          echo "PUBLIC_IP=$PUBLIC_IP" >> $GITHUB_ENV
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -52,12 +52,12 @@ jobs:
           context: .
           file: ./jaknaeso-server/Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64
           tags: |
             ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:${{ env.BUILD_NUMBER }}
             ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:latest
-          cache-from: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:latest
-          cache-to: type=inline
+          cache-from: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:buildcache,image-manifest=true,oci-mediatypes=true
+          cache-to: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true
 
       - name: Setting NCP CLI & Credentials
         run: |
@@ -73,8 +73,8 @@ jobs:
           cd ~/cli_linux
           ./ncloud vserver addAccessControlGroupInboundRule \
             --regionCode KR --vpcNo ${{ env.NCP_VPC_ID }} \
-            --accessControlGroupNo ${{ secrets.NCP_AGC_ID }} \
-            --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.public_ip }}/32', portRange='22'" > /dev/null 2>&1
+            --accessControlGroupNo ${{ env.NCP_AGC_ID }} \
+            --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ env.PUBLIC_IP }}/32', portRange='22'" > /dev/null 2>&1
 
       - name: Create .env file
         run: |
@@ -111,7 +111,7 @@ jobs:
             docker login ${{ env.REGISTRY_URL }} -u ${{ env.NCP_ACCESS_KEY }} -p ${{ env.NCP_SECRET_KEY }}
 
             docker-compose -f ~/docker-compose.yml pull
-            docker-compose -f ~/docker-compose.yml up -d
+            docker-compose -f ~/docker-compose.yml up -d --remove-orphans
             docker-compose exec nginx nginx -s reload
             
             chmod +x ~/scripts/server/register-certbot-cron-job.sh
@@ -125,4 +125,4 @@ jobs:
           ./ncloud vserver removeAccessControlGroupInboundRule \
             --regionCode KR --vpcNo ${{ env.NCP_VPC_ID }} \
             --accessControlGroupNo ${{ env.NCP_AGC_ID }} \
-            --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ steps.ip.outputs.public_ip }}/32', portRange='22'" > /dev/null 2>&1
+            --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ env.PUBLIC_IP }}/32', portRange='22'" > /dev/null 2>&1
