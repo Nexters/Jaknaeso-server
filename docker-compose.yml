@@ -31,6 +31,7 @@ services:
       KAKAO_LOGIN_CLIENT_ID: ${KAKAO_LOGIN_CLIENT_ID}
       KAKAO_LOGIN_CLIENT_SECRET: ${KAKAO_LOGIN_CLIENT_SECRET}
       SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      TZ: Asia/Seoul
     volumes:
       - /var/log/jaknaeso:/var/log/jaknaeso
     depends_on:
