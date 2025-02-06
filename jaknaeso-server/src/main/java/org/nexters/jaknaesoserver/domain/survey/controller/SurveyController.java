@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionCommand;
 import org.nexters.jaknaesocore.domain.survey.service.SurveyService;
 import org.nexters.jaknaesoserver.domain.auth.model.CustomUserDetails;
 import org.nexters.jaknaesoserver.domain.survey.controller.dto.SurveySubmissionRequest;
@@ -39,8 +40,14 @@ public class SurveyController {
       @PathVariable Long surveyId,
       @Valid @RequestBody SurveySubmissionRequest request) {
     LocalDateTime submittedAt = LocalDateTime.now();
-    surveyService.submitSurvey(
-        surveyId, member.getMemberId(), request.toServiceRequest(), submittedAt);
+    SurveySubmissionCommand command =
+        SurveySubmissionCommand.builder()
+            .surveyId(surveyId)
+            .memberId(member.getMemberId())
+            .optionId(request.optionId())
+            .comment(request.comment())
+            .build();
+    surveyService.submitSurvey(command, submittedAt);
     return ApiResponse.success();
   }
 }

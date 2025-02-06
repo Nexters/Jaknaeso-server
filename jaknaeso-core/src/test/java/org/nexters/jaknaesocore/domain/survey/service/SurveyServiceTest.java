@@ -101,15 +101,12 @@ class SurveyServiceTest extends IntegrationTest {
             SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
         surveyOptionRepository.save(option);
 
-        SurveySubmissionCommand request =
-            new SurveySubmissionCommand(option.getId(), "나는 행복한게 좋으니까");
+        SurveySubmissionCommand command =
+            new SurveySubmissionCommand(option.getId(), balanceSurvey.getId(), 0L, "나는 행복한게 좋으니까");
 
         // when
         // then
-        thenThrownBy(
-                () ->
-                    surveyService.submitSurvey(
-                        balanceSurvey.getId(), 0L, request, LocalDateTime.now()))
+        thenThrownBy(() -> surveyService.submitSurvey(command, LocalDateTime.now()))
             .isEqualTo(CustomException.MEMBER_NOT_FOUND);
       }
     }
@@ -134,12 +131,12 @@ class SurveyServiceTest extends IntegrationTest {
             SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
         surveyOptionRepository.save(option);
 
-        SurveySubmissionCommand request =
-            new SurveySubmissionCommand(option.getId(), "나는 행복한게 좋으니까");
+        SurveySubmissionCommand command =
+            new SurveySubmissionCommand(
+                option.getId(), balanceSurvey.getId(), member.getId(), "나는 행복한게 좋으니까");
 
         // when
-        surveyService.submitSurvey(
-            balanceSurvey.getId(), member.getId(), request, LocalDateTime.now());
+        surveyService.submitSurvey(command, LocalDateTime.now());
         // then
         List<SurveySubmission> submissions = surveySubmissionRepository.findAll();
         then(submissions).hasSize(1);
@@ -170,13 +167,12 @@ class SurveyServiceTest extends IntegrationTest {
             SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
         surveyOptionRepository.save(option);
 
-        SurveySubmissionCommand request =
-            new SurveySubmissionCommand(option.getId(), "나는 행복한게 좋으니까");
+        SurveySubmissionCommand command =
+            new SurveySubmissionCommand(0L, member.getId(), option.getId(), "나는 행복한게 좋으니까");
 
         // when
         // then
-        thenThrownBy(
-                () -> surveyService.submitSurvey(0L, member.getId(), request, LocalDateTime.now()))
+        thenThrownBy(() -> surveyService.submitSurvey(command, LocalDateTime.now()))
             .isEqualTo(CustomException.SURVEY_NOT_FOUND);
       }
     }

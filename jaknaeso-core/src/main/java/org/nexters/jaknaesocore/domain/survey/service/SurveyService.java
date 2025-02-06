@@ -108,18 +108,19 @@ public class SurveyService {
   }
 
   @Transactional
-  public void submitSurvey(
-      Long surveyId, Long memberId, SurveySubmissionCommand request, LocalDateTime submittedAt) {
+  public void submitSurvey(SurveySubmissionCommand command, LocalDateTime submittedAt) {
     Survey survey =
-        surveyRepository.findById(surveyId).orElseThrow(() -> CustomException.SURVEY_NOT_FOUND);
-    SurveyOption surveyOption = survey.getOptionById(request.optionId());
+        surveyRepository
+            .findById(command.surveyId())
+            .orElseThrow(() -> CustomException.SURVEY_NOT_FOUND);
+    SurveyOption surveyOption = survey.getOptionById(command.optionId());
     Member member =
         memberRepository
-            .findByIdAndDeletedAtIsNull(memberId)
+            .findByIdAndDeletedAtIsNull(command.memberId())
             .orElseThrow(() -> CustomException.MEMBER_NOT_FOUND);
 
     SurveySubmission surveySubmission =
-        SurveySubmission.create(member, survey, surveyOption, request.comment(), submittedAt);
+        SurveySubmission.create(member, survey, surveyOption, command.comment(), submittedAt);
 
     surveySubmissionRepository.save(surveySubmission);
   }
