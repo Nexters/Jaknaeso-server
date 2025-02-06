@@ -16,6 +16,8 @@ env:
   NCP_SERVER_HOST: ${{ secrets.NCP_SERVER_HOST }}
   NCP_SERVER_USERNAME: ${{ secrets.NCP_SERVER_USERNAME }}
   NCP_SERVER_PASSWORD: ${{ secrets.NCP_SERVER_PASSWORD }}
+  ACCESS_TOKEN_EXPIRATION: ${{ secrets.ACCESS_TOKEN_EXPIRATION }}
+  REFRESH_TOKEN_EXPIRATION: ${{ secrets.REFRESH_TOKEN_EXPIRATION }}
   SSH_PORT: 22
   BUILD_NUMBER: ${{ github.sha }}-${{ github.run_id }}
   SPRING_PROFILES_ACTIVE: dev
@@ -81,6 +83,8 @@ jobs:
           echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
           echo "DATABASE_ROOT_PASSWORD=${{ secrets.DATABASE_ROOT_PASSWORD }}" >> .env
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
+          echo "ACCESS_TOKEN_EXPIRATION=${{ env.ACCESS_TOKEN_EXPIRATION }}" >> .env
+          echo "REFRESH_TOKEN_EXPIRATION=${{ env.REFRESH_TOKEN_EXPIRATION }}" >> .env
           echo "KAKAO_LOGIN_CLIENT_ID=${{ secrets.KAKAO_LOGIN_CLIENT_ID }}" >> .env
           echo "KAKAO_LOGIN_CLIENT_SECRET=${{ secrets.KAKAO_LOGIN_CLIENT_SECRET }}" >> .env
           echo "SPRING_PROFILES_ACTIVE=${{ env.SPRING_PROFILES_ACTIVE }}" >> .env
