@@ -50,7 +50,8 @@ class SurveyBundleRepositoryTest extends IntegrationTest {
     surveyBundleRepository.saveAll(
         List.of(surveyBundle1, surveyBundle2, surveyBundle3, surveyBundle4));
     // when
-    Optional<SurveyBundle> result = surveyBundleRepository.findFirstByIdGreaterThanOrderByIdAsc(4L);
+    Optional<SurveyBundle> result =
+        surveyBundleRepository.findFirstByIdGreaterThanOrderByIdAsc(surveyBundle4.getId());
     // then
     then(result).isEmpty();
   }

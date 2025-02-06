@@ -1,6 +1,7 @@
 package org.nexters.jaknaesoserver.domain.survey.controller;
 
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
@@ -37,7 +38,9 @@ public class SurveyController {
       @AuthenticationPrincipal CustomUserDetails member,
       @PathVariable Long surveyId,
       @Valid @RequestBody SurveySubmissionRequest request) {
-    surveyService.submitSurvey(surveyId, member.getMemberId(), request.toServiceRequest());
+    LocalDateTime submittedAt = LocalDateTime.now();
+    surveyService.submitSurvey(
+        surveyId, member.getMemberId(), request.toServiceRequest(), submittedAt);
     return ApiResponse.success();
   }
 }

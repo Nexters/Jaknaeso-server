@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import com.epages.restdocs.apispec.SimpleType;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -128,7 +129,8 @@ class SurveyControllerTest extends ControllerTest {
     SurveySubmissionRequest request = new SurveySubmissionRequest(1L, "나는 행복해요");
     willDoNothing()
         .given(surveyService)
-        .submitSurvey(anyLong(), anyLong(), any(SurveySubmissionCommand.class));
+        .submitSurvey(
+            anyLong(), anyLong(), any(SurveySubmissionCommand.class), any(LocalDateTime.class));
 
     mockMvc
         .perform(
