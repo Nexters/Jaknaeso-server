@@ -24,7 +24,6 @@ public class CorsConfig {
     corsConfiguration.setAllowedOrigins(List.of(API_DOC_HOST, LOCAL_URL, JAKNAESO_WEB_VERCEL_APP));
     corsConfiguration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE"));
     corsConfiguration.addAllowedHeader("*");
-    corsConfiguration.setAllowCredentials(true);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", corsConfiguration);
