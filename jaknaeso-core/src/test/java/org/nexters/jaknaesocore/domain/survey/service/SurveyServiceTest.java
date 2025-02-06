@@ -3,6 +3,7 @@ package org.nexters.jaknaesocore.domain.survey.service;
 import static org.assertj.core.api.BDDAssertions.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -105,7 +106,10 @@ class SurveyServiceTest extends IntegrationTest {
 
         // when
         // then
-        thenThrownBy(() -> surveyService.submitSurvey(balanceSurvey.getId(), 0L, request))
+        thenThrownBy(
+                () ->
+                    surveyService.submitSurvey(
+                        balanceSurvey.getId(), 0L, request, LocalDateTime.now()))
             .isEqualTo(CustomException.MEMBER_NOT_FOUND);
       }
     }
@@ -134,7 +138,8 @@ class SurveyServiceTest extends IntegrationTest {
             new SurveySubmissionCommand(option.getId(), "나는 행복한게 좋으니까");
 
         // when
-        surveyService.submitSurvey(balanceSurvey.getId(), member.getId(), request);
+        surveyService.submitSurvey(
+            balanceSurvey.getId(), member.getId(), request, LocalDateTime.now());
         // then
         List<SurveySubmission> submissions = surveySubmissionRepository.findAll();
         then(submissions).hasSize(1);
@@ -170,7 +175,8 @@ class SurveyServiceTest extends IntegrationTest {
 
         // when
         // then
-        thenThrownBy(() -> surveyService.submitSurvey(0L, member.getId(), request))
+        thenThrownBy(
+                () -> surveyService.submitSurvey(0L, member.getId(), request, LocalDateTime.now()))
             .isEqualTo(CustomException.SURVEY_NOT_FOUND);
       }
     }

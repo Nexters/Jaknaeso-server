@@ -1,5 +1,6 @@
 package org.nexters.jaknaesocore.domain.survey.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
@@ -94,7 +95,8 @@ public class SurveyService {
   }
 
   @Transactional
-  public void submitSurvey(Long surveyId, Long memberId, SurveySubmissionCommand request) {
+  public void submitSurvey(
+      Long surveyId, Long memberId, SurveySubmissionCommand request, LocalDateTime submittedAt) {
     Survey survey =
         surveyRepository.findById(surveyId).orElseThrow(() -> CustomException.SURVEY_NOT_FOUND);
     SurveyOption surveyOption = survey.getOptionById(request.optionId());
@@ -104,7 +106,7 @@ public class SurveyService {
             .orElseThrow(() -> CustomException.MEMBER_NOT_FOUND);
 
     SurveySubmission surveySubmission =
-        SurveySubmission.create(member, survey, surveyOption, request.comment());
+        SurveySubmission.create(member, survey, surveyOption, request.comment(), submittedAt);
 
     surveySubmissionRepository.save(surveySubmission);
   }
