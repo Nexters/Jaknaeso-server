@@ -133,8 +133,7 @@ class SurveyControllerTest extends ControllerTest {
     SurveySubmissionRequest request = new SurveySubmissionRequest(1L, "나는 행복해요");
     willDoNothing()
         .given(surveyService)
-        .submitSurvey(
-            anyLong(), anyLong(), any(SurveySubmissionCommand.class), any(LocalDateTime.class));
+        .submitSurvey(any(SurveySubmissionCommand.class), any(LocalDateTime.class));
 
     mockMvc
         .perform(

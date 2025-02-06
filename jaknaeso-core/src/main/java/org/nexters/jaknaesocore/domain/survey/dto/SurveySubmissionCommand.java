@@ -1,3 +1,7 @@
 package org.nexters.jaknaesocore.domain.survey.dto;
 
-public record SurveySubmissionCommand(Long optionId, String comment) {}
+import lombok.Builder;
+
+@Builder
+public record SurveySubmissionCommand(
+    Long optionId, Long surveyId, Long memberId, String comment) {}
