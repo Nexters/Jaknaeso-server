@@ -24,7 +24,7 @@ class SurveySubscriptionsTest {
 
     List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
             KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
 
     SurveyOption option1 =
@@ -63,7 +63,7 @@ class SurveySubscriptionsTest {
 
     List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
             KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
 
     SurveyOption option1 =

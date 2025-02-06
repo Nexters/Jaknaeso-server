@@ -58,7 +58,7 @@ class SurveyServiceTest extends IntegrationTest {
     surveyRepository.save(balanceSurvey);
     List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
             KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
     SurveyOption option =
         SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
@@ -94,7 +94,7 @@ class SurveyServiceTest extends IntegrationTest {
         surveyRepository.save(balanceSurvey);
         List<KeywordScore> scores =
             List.of(
-                KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+                KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
                 KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
         SurveyOption option =
             SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
@@ -124,7 +124,7 @@ class SurveyServiceTest extends IntegrationTest {
         surveyRepository.save(balanceSurvey);
         List<KeywordScore> scores =
             List.of(
-                KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+                KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
                 KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
         SurveyOption option =
             SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
@@ -159,7 +159,7 @@ class SurveyServiceTest extends IntegrationTest {
         surveyRepository.save(balanceSurvey);
         List<KeywordScore> scores =
             List.of(
-                KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+                KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
                 KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
         SurveyOption option =
             SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
@@ -191,7 +191,7 @@ class SurveyServiceTest extends IntegrationTest {
     surveyRepository.saveAll(List.of(survey1, survey2, survey3, survey4));
     List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
             KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
     SurveyOption option1 =
         SurveyOption.builder().survey(survey1).scores(scores).content("한다.").build();
@@ -230,7 +230,7 @@ class SurveyServiceTest extends IntegrationTest {
     surveyRepository.saveAll(List.of(survey1, survey2, survey3, survey4));
     List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
             KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
     SurveyOption option1 =
         SurveyOption.builder().survey(survey1).scores(scores).content("한다.").build();
@@ -283,7 +283,7 @@ class SurveyServiceTest extends IntegrationTest {
 
     List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
             KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
 
     SurveyOption option1 =
@@ -335,7 +335,7 @@ class SurveyServiceTest extends IntegrationTest {
 
     List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
             KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
 
     SurveyOption option1 =

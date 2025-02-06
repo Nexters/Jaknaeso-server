@@ -2,15 +2,12 @@ package org.nexters.jaknaesocore.domain.survey.model;
 
 public enum Keyword {
   SELF_DIRECTION("자기주도"),
-  STIMULATION("자극"),
-  HEDONISM("쾌락"),
-  ACHIEVEMENT("성취"),
-  POWER("권력"),
+  ADVENTURE("모험"),
   SECURITY("안전"),
-  CONFORMITY("순응"),
-  TRADITION("전통"),
+  STABILITY("안정"),
+  SUCCESS("성공"),
   BENEVOLENCE("박애"),
-  UNIVERSALISM("보편");
+  UNIVERSALISM("보편주의");
 
   private final String description;
 
