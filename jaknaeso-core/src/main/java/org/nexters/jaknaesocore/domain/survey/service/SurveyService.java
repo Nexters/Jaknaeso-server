@@ -3,6 +3,7 @@ package org.nexters.jaknaesocore.domain.survey.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -122,6 +123,7 @@ public class SurveyService {
     return surveySubmissionRepository
         .findByMember_IdAndSurvey_SurveyBundle_Id(command.memberId(), command.bundleId())
         .stream()
+        .sorted(Comparator.comparing(SurveySubmission::getSubmittedAt))
         .map(SurveyRecord::of)
         .collect(
             Collectors.collectingAndThen(
