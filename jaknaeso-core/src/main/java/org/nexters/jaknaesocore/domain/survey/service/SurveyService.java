@@ -2,17 +2,16 @@ package org.nexters.jaknaesocore.domain.survey.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseEntity;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryDetailResponse;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionCommand;
+import org.nexters.jaknaesocore.domain.survey.dto.*;
 import org.nexters.jaknaesocore.domain.survey.model.*;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
@@ -23,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class SurveyService {
+
+  private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
 
   private final MemberRepository memberRepository;
   private final SurveyBundleRepository surveyBundleRepository;
@@ -113,5 +114,17 @@ public class SurveyService {
         SurveySubmission.create(member, survey, surveyOption, command.comment(), submittedAt);
 
     surveySubmissionRepository.save(surveySubmission);
+  }
+
+  @Transactional(readOnly = true)
+  public SurveySubmissionHistoryResponse getSurveySubmissionHistory(
+      final SurveySubmissionHistoryCommand command) {
+    return surveySubmissionRepository
+        .findByMember_IdAndSurvey_SurveyBundle_Id(command.memberId(), command.bundleId())
+        .stream()
+        .map(SurveyRecord::of)
+        .collect(
+            Collectors.collectingAndThen(
+                Collectors.toList(), SurveySubmissionHistoryResponse::new));
   }
 }

@@ -20,11 +20,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryDetailResponse;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveyOptionsResponse;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionCommand;
+import org.nexters.jaknaesocore.domain.survey.dto.*;
+import org.nexters.jaknaesocore.domain.survey.model.SurveyRecord;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.common.support.WithMockCustomUser;
 import org.nexters.jaknaesoserver.domain.survey.controller.dto.SurveySubmissionRequest;
@@ -166,6 +163,69 @@ class SurveyControllerTest extends ControllerTest {
                             fieldWithPath("error").description("에러").optional())
                         .requestSchema(Schema.schema("surveySubmissionRequest"))
                         .responseSchema(Schema.schema("surveyResponse"))
+                        .build())));
+  }
+
+  @WithMockCustomUser
+  @Test
+  void 설문_결과를_조회한다() throws Exception {
+    // given
+    SurveyRecord record1 =
+        SurveyRecord.builder()
+            .question("커리어를 향상시킬 수 있는 일자리이지만 가까운 사람들과 멀어져야한다면, 이 일자리를 선택하실 건가요?")
+            .answer("주변 사람과 물리적으로 멀어지더라도, 커리어를 선택한다.")
+            .retrospective(
+                "가까운 사람들과 물리적으로 멀어지더라도 그 관계가 사라지진 않음.  내 노력에 따라 관계는 달라질 수 있지만 커리어 기회는 원할 때 오는게 아님")
+            .submittedAt("2025.02.06")
+            .build();
+    SurveyRecord record2 =
+        SurveyRecord.builder()
+            .question("새로운 친구를 만나며 나의 삶에 변화를 주고 싶다. 나는 어떤 친구를 더 가까이 두고 싶을까?")
+            .answer("감정적인 교류를 통해 서로를 깊이 이해하고 지지하는 친구")
+            .submittedAt("2025.02.06")
+            .build();
+    SurveySubmissionHistoryResponse response =
+        new SurveySubmissionHistoryResponse(List.of(record1, record2));
+
+    given(surveyService.getSurveySubmissionHistory(any(SurveySubmissionHistoryCommand.class)))
+        .willReturn(response);
+
+    mockMvc
+        .perform(
+            get("/api/v1/surveys/history/{bundleId}/submissions/{memberId}", 1L, 1L).with(csrf()))
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "survey-get-submission-history",
+                resource(
+                    ResourceSnippetParameters.builder()
+                        .description("설문 결과를 조회")
+                        .tag("Survey Domain")
+                        .pathParameters(
+                            parameterWithName("bundleId")
+                                .type(SimpleType.NUMBER)
+                                .description("번들 ID"),
+                            parameterWithName("memberId")
+                                .type(SimpleType.NUMBER)
+                                .description("회원 ID"))
+                        .responseFields(
+                            fieldWithPath("result").type(SimpleType.STRING).description("결과"),
+                            fieldWithPath("data.surveyRecords").description("설문 이력"),
+                            fieldWithPath("data.surveyRecords[].question")
+                                .type(SimpleType.STRING)
+                                .description("질문"),
+                            fieldWithPath("data.surveyRecords[].answer")
+                                .type(SimpleType.STRING)
+                                .description("답변"),
+                            fieldWithPath("data.surveyRecords[].retrospective")
+                                .type(SimpleType.STRING)
+                                .optional()
+                                .description("회고"),
+                            fieldWithPath("data.surveyRecords[].submittedAt")
+                                .type(SimpleType.STRING)
+                                .description("제출 일자"),
+                            fieldWithPath("error").description("에러").optional())
+                        .responseSchema(Schema.schema("surveySubmissionHistoryResponse"))
                         .build())));
   }
 }

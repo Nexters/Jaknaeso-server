@@ -13,9 +13,7 @@ import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
-import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionCommand;
+import org.nexters.jaknaesocore.domain.survey.dto.*;
 import org.nexters.jaknaesocore.domain.survey.model.*;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
@@ -297,7 +295,7 @@ class SurveyServiceTest extends IntegrationTest {
     surveyRepository.saveAll(List.of(survey1, survey2, survey3, survey4));
     List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(Keyword.ACHIEVEMENT).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
             KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
     SurveyOption option1 =
         SurveyOption.builder().survey(survey1).scores(scores).content("한다.").build();
@@ -496,5 +494,83 @@ class SurveyServiceTest extends IntegrationTest {
     thenThrownBy(() -> surveyService.getSurveyHistory(member.getId()))
         .isInstanceOf(CustomException.class)
         .isEqualTo(CustomException.NOT_READY_FOR_NEXT_BUNDLE);
+  }
+
+  @Test
+  void 개인의_번들_내부의_제출_결과를_가져온다() {
+    // given
+    Member member = Member.create("나민혁", "test@test.com");
+    memberRepository.save(member);
+    SurveyBundle surveyBundle = new SurveyBundle();
+
+    surveyBundleRepository.save(surveyBundle);
+
+    BalanceSurvey survey1 = new BalanceSurvey("돈 vs 명예", surveyBundle);
+    BalanceSurvey survey2 = new BalanceSurvey("사랑 vs 우정", surveyBundle);
+    MultipleChoiceSurvey survey3 = new MultipleChoiceSurvey("나의 행복 지수는", surveyBundle);
+    MultipleChoiceSurvey survey4 = new MultipleChoiceSurvey("나는 노는게 좋다.", surveyBundle);
+
+    surveyRepository.saveAll(List.of(survey1, survey2, survey3, survey4));
+
+    List<KeywordScore> scores =
+        List.of(
+            KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
+
+    SurveyOption option1 =
+        SurveyOption.builder().survey(survey1).scores(scores).content("돈").build();
+    SurveyOption option2 =
+        SurveyOption.builder().survey(survey2).scores(scores).content("사랑").build();
+    SurveyOption option3 =
+        SurveyOption.builder().survey(survey3).scores(scores).content("3점").build();
+    SurveyOption option4 =
+        SurveyOption.builder().survey(survey4).scores(scores).content("4점").build();
+
+    surveyOptionRepository.saveAll(List.of(option1, option2, option3, option4));
+    SurveySubmission submission1 =
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option1)
+            .survey(survey1)
+            .submittedAt(LocalDateTime.of(2025, 1, 1, 0, 0, 0))
+            .build();
+    SurveySubmission submission2 =
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option2)
+            .survey(survey2)
+            .submittedAt(LocalDateTime.of(2025, 1, 2, 0, 0, 0))
+            .build();
+    SurveySubmission submission3 =
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option3)
+            .survey(survey3)
+            .submittedAt(LocalDateTime.of(2025, 1, 3, 0, 0, 0))
+            .build();
+    SurveySubmission submission4 =
+        SurveySubmission.builder()
+            .member(member)
+            .selectedOption(option4)
+            .survey(survey4)
+            .retrospective("당연히 노는게 좋은거 아닌가?")
+            .submittedAt(LocalDateTime.of(2025, 2, 1, 0, 0, 0))
+            .build();
+
+    surveySubmissionRepository.saveAll(List.of(submission1, submission2, submission3, submission4));
+
+    // when
+    SurveySubmissionHistoryResponse response =
+        surveyService.getSurveySubmissionHistory(
+            new SurveySubmissionHistoryCommand(member.getId(), surveyBundle.getId()));
+    // then
+    then(response.surveyRecords())
+        .hasSize(4)
+        .extracting("question", "answer", "retrospective", "submittedAt")
+        .containsExactly(
+            tuple("돈 vs 명예", "돈", null, "2025.01.01"),
+            tuple("사랑 vs 우정", "사랑", null, "2025.01.02"),
+            tuple("나의 행복 지수는", "3점", null, "2025.01.03"),
+            tuple("나는 노는게 좋다.", "4점", "당연히 노는게 좋은거 아닌가?", "2025.02.01"));
   }
 }

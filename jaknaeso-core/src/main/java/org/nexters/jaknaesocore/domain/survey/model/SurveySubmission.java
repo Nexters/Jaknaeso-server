@@ -32,7 +32,7 @@ public class SurveySubmission extends BaseTimeEntity {
   private LocalDateTime submittedAt;
 
   @Builder
-  public SurveySubmission(
+  private SurveySubmission(
       Member member,
       Survey survey,
       SurveyOption selectedOption,
