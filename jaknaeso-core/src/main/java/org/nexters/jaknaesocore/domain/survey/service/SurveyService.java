@@ -2,7 +2,6 @@ package org.nexters.jaknaesocore.domain.survey.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class SurveyService {
-
-  private static final DateTimeFormatter MONTH_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM");
 
   private final MemberRepository memberRepository;
   private final SurveyBundleRepository surveyBundleRepository;

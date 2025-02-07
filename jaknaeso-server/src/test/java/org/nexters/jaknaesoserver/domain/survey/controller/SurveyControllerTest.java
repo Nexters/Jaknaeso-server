@@ -192,7 +192,9 @@ class SurveyControllerTest extends ControllerTest {
 
     mockMvc
         .perform(
-            get("/api/v1/surveys/history/{bundleId}/submissions/{memberId}", 1L, 1L).with(csrf()))
+            get("/api/v1/surveys/members/{memberId}/submissions", 1L)
+                .queryParam("bundleId", "1")
+                .with(csrf()))
         .andExpect(status().isOk())
         .andDo(
             document(
@@ -202,12 +204,13 @@ class SurveyControllerTest extends ControllerTest {
                         .description("설문 결과를 조회")
                         .tag("Survey Domain")
                         .pathParameters(
-                            parameterWithName("bundleId")
-                                .type(SimpleType.NUMBER)
-                                .description("번들 ID"),
                             parameterWithName("memberId")
                                 .type(SimpleType.NUMBER)
                                 .description("회원 ID"))
+                        .queryParameters(
+                            parameterWithName("bundleId")
+                                .type(SimpleType.NUMBER)
+                                .description("번들 ID"))
                         .responseFields(
                             fieldWithPath("result").type(SimpleType.STRING).description("결과"),
                             fieldWithPath("data.surveyRecords").description("설문 이력"),

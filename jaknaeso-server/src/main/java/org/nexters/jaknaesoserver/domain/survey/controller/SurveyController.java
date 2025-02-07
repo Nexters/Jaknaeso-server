@@ -49,14 +49,11 @@ public class SurveyController {
     return ApiResponse.success();
   }
 
-  @GetMapping("/history/{bundleId}/submissions/{memberId}")
+  @GetMapping("/members/{memberId}/submissions")
   public ApiResponse<SurveySubmissionHistoryResponse> getSurveyHistoryByMemberId(
-      @PathVariable Long bundleId, @PathVariable Long memberId) {
+      @RequestParam Long bundleId, @PathVariable Long memberId) {
     SurveySubmissionHistoryCommand command =
         SurveySubmissionHistoryCommand.builder().bundleId(bundleId).memberId(memberId).build();
-    // BundleId 받아서 submissions를 그냥 가져오기
-    // submissions record 안에 들어가야 할 정보
-    // 번들 내에서 제출 회차, 제출 일자(연.월.일), 질문, 답변, 회고
     return ApiResponse.success(surveyService.getSurveySubmissionHistory(command));
   }
 }
