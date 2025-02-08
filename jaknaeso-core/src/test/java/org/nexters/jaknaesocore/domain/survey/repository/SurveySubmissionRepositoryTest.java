@@ -2,6 +2,7 @@ package org.nexters.jaknaesocore.domain.survey.repository;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.tuple;
+import static org.junit.jupiter.api.Assertions.assertAll;
 
 import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
@@ -13,7 +14,13 @@ import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
-import org.nexters.jaknaesocore.domain.survey.model.*;
+import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
+import org.nexters.jaknaesocore.domain.survey.model.Keyword;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
+import org.nexters.jaknaesocore.domain.survey.model.MultipleChoiceSurvey;
+import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
+import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
+import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class SurveySubmissionRepositoryTest extends IntegrationTest {
@@ -161,5 +168,39 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
         .hasSize(2)
         .extracting("id")
         .containsExactly(submission1.getId(), submission2.getId());
+  }
+
+  @Transactional
+  @Test
+  void 회원이_참여한_설문_응답_리스트를_설문_번들과_함께_가져온다() {
+    Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+    SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+    BalanceSurvey survey =
+        surveyRepository.save(
+            new BalanceSurvey(
+                "꿈에 그리던 드림 기업에 입사했다. 연봉도 좋지만, 무엇보다 회사의 근무 방식이 나와 잘 맞는 것 같다. 우리 회사의 근무 방식은...",
+                bundle));
+
+    List<KeywordScore> scores =
+        List.of(
+            KeywordScore.builder().keyword(Keyword.SELF_DIRECTION).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.STABILITY).score(BigDecimal.TWO).build());
+    SurveyOption option =
+        surveyOptionRepository.save(
+            SurveyOption.builder()
+                .survey(survey)
+                .content("자율 출퇴근제로 원하는 시간에 근무하며 창의적인 성과 내기")
+                .scores(scores)
+                .build());
+
+    surveySubmissionRepository.save(
+        SurveySubmission.builder().member(member).survey(survey).selectedOption(option).build());
+
+    List<SurveySubmission> actual =
+        surveySubmissionRepository.findSurveyBundlesByMemberIdAndDeletedAtIsNull(member.getId());
+
+    assertAll(
+        () -> then(actual).hasSize(1),
+        () -> then(actual.get(0).getSurvey().getSurveyBundle()).isEqualTo(bundle));
   }
 }
