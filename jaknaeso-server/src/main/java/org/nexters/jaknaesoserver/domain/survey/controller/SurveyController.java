@@ -3,6 +3,7 @@ package org.nexters.jaknaesoserver.domain.survey.controller;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.*;
 import org.nexters.jaknaesocore.domain.survey.service.SurveyService;
@@ -51,7 +52,12 @@ public class SurveyController {
 
   @GetMapping("/members/{memberId}/submissions")
   public ApiResponse<SurveySubmissionHistoryResponse> getSurveyHistoryByMemberId(
-      @RequestParam Long bundleId, @PathVariable Long memberId) {
+      @RequestParam Long bundleId,
+      @PathVariable Long memberId,
+      @AuthenticationPrincipal CustomUserDetails member) {
+    if (!member.getMemberId().equals(memberId)) {
+      throw CustomException.FORBIDDEN_ACCESS;
+    }
     SurveySubmissionHistoryCommand command =
         SurveySubmissionHistoryCommand.builder().bundleId(bundleId).memberId(memberId).build();
     return ApiResponse.success(surveyService.getSurveySubmissionHistory(command));
