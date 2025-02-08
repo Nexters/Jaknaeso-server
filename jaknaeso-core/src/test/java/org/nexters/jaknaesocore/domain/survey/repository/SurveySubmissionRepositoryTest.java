@@ -4,7 +4,6 @@ import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.tuple;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-import jakarta.transaction.Transactional;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +21,7 @@ import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 class SurveySubmissionRepositoryTest extends IntegrationTest {
 
@@ -197,7 +197,8 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
         SurveySubmission.builder().member(member).survey(survey).selectedOption(option).build());
 
     List<SurveySubmission> actual =
-        surveySubmissionRepository.findSurveyBundlesByMemberIdAndDeletedAtIsNull(member.getId());
+        surveySubmissionRepository.findWithSurveyBundlesByMemberIdAndDeletedAtIsNull(
+            member.getId());
 
     assertAll(
         () -> then(actual).hasSize(1),

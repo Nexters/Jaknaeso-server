@@ -22,5 +22,5 @@ public interface SurveySubmissionRepository extends JpaRepository<SurveySubmissi
       "SELECT s FROM SurveySubmission s "
           + "JOIN FETCH s.member sm JOIN FETCH s.survey ss JOIN FETCH ss.surveyBundle sb "
           + "WHERE sm.id = :memberId AND s.deletedAt IS NULL")
-  List<SurveySubmission> findSurveyBundlesByMemberIdAndDeletedAtIsNull(final Long memberId);
+  List<SurveySubmission> findWithSurveyBundlesByMemberIdAndDeletedAtIsNull(final Long memberId);
 }

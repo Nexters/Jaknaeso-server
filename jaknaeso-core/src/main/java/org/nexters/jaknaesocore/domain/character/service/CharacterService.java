@@ -27,7 +27,7 @@ public class CharacterService {
 
   private List<SurveyBundle> getSurveyBundles(final Long memberId) {
     return surveySubmissionRepository
-        .findSurveyBundlesByMemberIdAndDeletedAtIsNull(memberId)
+        .findWithSurveyBundlesByMemberIdAndDeletedAtIsNull(memberId)
         .stream()
         .map(it -> it.getSurvey().getSurveyBundle())
         .toList();
