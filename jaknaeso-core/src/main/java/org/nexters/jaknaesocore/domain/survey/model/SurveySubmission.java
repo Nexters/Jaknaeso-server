@@ -29,7 +29,7 @@ public class SurveySubmission extends BaseTimeEntity {
 
   private String retrospective;
 
-  private LocalDateTime submittedAt;
+  @Embedded private SubmittedAt submittedAt;
 
   @Builder
   private SurveySubmission(
@@ -42,7 +42,7 @@ public class SurveySubmission extends BaseTimeEntity {
     this.survey = survey;
     this.selectedOption = selectedOption;
     this.retrospective = retrospective;
-    this.submittedAt = submittedAt;
+    this.submittedAt = SubmittedAt.builder().submittedAt(submittedAt).build();
   }
 
   public static SurveySubmission create(
@@ -61,6 +61,14 @@ public class SurveySubmission extends BaseTimeEntity {
   }
 
   public boolean isSubmittedByDate(LocalDate date) {
-    return submittedAt.toLocalDate().isEqual(date);
+    return submittedAt.isSubmittedByDate(date);
+  }
+
+  public LocalDateTime getSubmittedAt() {
+    return submittedAt.getSubmittedAt();
+  }
+
+  public String getYearMonthDay() {
+    return submittedAt.getYearMonthDay();
   }
 }
