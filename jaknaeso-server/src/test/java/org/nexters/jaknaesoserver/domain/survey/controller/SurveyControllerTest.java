@@ -166,7 +166,7 @@ class SurveyControllerTest extends ControllerTest {
                         .build())));
   }
 
-  @WithMockCustomUser
+  @WithMockCustomUser(userId = 1L)
   @Test
   void 설문_결과를_조회한다() throws Exception {
     // given
@@ -230,5 +230,36 @@ class SurveyControllerTest extends ControllerTest {
                             fieldWithPath("error").description("에러").optional())
                         .responseSchema(Schema.schema("surveySubmissionHistoryResponse"))
                         .build())));
+  }
+
+  @WithMockCustomUser
+  @Test
+  void 설문_결과를_조회할_때_자신의_결과가_아니면_예외가_발생한다() throws Exception {
+    SurveyRecord record1 =
+        SurveyRecord.builder()
+            .question("커리어를 향상시킬 수 있는 일자리이지만 가까운 사람들과 멀어져야한다면, 이 일자리를 선택하실 건가요?")
+            .answer("주변 사람과 물리적으로 멀어지더라도, 커리어를 선택한다.")
+            .retrospective(
+                "가까운 사람들과 물리적으로 멀어지더라도 그 관계가 사라지진 않음.  내 노력에 따라 관계는 달라질 수 있지만 커리어 기회는 원할 때 오는게 아님")
+            .submittedAt("2025.02.06")
+            .build();
+    SurveyRecord record2 =
+        SurveyRecord.builder()
+            .question("새로운 친구를 만나며 나의 삶에 변화를 주고 싶다. 나는 어떤 친구를 더 가까이 두고 싶을까?")
+            .answer("감정적인 교류를 통해 서로를 깊이 이해하고 지지하는 친구")
+            .submittedAt("2025.02.06")
+            .build();
+    SurveySubmissionHistoryResponse response =
+        new SurveySubmissionHistoryResponse(List.of(record1, record2));
+
+    given(surveyService.getSurveySubmissionHistory(any(SurveySubmissionHistoryCommand.class)))
+        .willReturn(response);
+
+    mockMvc
+        .perform(
+            get("/api/v1/surveys/members/{memberId}/submissions", 2L)
+                .queryParam("bundleId", "1")
+                .with(csrf()))
+        .andExpect(status().isForbidden());
   }
 }
