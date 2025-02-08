@@ -2,6 +2,7 @@ package org.nexters.jaknaesoserver.common.support;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.nexters.jaknaesocore.domain.auth.service.OauthService;
+import org.nexters.jaknaesocore.domain.character.service.CharacterService;
 import org.nexters.jaknaesocore.domain.member.service.MemberService;
 import org.nexters.jaknaesocore.domain.survey.service.SurveyService;
 import org.nexters.jaknaesoserver.config.TestSecurityConfig;
@@ -37,4 +38,6 @@ public abstract class ControllerTest {
   @MockitoBean protected JwtProvider jwtProvider;
 
   @MockitoBean protected SurveyService surveyService;
+
+  @MockitoBean protected CharacterService characterService;
 }
