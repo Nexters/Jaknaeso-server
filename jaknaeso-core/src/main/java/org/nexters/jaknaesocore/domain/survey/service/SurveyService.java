@@ -43,7 +43,7 @@ public class SurveyService {
   private List<Survey> getSubmittedSurvey(final Long memberId) {
     List<SurveySubmission> surveySubmissionsByMember =
         surveySubmissionRepository.findByMember_IdAndDeletedAtIsNull(memberId);
-    return new SurveySubscriptions(surveySubmissionsByMember).getSubmittedSurvey(memberId);
+    return new SurveySubmissions(surveySubmissionsByMember).getSubmittedSurvey(memberId);
   }
 
   @Transactional(readOnly = true)

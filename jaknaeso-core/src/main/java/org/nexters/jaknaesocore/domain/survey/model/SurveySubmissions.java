@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
-public class SurveySubscriptions {
+public class SurveySubmissions {
 
   private final List<SurveySubmission> submissions;
 
