@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
-import org.nexters.jaknaesocore.domain.character.service.dto.CharacterQuestionsCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
@@ -47,11 +46,6 @@ class CharacterServiceTest extends IntegrationTest {
     surveyRepository.deleteAllInBatch();
     surveyBundleRepository.deleteAllInBatch();
     memberRepository.deleteAllInBatch();
-  }
-
-  private CharacterQuestionsCommand createCharacterQuestionsCommand(
-      final Long memberId, final Long bundleId) {
-    return new CharacterQuestionsCommand(memberId, bundleId);
   }
 
   @Nested
