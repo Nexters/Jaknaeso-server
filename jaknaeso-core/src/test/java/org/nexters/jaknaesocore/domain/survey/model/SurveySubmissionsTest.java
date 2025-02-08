@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.springframework.test.util.ReflectionTestUtils;
 
-class SurveySubscriptionsTest {
+class SurveySubmissionsTest {
 
   @DisplayName("회원이 제출한 설문들을 가져온다")
   @Test
@@ -40,7 +40,7 @@ class SurveySubscriptionsTest {
         SurveySubmission.builder().member(member).selectedOption(option2).survey(survey2).build();
 
     // when
-    SurveySubscriptions subscriptions = new SurveySubscriptions(List.of(submission1, submission2));
+    SurveySubmissions subscriptions = new SurveySubmissions(List.of(submission1, submission2));
     List<Survey> submittedSurveys = subscriptions.getSubmittedSurvey(1L);
 
     // then
@@ -79,7 +79,7 @@ class SurveySubscriptionsTest {
         SurveySubmission.builder().member(member2).selectedOption(option2).survey(survey2).build();
 
     // when
-    SurveySubscriptions subscriptions = new SurveySubscriptions(List.of(submission1, submission2));
+    SurveySubmissions subscriptions = new SurveySubmissions(List.of(submission1, submission2));
     List<Survey> submittedSurveys = subscriptions.getSubmittedSurvey(1L);
 
     // then
@@ -94,7 +94,7 @@ class SurveySubscriptionsTest {
     ReflectionTestUtils.setField(member, "id", 1L);
 
     // when
-    SurveySubscriptions subscriptions = new SurveySubscriptions(List.of());
+    SurveySubmissions subscriptions = new SurveySubmissions(List.of());
     List<Survey> submittedSurveys = subscriptions.getSubmittedSurvey(1L);
 
     // then
