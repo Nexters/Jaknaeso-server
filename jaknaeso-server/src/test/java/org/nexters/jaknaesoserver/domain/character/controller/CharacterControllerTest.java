@@ -1,7 +1,6 @@
 package org.nexters.jaknaesoserver.domain.character.controller;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
-import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.Schema.schema;
@@ -33,7 +32,6 @@ class CharacterControllerTest extends ControllerTest {
             get("/api/v1/characters")
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
-                .header("Refresh-Token", "Bearer refreshToken")
                 .queryParam("memberId", "1")
                 .with(csrf()))
         .andExpect(status().isOk())
@@ -44,7 +42,6 @@ class CharacterControllerTest extends ControllerTest {
                     ResourceSnippetParameters.builder()
                         .description("캐릭터 목록 반환")
                         .tag("Character Domain")
-                        .requestHeaders(headerWithName("Refresh-Token").description("리프레시 토큰"))
                         .queryParameters(
                             parameterWithName("memberId")
                                 .type(SimpleType.NUMBER)
@@ -60,7 +57,7 @@ class CharacterControllerTest extends ControllerTest {
                                 .type(SimpleType.NUMBER)
                                 .description("설문 번들 아이디"),
                             fieldWithPath("error").description("에러").optional())
-                        .responseSchema(schema("List<CharacterResponse>"))
+                        .responseSchema(schema("CharacterResponse"))
                         .build())));
   }
 }
