@@ -6,6 +6,7 @@ import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithNam
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.Schema.schema;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -30,6 +31,8 @@ class CharacterControllerTest extends ControllerTest {
     mockMvc
         .perform(
             get("/api/v1/characters")
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
                 .header("Refresh-Token", "Bearer refreshToken")
                 .queryParam("memberId", "1")
                 .with(csrf()))

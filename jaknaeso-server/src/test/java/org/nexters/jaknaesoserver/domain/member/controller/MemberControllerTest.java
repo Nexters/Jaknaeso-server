@@ -29,7 +29,7 @@ class MemberControllerTest extends ControllerTest {
 
     mockMvc
         .perform(
-            delete("/api/v1/members/1")
+            delete("/api/v1/members/{memberId}", 1)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .with(csrf()))
@@ -52,7 +52,7 @@ class MemberControllerTest extends ControllerTest {
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.get("/api/v1/members/1")
+            MockMvcRequestBuilders.get("/api/v1/members/{memberId}", 1L)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .with(csrf()))
