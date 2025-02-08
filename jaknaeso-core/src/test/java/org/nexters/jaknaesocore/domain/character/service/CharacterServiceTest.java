@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -68,45 +67,36 @@ class CharacterServiceTest extends IntegrationTest {
     @DisplayName("유저를 찾으면")
     class whenMemberFound {
 
-      private static final List<KeywordScore> scores =
-          List.of(
-              KeywordScore.builder().keyword(Keyword.SELF_DIRECTION).score(BigDecimal.ONE).build(),
-              KeywordScore.builder().keyword(Keyword.STABILITY).score(BigDecimal.TWO).build());
-
-      private SurveyBundle bundle;
-      private Survey survey;
-
-      private SurveyOption createSurveyOption(final Survey survey, final String content) {
-        return surveyOptionRepository.save(
-            SurveyOption.builder().survey(survey).content(content).scores(scores).build());
-      }
-
-      private SurveySubmission createSurveySubmission(
-          final Member member, final Survey survey, final SurveyOption option) {
-        return SurveySubmission.builder()
-            .member(member)
-            .survey(survey)
-            .selectedOption(option)
-            .build();
-      }
-
-      @BeforeEach
-      void setUp() {
-        bundle = surveyBundleRepository.save(new SurveyBundle());
-        survey =
-            surveyRepository.save(
-                new BalanceSurvey(
-                    "꿈에 그리던 드림 기업에 입사했다. 연봉도 좋지만, 무엇보다 회사의 근무 방식이 나와 잘 맞는 것 같다. 우리 회사의 근무 방식은...",
-                    bundle));
-      }
-
       @Test
       @DisplayName("회원의 캐릭터 리스트를 반환한다.")
       void shouldReturnQuestions() {
         final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
-        final SurveyOption option = createSurveyOption(survey, "자율 출퇴근제로 원하는 시간에 근무하며 창의적인 성과 내기");
-
-        surveySubmissionRepository.save(createSurveySubmission(member, survey, option));
+        final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+        final Survey survey =
+            surveyRepository.save(
+                new BalanceSurvey(
+                    "꿈에 그리던 드림 기업에 입사했다. 연봉도 좋지만, 무엇보다 회사의 근무 방식이 나와 잘 맞는 것 같다. 우리 회사의 근무 방식은...",
+                    bundle));
+        final List<KeywordScore> scores =
+            List.of(
+                KeywordScore.builder()
+                    .keyword(Keyword.SELF_DIRECTION)
+                    .score(BigDecimal.ONE)
+                    .build(),
+                KeywordScore.builder().keyword(Keyword.STABILITY).score(BigDecimal.TWO).build());
+        final SurveyOption option =
+            surveyOptionRepository.save(
+                SurveyOption.builder()
+                    .survey(survey)
+                    .content("자율 출퇴근제로 원하는 시간에 근무하며 창의적인 성과 내기")
+                    .scores(scores)
+                    .build());
+        surveySubmissionRepository.save(
+            SurveySubmission.builder()
+                .member(member)
+                .survey(survey)
+                .selectedOption(option)
+                .build());
 
         List<CharacterResponse> actual = sut.getCharacters(member.getId());
 
