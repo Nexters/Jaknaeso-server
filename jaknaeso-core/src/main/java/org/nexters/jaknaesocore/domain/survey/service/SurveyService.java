@@ -33,7 +33,7 @@ public class SurveyService {
     SurveyBundle bundle =
         surveyBundleRepository
             .findById(bundleId)
-            .orElseThrow(() -> new IllegalArgumentException("설문 번들을 찾을 수 없습니다."));
+            .orElseThrow(() -> CustomException.BUNDLE_NOT_FOUND);
     List<Survey> submittedSurvey = getSubmittedSurvey(memberId);
     Survey nextSurvey = bundle.getNextSurvey(submittedSurvey);
 

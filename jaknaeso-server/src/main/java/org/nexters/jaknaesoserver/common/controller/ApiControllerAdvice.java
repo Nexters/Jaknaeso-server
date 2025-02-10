@@ -15,6 +15,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 @Slf4j
 @RestControllerAdvice
@@ -101,6 +103,28 @@ public class ApiControllerAdvice {
     log.warn("Access denied error occurred: {}", e.getMessage(), e);
     return new ResponseEntity<>(
         ApiResponse.error(ErrorType.FORBIDDEN), ErrorType.FORBIDDEN.getStatus());
+  }
+
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<ApiResponse<?>> handleMethodArgumentTypeMismatchException(
+      MethodArgumentTypeMismatchException e) {
+    log.warn("Method argument type mismatch error occurred: {}", e.getMessage(), e);
+    Map<String, String> errorDetails =
+        Map.of(
+            "parameter",
+            e.getName(),
+            "message",
+            "invalid type: excpected " + e.getRequiredType().getSimpleName());
+    return new ResponseEntity<>(
+        ApiResponse.error(ErrorType.METHOD_ARGUMENT_NOT_VALID, List.of(errorDetails)),
+        ErrorType.METHOD_ARGUMENT_NOT_VALID.getStatus());
+  }
+
+  @ExceptionHandler(NoResourceFoundException.class)
+  public ResponseEntity<ApiResponse<?>> handleNoResourceFoundException(NoResourceFoundException e) {
+    log.warn("Resource not found error occurred: {}", e.getMessage(), e);
+    return new ResponseEntity<>(
+        ApiResponse.error(ErrorType.RESOURCE_NOT_FOUND), ErrorType.RESOURCE_NOT_FOUND.getStatus());
   }
 
   @ExceptionHandler(Exception.class)
