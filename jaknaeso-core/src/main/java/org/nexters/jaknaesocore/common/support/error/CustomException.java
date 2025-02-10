@@ -26,6 +26,8 @@ public class CustomException extends RuntimeException {
   public static final CustomException ALREADY_COMPLETED_SURVEY_BUNDLE =
       new CustomException(ErrorType.ALREADY_COMPLETED_SURVEY_BUNDLE);
   public static final CustomException FORBIDDEN_ACCESS = new CustomException(ErrorType.FORBIDDEN);
+  public static final CustomException BUNDLE_NOT_FOUND =
+      new CustomException(ErrorType.BUNDLE_NOT_FOUND);
 
   private final ErrorType errorType;
 

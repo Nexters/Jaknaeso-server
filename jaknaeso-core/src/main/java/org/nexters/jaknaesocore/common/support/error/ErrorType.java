@@ -12,6 +12,7 @@ public enum ErrorType {
   METHOD_ARGUMENT_NOT_VALID(
       HttpStatus.BAD_REQUEST, ErrorCode.E400, "입력하신 데이터가 올바르지 않습니다.", LogLevel.DEBUG),
   BINDING_ERROR(HttpStatus.BAD_REQUEST, ErrorCode.E400, "입력 형식이 올바르지 않습니다.", LogLevel.WARN),
+  RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "요청하신 리소스를 찾을 수 없습니다.", LogLevel.WARN),
 
   // token
   EXPIRED_TOKEN(HttpStatus.UNAUTHORIZED, ErrorCode.E4011, "토큰이 만료되었습니다.", LogLevel.WARN),
@@ -45,7 +46,7 @@ public enum ErrorType {
 
   ALREADY_COMPLETED_SURVEY_BUNDLE(
       HttpStatus.BAD_REQUEST, ErrorCode.E400, "이미 완료된 설문 번들입니다.", LogLevel.WARN),
-  ;
+  BUNDLE_NOT_FOUND(HttpStatus.BAD_REQUEST, ErrorCode.E400, "해당 번들을 찾을 수 없습니다.", LogLevel.WARN);
 
   private final HttpStatus status;
 
