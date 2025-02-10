@@ -46,7 +46,7 @@ public enum ErrorType {
 
   ALREADY_COMPLETED_SURVEY_BUNDLE(
       HttpStatus.BAD_REQUEST, ErrorCode.E400, "이미 완료된 설문 번들입니다.", LogLevel.WARN),
-  BUNDLE_NOT_FOUND(HttpStatus.BAD_REQUEST, ErrorCode.E400, "해당 번들을 찾을 수 없습니다.", LogLevel.WARN);
+  BUNDLE_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "해당 번들을 찾을 수 없습니다.", LogLevel.WARN);
 
   private final HttpStatus status;
 
