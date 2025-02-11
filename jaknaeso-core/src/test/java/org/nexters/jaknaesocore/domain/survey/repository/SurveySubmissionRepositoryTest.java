@@ -172,6 +172,38 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
 
   @Transactional
   @Test
+  void 회원이_참여한_설문_응답_리스트를_설문과_함께_가져온다() {
+    Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+    SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+    BalanceSurvey survey =
+        surveyRepository.save(
+            new BalanceSurvey(
+                "꿈에 그리던 드림 기업에 입사했다. 연봉도 좋지만, 무엇보다 회사의 근무 방식이 나와 잘 맞는 것 같다. 우리 회사의 근무 방식은...",
+                bundle));
+    List<KeywordScore> scores =
+        List.of(
+            KeywordScore.builder().keyword(Keyword.SELF_DIRECTION).score(BigDecimal.ONE).build());
+    SurveyOption option =
+        surveyOptionRepository.save(
+            SurveyOption.builder()
+                .survey(survey)
+                .content("자율 출퇴근제로 원하는 시간에 근무하며 창의적인 성과 내기")
+                .scores(scores)
+                .build());
+
+    surveySubmissionRepository.save(
+        SurveySubmission.builder().member(member).survey(survey).selectedOption(option).build());
+
+    List<SurveySubmission> actual =
+        surveySubmissionRepository.findWithSurveyByMemberIdAndDeletedAtIsNull(
+            member.getId(), bundle.getId());
+
+    assertAll(
+        () -> then(actual).hasSize(1), () -> then(actual.get(0).getSurvey()).isEqualTo(survey));
+  }
+
+  @Transactional
+  @Test
   void 회원이_참여한_설문_응답_리스트를_설문_번들과_함께_가져온다() {
     Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
@@ -183,8 +215,7 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
 
     List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(Keyword.SELF_DIRECTION).score(BigDecimal.ONE).build(),
-            KeywordScore.builder().keyword(Keyword.STABILITY).score(BigDecimal.TWO).build());
+            KeywordScore.builder().keyword(Keyword.SELF_DIRECTION).score(BigDecimal.ONE).build());
     SurveyOption option =
         surveyOptionRepository.save(
             SurveyOption.builder()
