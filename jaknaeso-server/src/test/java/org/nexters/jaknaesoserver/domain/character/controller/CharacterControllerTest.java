@@ -15,7 +15,8 @@ import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.SimpleType;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse.CharacterResponse;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.common.support.WithMockCustomUser;
 
@@ -25,7 +26,8 @@ class CharacterControllerTest extends ControllerTest {
   @Test
   void 캐릭터_목록을_조회한다() throws Exception {
 
-    given(characterService.getCharacters(1L)).willReturn(List.of(new CharacterResponse(1L, 1L)));
+    given(characterService.getCharacters(1L))
+        .willReturn(new CharactersResponse(List.of(new CharacterResponse(1L, 1L))));
 
     mockMvc
         .perform(
@@ -50,14 +52,14 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
                                 .description("API 요청 결과 (성공/실패)"),
-                            fieldWithPath("data[].ordinalNumber")
+                            fieldWithPath("data.characters[].ordinalNumber")
                                 .type(SimpleType.NUMBER)
                                 .description("캐릭터 회차"),
-                            fieldWithPath("data[].bundleId")
+                            fieldWithPath("data.characters[].bundleId")
                                 .type(SimpleType.NUMBER)
                                 .description("설문 번들 아이디"),
                             fieldWithPath("error").description("에러").optional())
-                        .responseSchema(schema("CharacterResponse"))
+                        .responseSchema(schema("CharactersResponse"))
                         .build())));
   }
 }
