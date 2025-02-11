@@ -15,8 +15,8 @@ public class KeywordScoreNormalizer {
     var maxScore = metrics.getPositive().multiply(weight);
     var minScore = metrics.getNegative().multiply(weight);
 
-    var numerator = originalScore.add(minScore);
-    var denominator = maxScore.add(minScore);
+    var numerator = originalScore.subtract(minScore);
+    var denominator = maxScore.subtract(minScore);
     return numerator.divide(denominator, 2, RoundingMode.HALF_UP).multiply(weight);
   }
 }
