@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
-import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
@@ -98,12 +98,12 @@ class CharacterServiceTest extends IntegrationTest {
                 .selectedOption(option)
                 .build());
 
-        List<CharacterResponse> actual = sut.getCharacters(member.getId());
+        CharactersResponse actual = sut.getCharacters(member.getId());
 
         assertAll(
-            () -> then(actual).hasSize(1),
+            () -> then(actual.characters()).hasSize(1),
             () ->
-                then(actual.get(0))
+                then(actual.characters().get(0))
                     .extracting("ordinalNumber", "bundleId")
                     .containsExactly(1L, bundle.getId()));
       }
