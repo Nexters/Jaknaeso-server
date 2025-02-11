@@ -16,7 +16,7 @@ import org.nexters.jaknaesocore.domain.survey.model.KeywordStatistics.KeywordMet
 class KeywordStatisticsTest {
 
   @Test
-  void 키워드_통계를_계산한다() {
+  void 키워드_지표를_계산한다() {
     List<KeywordScore> scores =
         List.of(
             KeywordScore.builder().keyword(ADVENTURE).score(BigDecimal.valueOf(1)).build(),
@@ -25,25 +25,22 @@ class KeywordStatisticsTest {
             KeywordScore.builder().keyword(UNIVERSALISM).score(BigDecimal.valueOf(-1)).build());
     KeywordStatistics statistics = new KeywordStatistics(scores);
 
-    Map<Keyword, KeywordMetrics> actual = statistics.getStatistics();
+    Map<Keyword, KeywordMetrics> actual = statistics.getMetrics();
 
     assertAll(
         () -> then(actual).hasSize(3),
         () ->
             then(actual.get(ADVENTURE))
-                .extracting("total", "positive", "negative")
-                .containsExactly(
-                    BigDecimal.valueOf(2), BigDecimal.valueOf(1), BigDecimal.valueOf(1)),
+                .extracting("cnt", "positive", "negative")
+                .containsExactly(2, BigDecimal.valueOf(1), BigDecimal.valueOf(-1)),
         () ->
             then(actual.get(SECURITY))
-                .extracting("total", "positive", "negative")
-                .containsExactly(
-                    BigDecimal.valueOf(1), BigDecimal.valueOf(1), BigDecimal.valueOf(0)),
+                .extracting("cnt", "positive", "negative")
+                .containsExactly(1, BigDecimal.valueOf(1), BigDecimal.valueOf(0)),
         () ->
             then(actual.get(UNIVERSALISM))
-                .extracting("total", "positive", "negative")
-                .containsExactly(
-                    BigDecimal.valueOf(1), BigDecimal.valueOf(0), BigDecimal.valueOf(1)));
+                .extracting("cnt", "positive", "negative")
+                .containsExactly(1, BigDecimal.valueOf(0), BigDecimal.valueOf(-1)));
   }
 
   @Test
@@ -57,7 +54,7 @@ class KeywordStatisticsTest {
             KeywordScore.builder().keyword(UNIVERSALISM).score(BigDecimal.valueOf(-1)).build());
     KeywordStatistics statistics = new KeywordStatistics(scores);
 
-    Map<Keyword, BigDecimal> actual = statistics.getKeywordWeights();
+    Map<Keyword, BigDecimal> actual = statistics.getWeights();
 
     assertAll(
         () -> then(actual).hasSize(4),

@@ -13,48 +13,51 @@ public class KeywordStatistics {
 
   private final List<KeywordScore> scores;
 
-  public Map<Keyword, KeywordMetrics> getStatistics() {
-    Map<Keyword, KeywordMetrics> statistics = new HashMap<>();
+  public Map<Keyword, KeywordMetrics> getMetrics() {
+    Map<Keyword, KeywordMetrics> metrics = new HashMap<>();
 
     scores.forEach(
         it -> {
           Keyword keyword = it.getKeyword();
           BigDecimal score = it.getScore();
 
-          statistics.computeIfAbsent(keyword, v -> new KeywordMetrics());
-          var m = statistics.get(keyword);
+          metrics.computeIfAbsent(keyword, v -> new KeywordMetrics());
+          var m = metrics.get(keyword);
           m.update(score);
         });
-    return statistics;
+    return metrics;
   }
 
-  public Map<Keyword, BigDecimal> getKeywordWeights() {
+  public Map<Keyword, BigDecimal> getWeights() {
     Map<Keyword, BigDecimal> weights = new HashMap<>();
-    Map<Keyword, KeywordMetrics> statistics = getStatistics();
+    Map<Keyword, KeywordMetrics> metrics = getMetrics();
 
-    int keywordCnt = statistics.size();
+    int keywordCnt = metrics.size();
     BigDecimal sumPerKeyword =
         BigDecimal.valueOf(100).divide(BigDecimal.valueOf(keywordCnt), 2, RoundingMode.DOWN);
 
-    statistics.forEach((k, v) -> weights.put(k, sumPerKeyword.divide(v.getTotal(), 2)));
+    metrics.forEach(
+        (k, v) ->
+            weights.put(
+                k,
+                sumPerKeyword.divide(
+                    v.getPositive().subtract(v.getNegative()), 2, RoundingMode.HALF_EVEN)));
     return weights;
   }
 
   @Getter
   public static class KeywordMetrics {
 
-    private BigDecimal total = BigDecimal.ZERO;
+    private int cnt = 0;
     private BigDecimal positive = BigDecimal.ZERO;
     private BigDecimal negative = BigDecimal.ZERO;
 
     public void update(final BigDecimal score) {
-      BigDecimal absScore = score.abs();
-      total = total.add(absScore);
-
+      cnt++;
       if (score.compareTo(BigDecimal.ZERO) > 0) {
-        positive = positive.add(absScore);
+        positive = positive.add(score);
       } else if (score.compareTo(BigDecimal.ZERO) < 0) {
-        negative = negative.add(absScore);
+        negative = negative.add(score);
       }
     }
   }
