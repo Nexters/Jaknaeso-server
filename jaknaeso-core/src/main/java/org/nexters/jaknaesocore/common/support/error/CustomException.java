@@ -7,6 +7,7 @@ public class CustomException extends RuntimeException {
 
   public static final CustomException INTERNAL_SERVER_ERROR =
       new CustomException(ErrorType.DEFAULT_ERROR);
+
   public static final CustomException TOKEN_EXPIRED = new CustomException(ErrorType.EXPIRED_TOKEN);
   public static final CustomException INVALID_TOKEN = new CustomException(ErrorType.INVALID_TOKEN);
   public static final CustomException UNSUPPORTED_TOKEN =
@@ -15,8 +16,10 @@ public class CustomException extends RuntimeException {
       new CustomException(ErrorType.INCORRECT_TOKEN_FORMAT);
   public static final CustomException INVALID_APPLE_ID_TOKEN =
       new CustomException(ErrorType.INVALID_APPLE_ID_TOKEN);
+
   public static final CustomException MEMBER_NOT_FOUND =
       new CustomException(ErrorType.MEMBER_NOT_FOUND);
+
   public static final CustomException SURVEY_OPTION_NOT_FOUND =
       new CustomException(ErrorType.SURVEY_OPTION_NOT_FOUND);
   public static final CustomException SURVEY_NOT_FOUND =
@@ -25,11 +28,15 @@ public class CustomException extends RuntimeException {
       new CustomException(ErrorType.NOT_READY_FOR_NEXT_BUNDLE);
   public static final CustomException ALREADY_COMPLETED_SURVEY_BUNDLE =
       new CustomException(ErrorType.ALREADY_COMPLETED_SURVEY_BUNDLE);
-  public static final CustomException FORBIDDEN_ACCESS = new CustomException(ErrorType.FORBIDDEN);
   public static final CustomException BUNDLE_NOT_FOUND =
       new CustomException(ErrorType.BUNDLE_NOT_FOUND);
   public static final CustomException NOT_PROCEED_ONBOARDING =
       new CustomException(ErrorType.NOT_PROCEED_ONBOARDING);
+
+  public static final CustomException CHARACTER_RECORD_NOT_FOUND =
+      new CustomException(ErrorType.CHARACTER_RECORD_NOT_FOUND);
+
+  public static final CustomException FORBIDDEN_ACCESS = new CustomException(ErrorType.FORBIDDEN);
 
   private final ErrorType errorType;
 
