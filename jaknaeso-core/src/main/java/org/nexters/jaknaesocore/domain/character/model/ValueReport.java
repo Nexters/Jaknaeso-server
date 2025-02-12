@@ -1,5 +1,6 @@
 package org.nexters.jaknaesocore.domain.character.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -14,9 +15,11 @@ import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 @Embeddable
 public class ValueReport {
 
+  @JsonProperty("keyword")
   @Enumerated(EnumType.STRING)
   private Keyword keyword;
 
+  @JsonProperty("percentage")
   private BigDecimal percentage;
 
   private ValueReport(final Keyword keyword, final BigDecimal percentage) {
