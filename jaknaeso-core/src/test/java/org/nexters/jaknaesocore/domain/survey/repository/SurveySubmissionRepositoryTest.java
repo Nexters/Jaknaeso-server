@@ -172,7 +172,7 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
 
   @Transactional
   @Test
-  void 회원이_참여한_설문_응답_리스트를_설문과_함께_가져온다() {
+  void 회원이_참여한_설문_응답_리스트를_설문과_함께_조회한다() {
     Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
     BalanceSurvey survey =
@@ -195,7 +195,7 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
         SurveySubmission.builder().member(member).survey(survey).selectedOption(option).build());
 
     List<SurveySubmission> actual =
-        surveySubmissionRepository.findWithSurveyByMemberIdAndDeletedAtIsNull(
+        surveySubmissionRepository.findWithSurveyByMemberIdAndBundleIdAndDeletedAtIsNull(
             member.getId(), bundle.getId());
 
     assertAll(
@@ -204,7 +204,7 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
 
   @Transactional
   @Test
-  void 회원이_참여한_설문_응답_리스트를_설문_번들과_함께_가져온다() {
+  void 회원이_참여한_설문_응답_리스트를_설문_번들과_함께_조회한다() {
     Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
     BalanceSurvey survey =
