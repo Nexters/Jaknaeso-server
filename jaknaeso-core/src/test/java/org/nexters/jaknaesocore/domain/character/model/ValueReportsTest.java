@@ -20,7 +20,7 @@ import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 
-class ValueReportTest {
+class ValueReportsTest {
 
   @Test
   void 키워드_가중치와_설문_응답_목록으로_가치관_리포트를_반환한다() {
@@ -88,22 +88,30 @@ class ValueReportTest {
             SurveySubmission.builder().survey(survey4).selectedOption(option4).build(),
             SurveySubmission.builder().survey(survey5).selectedOption(option5).build());
 
-    ValueReport report = ValueReport.of(weights, submissions);
+    ValueReports reports = ValueReports.of(weights, submissions);
 
-    Map<Keyword, BigDecimal> actual = report.getPercentage();
+    List<ValueReport> actual = reports.getReports();
 
     assertAll(
         () ->
-            then(actual.get(SELF_DIRECTION))
-                .isEqualTo(BigDecimal.valueOf(40).setScale(2, RoundingMode.HALF_UP)),
+            then(actual)
+                .contains(
+                    ValueReport.of(
+                        SELF_DIRECTION, BigDecimal.valueOf(40).setScale(2, RoundingMode.HALF_UP))),
         () ->
-            then(actual.get(STABILITY))
-                .isEqualTo(BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_UP)),
+            then(actual)
+                .contains(
+                    ValueReport.of(
+                        STABILITY, BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_UP))),
         () ->
-            then(actual.get(SUCCESS))
-                .isEqualTo(BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_UP)),
+            then(actual)
+                .contains(
+                    ValueReport.of(
+                        SUCCESS, BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_UP))),
         () ->
-            then(actual.get(BENEVOLENCE))
-                .isEqualTo(BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_UP)));
+            then(actual)
+                .contains(
+                    ValueReport.of(
+                        BENEVOLENCE, BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_UP))));
   }
 }

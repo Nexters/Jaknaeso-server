@@ -1,64 +1,52 @@
 package org.nexters.jaknaesocore.domain.character.model;
 
 import jakarta.persistence.Embeddable;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Objects;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
-import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
-import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Embeddable
 public class ValueReport {
 
-  private static final BigDecimal PERCENTAGE100 = BigDecimal.valueOf(100);
+  @Enumerated(EnumType.STRING)
+  private Keyword keyword;
 
-  private Map<Keyword, BigDecimal> percentage;
+  private BigDecimal percentage;
 
-  private ValueReport(final Map<Keyword, BigDecimal> percentage) {
+  private ValueReport(final Keyword keyword, final BigDecimal percentage) {
+    this.keyword = keyword;
     this.percentage = percentage;
   }
 
-  public static ValueReport of(
-      final Map<Keyword, BigDecimal> weights, final List<SurveySubmission> submissions) {
-    Map<Keyword, BigDecimal> percentage = new HashMap<>();
-    Map<Keyword, BigDecimal> sum = getKeywordSum(weights, submissions);
-
-    int keywordCnt = weights.size();
-    BigDecimal sumPerKeyword =
-        PERCENTAGE100.divide(BigDecimal.valueOf(keywordCnt), 2, RoundingMode.DOWN);
-
-    sum.forEach(
-        (k, v) ->
-            percentage.put(
-                k, v.divide(sumPerKeyword, 2, RoundingMode.HALF_UP).multiply(PERCENTAGE100)));
-    return new ValueReport(percentage);
+  public static ValueReport of(final Keyword keyword, final BigDecimal percentage) {
+    return new ValueReport(keyword, percentage);
   }
 
-  private static Map<Keyword, BigDecimal> getKeywordSum(
-      final Map<Keyword, BigDecimal> weights, final List<SurveySubmission> submissions) {
-    Map<Keyword, BigDecimal> sum = new HashMap<>();
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
+    }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    ValueReport that = (ValueReport) o;
+    return Objects.equals(keyword, that.keyword) && percentage.compareTo(that.percentage) == 0;
+  }
 
-    submissions.forEach(
-        submission -> {
-          List<KeywordScore> keywordScores = submission.getSelectedOption().getScores();
+  @Override
+  public int hashCode() {
+    return Objects.hash(keyword, percentage.setScale(2, RoundingMode.HALF_UP));
+  }
 
-          keywordScores.forEach(
-              keywordScore -> {
-                var keyword = keywordScore.getKeyword();
-                var score = keywordScore.getScore();
-                var weight = weights.get(keyword);
-
-                sum.merge(keyword, score.multiply(weight), BigDecimal::add);
-              });
-        });
-    return sum;
+  @Override
+  public String toString() {
+    return "ValueReport{" + "keyword=" + keyword + ",percentage=" + percentage + "}";
   }
 }
