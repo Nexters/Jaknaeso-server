@@ -214,6 +214,9 @@ class SurveyControllerTest extends ControllerTest {
                         .responseFields(
                             fieldWithPath("result").type(SimpleType.STRING).description("결과"),
                             fieldWithPath("data.surveyRecords").description("설문 이력"),
+                            fieldWithPath("data.surveyRecords[].submissionId")
+                                .type(SimpleType.NUMBER)
+                                .description("제출 ID"),
                             fieldWithPath("data.surveyRecords[].question")
                                 .type(SimpleType.STRING)
                                 .description("질문"),

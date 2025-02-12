@@ -4,13 +4,14 @@ import lombok.Builder;
 
 @Builder
 public record SurveyRecord(
-    String question, String answer, String retrospective, String submittedAt) {
+    Long submissionId, String question, String answer, String retrospective, String submittedAt) {
 
   public static SurveyRecord of(SurveySubmission submission) {
+    Long submissionId = submission.getId();
     String question = submission.getSurvey().getContent();
     String answer = submission.getSelectedOption().getContent();
     String retrospective = submission.getRetrospective();
     String submittedAt = submission.getYearMonthDay();
-    return new SurveyRecord(question, answer, retrospective, submittedAt);
+    return new SurveyRecord(submissionId, question, answer, retrospective, submittedAt);
   }
 }
