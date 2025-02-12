@@ -16,7 +16,7 @@ import org.nexters.jaknaesocore.domain.survey.model.KeywordStatistics.KeywordMet
 class KeywordStatisticsTest {
 
   @Test
-  void 키워드_지표를_계산한다() {
+  void 키워드별_개수_양의_점수의_합_음의_점수의_합을_계산한다() {
     List<KeywordScore> scores =
         List.of(
             KeywordScore.builder().keyword(ADVENTURE).score(BigDecimal.valueOf(1)).build(),
@@ -44,7 +44,7 @@ class KeywordStatisticsTest {
   }
 
   @Test
-  void 키워드_통계를_바탕으로_키워드_문답별_가중치를_계산한다() {
+  void 키워드_지표를_바탕으로_키워드_응답별_가중치를_계산한다() {
     List<KeywordScore> scores =
         List.of(
             KeywordScore.builder().keyword(ADVENTURE).score(BigDecimal.valueOf(1)).build(),
