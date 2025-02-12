@@ -27,7 +27,7 @@ class CharacterControllerTest extends ControllerTest {
   void 캐릭터_목록을_조회한다() throws Exception {
 
     given(characterService.getCharacters(1L))
-        .willReturn(new CharactersResponse(List.of(new CharacterResponse(1L, 1L))));
+        .willReturn(new CharactersResponse(List.of(new CharacterResponse("첫번째", 1L))));
 
     mockMvc
         .perform(
@@ -52,7 +52,7 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
                                 .description("API 요청 결과 (성공/실패)"),
-                            fieldWithPath("data.characters[].ordinalNumber")
+                            fieldWithPath("data.characters[].characterNo")
                                 .type(SimpleType.NUMBER)
                                 .description("캐릭터 회차"),
                             fieldWithPath("data.characters[].bundleId")
