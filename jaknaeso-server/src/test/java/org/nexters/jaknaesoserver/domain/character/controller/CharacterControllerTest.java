@@ -17,7 +17,7 @@ import com.epages.restdocs.apispec.SimpleType;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.nexters.jaknaesocore.domain.character.model.Percentage;
+import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
 import org.nexters.jaknaesocore.domain.character.model.ValueReport;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportResponse;
@@ -34,7 +34,14 @@ class CharacterControllerTest extends ControllerTest {
   void 캐릭터_목록을_조회한다() throws Exception {
 
     given(characterService.getCharacters(1L))
-        .willReturn(new CharactersResponse(List.of(new SimpleCharacterResponse("첫번째", 1L))));
+        .willReturn(
+            new CharactersResponse(
+                List.of(
+                    SimpleCharacterResponse.builder()
+                        .characterNo("첫번째")
+                        .characterId(1L)
+                        .bundleId(1L)
+                        .build())));
 
     mockMvc
         .perform(
@@ -62,6 +69,9 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("data.characters[].characterNo")
                                 .type(SimpleType.NUMBER)
                                 .description("캐릭터 회차"),
+                            fieldWithPath("data.characters[].characterId")
+                                .type(SimpleType.NUMBER)
+                                .description("캐릭터 아이디"),
                             fieldWithPath("data.characters[].bundleId")
                                 .type(SimpleType.NUMBER)
                                 .description("설문 번들 아이디"),
@@ -78,7 +88,8 @@ class CharacterControllerTest extends ControllerTest {
         .willReturn(
             CharacterValueReportResponse.of(
                 List.of(
-                    ValueReport.of(Keyword.SUCCESS, Percentage.of(BigDecimal.valueOf(33.33))))));
+                    ValueReport.of(
+                        Keyword.SUCCESS, ScaledBigDecimal.of(BigDecimal.valueOf(33.33))))));
     mockMvc
         .perform(
             get("/api/v1/characters/report")
