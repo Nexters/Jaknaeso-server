@@ -1,12 +1,12 @@
 package org.nexters.jaknaesocore.domain.character.model;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Getter;
+import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
@@ -14,7 +14,8 @@ import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 @Getter
 public class ValueReports {
 
-  private static final BigDecimal PERCENTAGE100 = BigDecimal.valueOf(100);
+  private static final ScaledBigDecimal PERCENTAGE100 =
+      ScaledBigDecimal.of(BigDecimal.valueOf(100));
 
   private List<ValueReport> reports;
 
@@ -28,7 +29,7 @@ public class ValueReports {
 
     List<ValueReport> reports =
         percentage.entrySet().stream()
-            .map(it -> ValueReport.of(it.getKey(), Percentage.of(it.getValue())))
+            .map(it -> ValueReport.of(it.getKey(), ScaledBigDecimal.of(it.getValue())))
             .collect(Collectors.toList());
     return new ValueReports(reports);
   }
@@ -38,14 +39,17 @@ public class ValueReports {
     Map<Keyword, BigDecimal> percentage = new HashMap<>();
     Map<Keyword, BigDecimal> sum = getKeywordSum(weights, submissions);
 
-    int keywordCnt = weights.size();
-    BigDecimal sumPerKeyword =
-        PERCENTAGE100.divide(BigDecimal.valueOf(keywordCnt), 2, RoundingMode.DOWN);
+    BigDecimal keywordCnt = BigDecimal.valueOf(weights.size());
+    BigDecimal sumPerKeyword = PERCENTAGE100.divide(keywordCnt).getValue();
 
     sum.forEach(
         (k, v) ->
             percentage.put(
-                k, v.divide(sumPerKeyword, 2, RoundingMode.HALF_UP).multiply(PERCENTAGE100)));
+                k,
+                ScaledBigDecimal.of(v)
+                    .divide(sumPerKeyword)
+                    .multiply(PERCENTAGE100.getValue())
+                    .getValue()));
     return percentage;
   }
 
