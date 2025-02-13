@@ -139,7 +139,8 @@ class SurveyServiceTest extends IntegrationTest {
                 option.getId(), balanceSurvey.getId(), member.getId(), "나는 행복한게 좋으니까");
 
         // when
-        surveyService.submitSurvey(command, LocalDateTime.now());
+        LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 13, 18, 0, 0);
+        surveyService.submitSurvey(command, submittedAt);
         // then
         List<SurveySubmission> submissions = surveySubmissionRepository.findAll();
         then(submissions).hasSize(1);
@@ -671,7 +672,7 @@ class SurveyServiceTest extends IntegrationTest {
         SurveyOption.builder().survey(survey4).scores(scores).content("나와 같다.").build();
 
     surveyOptionRepository.saveAll(List.of(option1, option2, option3, option4));
-    LocalDateTime submittedAt = LocalDateTime.now();
+    LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 13, 18, 25, 0);
 
     OnboardingSubmissionsCommand command =
         new OnboardingSubmissionsCommand(
