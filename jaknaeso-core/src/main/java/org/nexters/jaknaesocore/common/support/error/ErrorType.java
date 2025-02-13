@@ -49,8 +49,9 @@ public enum ErrorType {
   BUNDLE_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "해당 번들을 찾을 수 없습니다.", LogLevel.WARN),
 
   // character
-  CHARACTER_RECORD_NOT_FOUND(
-      HttpStatus.NOT_FOUND, ErrorCode.E404, "존재하지 않는 캐릭터 기록입니다.", LogLevel.WARN),
+  CHARACTER_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "존재하지 않는 캐릭터 기록입니다.", LogLevel.WARN),
+  CHARACTER_VALUE_REPORT_NOT_FOUND(
+      HttpStatus.NOT_FOUND, ErrorCode.E404, "존재하지 않는 캐릭터 가치관 분석 기록입니다.", LogLevel.WARN),
 
   NOT_PROCEED_ONBOARDING(
       HttpStatus.FORBIDDEN, ErrorCode.E403, "온보딩을 진행해야 접근 가능합니다.", LogLevel.ERROR);
