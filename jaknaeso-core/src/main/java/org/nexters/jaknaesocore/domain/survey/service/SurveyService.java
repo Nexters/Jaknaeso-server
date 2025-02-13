@@ -2,9 +2,7 @@ package org.nexters.jaknaesocore.domain.survey.service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseEntity;
@@ -143,5 +141,65 @@ public class SurveyService {
     return onboardingSurveys.stream()
         .map(SurveyResponse::of)
         .collect(Collectors.collectingAndThen(Collectors.toList(), OnboardingSurveyResponse::new));
+  }
+
+  @Transactional
+  public void submitOnboardingSurvey(
+      OnboardingSubmissionsCommand command, LocalDateTime submittedAt) {
+    Member member = getMember(command.memberId());
+
+    List<Long> surveyIds = extractSurveyIdsBy(command);
+    Map<Long, Survey> surveyMap = createSurveyMapBy(surveyIds);
+
+    Map<Survey, SurveyOption> surveyToSelectedOption =
+        createSurveyToSelectedOption(command.submissions(), surveyMap);
+
+    List<SurveySubmission> submissions =
+        createSubmissionsBy(submittedAt, surveyToSelectedOption, member);
+
+    surveySubmissionRepository.saveAll(submissions);
+  }
+
+  private Member getMember(Long memberId) {
+    return memberRepository.findById(memberId).orElseThrow(() -> CustomException.MEMBER_NOT_FOUND);
+  }
+
+  private Map<Long, Survey> createSurveyMapBy(List<Long> surveyIds) {
+    return surveyRepository.findAllByIdWithOptions(surveyIds).stream()
+        .collect(Collectors.toMap(Survey::getId, survey -> survey));
+  }
+
+  private List<SurveySubmission> createSubmissionsBy(
+      LocalDateTime submittedAt, Map<Survey, SurveyOption> surveyToSelectedOption, Member member) {
+    return surveyToSelectedOption.entrySet().stream()
+        .map(
+            entry ->
+                SurveySubmission.create(
+                    member, entry.getKey(), entry.getValue(), null, submittedAt))
+        .toList();
+  }
+
+  private List<Long> extractSurveyIdsBy(OnboardingSubmissionsCommand command) {
+    return command.submissions().stream()
+        .map(OnboardingSubmissionResult::surveyId)
+        .distinct()
+        .toList();
+  }
+
+  private Map<Survey, SurveyOption> createSurveyToSelectedOption(
+      List<OnboardingSubmissionResult> submissionResults, Map<Long, Survey> surveyMap) {
+    Map<Survey, SurveyOption> surveyOptionMap =
+        submissionResults.stream()
+            .map(
+                submission -> {
+                  Survey survey = surveyMap.get(submission.surveyId());
+                  if (survey == null) {
+                    throw CustomException.SURVEY_NOT_FOUND;
+                  }
+                  SurveyOption option = survey.getOptionById(submission.optionId());
+                  return Map.entry(survey, option);
+                })
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    return surveyOptionMap;
   }
 }

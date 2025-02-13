@@ -24,6 +24,8 @@ import org.nexters.jaknaesocore.domain.survey.dto.*;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyRecord;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.common.support.WithMockCustomUser;
+import org.nexters.jaknaesoserver.domain.survey.controller.dto.OnboardingSubmissionInfoRequest;
+import org.nexters.jaknaesoserver.domain.survey.controller.dto.OnboardingSubmissionRequest;
 import org.nexters.jaknaesoserver.domain.survey.controller.dto.SurveySubmissionRequest;
 import org.springframework.http.MediaType;
 
@@ -348,6 +350,50 @@ class SurveyControllerTest extends ControllerTest {
                                 .description("설문지 옵션 내용"),
                             fieldWithPath("error").description("에러").optional())
                         .responseSchema(Schema.schema("onboardingSurveyResponse"))
+                        .build())));
+  }
+
+  @WithMockCustomUser
+  @Test
+  void 온보딩_설문에_응답을_제출한다() throws Exception {
+    willDoNothing()
+        .given(surveyService)
+        .submitOnboardingSurvey(any(OnboardingSubmissionsCommand.class), any(LocalDateTime.class));
+
+    OnboardingSubmissionRequest request =
+        new OnboardingSubmissionRequest(
+            List.of(
+                new OnboardingSubmissionInfoRequest(1L, 1L),
+                new OnboardingSubmissionInfoRequest(2L, 7L),
+                new OnboardingSubmissionInfoRequest(3L, 13L)));
+
+    mockMvc
+        .perform(
+            post("/api/v1/surveys/onboarding/submission")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+                .with(csrf()))
+        .andExpect(status().isNoContent())
+        .andDo(
+            document(
+                "survey-submit-onboarding",
+                resource(
+                    ResourceSnippetParameters.builder()
+                        .description("온보딩 설문 제출")
+                        .tag("Survey Domain")
+                        .requestFields(
+                            fieldWithPath("submissionsInfo[].surveyId")
+                                .type(SimpleType.NUMBER)
+                                .description("설문 ID"),
+                            fieldWithPath("submissionsInfo[].optionId")
+                                .type(SimpleType.NUMBER)
+                                .description("설문지 선택지 ID"))
+                        .responseFields(
+                            fieldWithPath("result").type(SimpleType.STRING).description("결과"),
+                            fieldWithPath("data").description("데이터").optional(),
+                            fieldWithPath("error").description("에러").optional())
+                        .requestSchema(Schema.schema("onboardingSubmissionRequest"))
+                        .responseSchema(Schema.schema("surveyResponse"))
                         .build())));
   }
 }

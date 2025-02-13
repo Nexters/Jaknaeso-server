@@ -8,6 +8,7 @@ import org.nexters.jaknaesocore.common.support.response.ApiResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.*;
 import org.nexters.jaknaesocore.domain.survey.service.SurveyService;
 import org.nexters.jaknaesoserver.domain.auth.model.CustomUserDetails;
+import org.nexters.jaknaesoserver.domain.survey.controller.dto.OnboardingSubmissionRequest;
 import org.nexters.jaknaesoserver.domain.survey.controller.dto.SurveySubmissionRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -66,5 +67,16 @@ public class SurveyController {
   @GetMapping("/onboarding")
   public ApiResponse<OnboardingSurveyResponse> getOnboardingSurvey() {
     return ApiResponse.success(surveyService.getOnboardingSurveys());
+  }
+
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @PostMapping("/onboarding/submission")
+  public ApiResponse<?> submitOnboardingSurvey(
+      @AuthenticationPrincipal CustomUserDetails member,
+      @Valid @RequestBody OnboardingSubmissionRequest request) {
+    LocalDateTime submittedAt = LocalDateTime.now();
+
+    surveyService.submitOnboardingSurvey(request.toCommand(member.getMemberId()), submittedAt);
+    return ApiResponse.success();
   }
 }
