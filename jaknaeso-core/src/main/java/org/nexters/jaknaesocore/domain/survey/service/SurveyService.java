@@ -13,6 +13,7 @@ import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.dto.*;
 import org.nexters.jaknaesocore.domain.survey.model.*;
+import org.nexters.jaknaesocore.domain.survey.repository.OnboardingSurveyRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
@@ -27,6 +28,7 @@ public class SurveyService {
   private final SurveyBundleRepository surveyBundleRepository;
   private final SurveySubmissionRepository surveySubmissionRepository;
   private final SurveyRepository surveyRepository;
+  private final OnboardingSurveyRepository onboardingSurveyRepository;
 
   @Transactional(readOnly = true)
   public SurveyResponse getNextSurvey(final Long bundleId, final Long memberId) {
@@ -133,5 +135,13 @@ public class SurveyService {
         .collect(
             Collectors.collectingAndThen(
                 Collectors.toList(), SurveySubmissionHistoryResponse::new));
+  }
+
+  @Transactional(readOnly = true)
+  public OnboardingSurveyResponse getOnboardingSurveys() {
+    List<OnboardingSurvey> onboardingSurveys = onboardingSurveyRepository.findAll();
+    return onboardingSurveys.stream()
+        .map(SurveyResponse::of)
+        .collect(Collectors.collectingAndThen(Collectors.toList(), OnboardingSurveyResponse::new));
   }
 }
