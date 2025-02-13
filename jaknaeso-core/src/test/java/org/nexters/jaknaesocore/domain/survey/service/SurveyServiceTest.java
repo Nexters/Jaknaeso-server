@@ -631,4 +631,68 @@ class SurveyServiceTest extends IntegrationTest {
                 "그/그녀에게 자신의 능력을 보여주는 것이 매우 중요하다. 사람들이 자신이 하는 일을 인정해주길 바란다.",
                 "ONBOARDING"));
   }
+
+  @Test
+  void 온보딩_설문을_제출한다() {
+    // given
+    Member member = Member.create("나민혁", "test@test.com");
+    memberRepository.save(member);
+    SurveyBundle surveyBundle = new SurveyBundle();
+
+    surveyBundleRepository.save(surveyBundle);
+
+    OnboardingSurvey survey1 =
+        new OnboardingSurvey(
+            "새로운 아이디어를 갖고 창의적인 것이 그/그녀에게 중요하다. 그/그녀는 일을 자신만의 독특한 방식으로 하는 것을 좋아한다.", surveyBundle);
+    OnboardingSurvey survey2 =
+        new OnboardingSurvey("그/그녀에게 부자가 되는 것은 중요하다. 많은 돈과 비싼 물건들을 가지길 원한다.", surveyBundle);
+    OnboardingSurvey survey3 =
+        new OnboardingSurvey(
+            "세상의 모든 사람들이 평등하게 대우받아야 한다고 생각한다. 그/그녀는 모든 사람이 인생에서 동등한 기회를 가져야 한다고 믿는다.",
+            surveyBundle);
+    OnboardingSurvey survey4 =
+        new OnboardingSurvey(
+            "그/그녀에게 자신의 능력을 보여주는 것이 매우 중요하다. 사람들이 자신이 하는 일을 인정해주길 바란다.", surveyBundle);
+
+    surveyRepository.saveAll(List.of(survey1, survey2, survey3, survey4));
+
+    List<KeywordScore> scores =
+        List.of(
+            KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
+            KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
+
+    SurveyOption option1 =
+        SurveyOption.builder().survey(survey1).scores(scores).content("전혀 나와 같지않다.").build();
+    SurveyOption option2 =
+        SurveyOption.builder().survey(survey2).scores(scores).content("나와 같지 않다.").build();
+    SurveyOption option3 =
+        SurveyOption.builder().survey(survey3).scores(scores).content("나와 조금 같다.").build();
+    SurveyOption option4 =
+        SurveyOption.builder().survey(survey4).scores(scores).content("나와 같다.").build();
+
+    surveyOptionRepository.saveAll(List.of(option1, option2, option3, option4));
+    LocalDateTime submittedAt = LocalDateTime.now();
+
+    OnboardingSubmissionsCommand command =
+        new OnboardingSubmissionsCommand(
+            List.of(
+                new OnboardingSubmissionResult(survey1.getId(), option1.getId()),
+                new OnboardingSubmissionResult(survey2.getId(), option2.getId()),
+                new OnboardingSubmissionResult(survey3.getId(), option3.getId()),
+                new OnboardingSubmissionResult(survey4.getId(), option4.getId())),
+            member.getId());
+    // when
+    surveyService.submitOnboardingSurvey(command, submittedAt);
+    // then
+    List<SurveySubmission> submissions = surveySubmissionRepository.findAll();
+
+    then(submissions).hasSize(4);
+    then(submissions)
+        .extracting("member.id", "survey.id", "selectedOption.id", "submittedAt")
+        .containsExactlyInAnyOrder(
+            tuple(member.getId(), survey1.getId(), option1.getId(), submittedAt),
+            tuple(member.getId(), survey2.getId(), option2.getId(), submittedAt),
+            tuple(member.getId(), survey3.getId(), option3.getId(), submittedAt),
+            tuple(member.getId(), survey4.getId(), option4.getId(), submittedAt));
+  }
 }
