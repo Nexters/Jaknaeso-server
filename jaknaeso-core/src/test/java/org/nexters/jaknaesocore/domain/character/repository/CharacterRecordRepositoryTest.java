@@ -52,6 +52,63 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
     memberRepository.deleteAllInBatch();
   }
 
+  @Transactional
+  @Test
+  void 회원의_현재_캐릭터를_조회한다() {
+    final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+
+    final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+    final CharacterRecord character1 =
+        CharacterRecord.builder()
+            .characterNo("첫번째")
+            .characterType("나만의 길을 찾는 개척자 유형")
+            .startDate(LocalDate.now().minusDays(31))
+            .endDate(LocalDate.now().minusDays(16))
+            .member(member)
+            .surveyBundle(bundle)
+            .build();
+    final CharacterRecord character2 =
+        CharacterRecord.builder()
+            .characterNo("두번째")
+            .characterType("튼튼한 보안 전문가 유형")
+            .startDate(LocalDate.now().minusDays(15))
+            .endDate(LocalDate.now())
+            .member(member)
+            .surveyBundle(bundle)
+            .build();
+    sut.saveAll(List.of(character1, character2));
+
+    final CharacterRecord actual =
+        sut.findTopWithMemberByMemberIdAndDeletedAtIsNull(member.getId()).get();
+
+    then(actual).extracting("characterNo", "characterType").containsExactly("두번째", "튼튼한 보안 전문가 유형");
+  }
+
+  @Transactional
+  @Test
+  void 회원의_특정_캐릭터를_조회한다() {
+    final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+
+    final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+    sut.save(
+        CharacterRecord.builder()
+            .characterNo("첫번째")
+            .characterType("나만의 길을 찾는 개척자 유형")
+            .startDate(LocalDate.now().minusDays(31))
+            .endDate(LocalDate.now().minusDays(16))
+            .member(member)
+            .surveyBundle(bundle)
+            .build());
+
+    final CharacterRecord actual =
+        sut.findTopWithMemberByMemberIdAndBundleIdAndDeletedAtIsNull(member.getId(), bundle.getId())
+            .get();
+
+    then(actual)
+        .extracting("characterNo", "characterType")
+        .containsExactly("첫번째", "나만의 길을 찾는 개척자 유형");
+  }
+
   @Test
   void 회원의_캐릭터_분석_결과를_조회한다() {
     final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
@@ -123,7 +180,8 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
 
     sut.save(
         CharacterRecord.builder()
-            .characterNo("첫번재")
+            .characterNo("첫번째")
+            .characterType("나만의 길을 찾는 개척자 유형")
             .startDate(LocalDate.now().minusDays(15))
             .endDate(LocalDate.now())
             .member(member)
@@ -214,7 +272,8 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
 
     sut.save(
         CharacterRecord.builder()
-            .characterNo("첫번재")
+            .characterNo("첫번째")
+            .characterType("나만의 길을 찾는 개척자 유형")
             .startDate(LocalDate.now().minusDays(15))
             .endDate(LocalDate.now())
             .member(member)
