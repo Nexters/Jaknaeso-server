@@ -23,6 +23,9 @@ public class CharacterRecord extends BaseTimeEntity {
 
   private String characterNo;
 
+  // TODO: 추후 enum으로 변경
+  private String characterType;
+
   private LocalDate startDate;
 
   private LocalDate endDate;
@@ -42,12 +45,14 @@ public class CharacterRecord extends BaseTimeEntity {
   @Builder
   private CharacterRecord(
       final String characterNo,
+      final String characterType,
       final LocalDate startDate,
       final LocalDate endDate,
       final Member member,
       final SurveyBundle surveyBundle,
       final List<ValueReport> valueReports) {
     this.characterNo = characterNo;
+    this.characterType = characterType;
     this.startDate = startDate;
     this.endDate = endDate;
     this.member = member;
