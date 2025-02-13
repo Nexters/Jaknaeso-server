@@ -3,8 +3,8 @@ package org.nexters.jaknaesoserver.domain.character.controller;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
 import org.nexters.jaknaesocore.domain.character.service.CharacterService;
-import org.nexters.jaknaesocore.domain.character.service.dto.CharacterReportCommand;
-import org.nexters.jaknaesocore.domain.character.service.dto.CharacterReportResponse;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportCommand;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,10 +25,10 @@ public class CharacterController {
   }
 
   @GetMapping("/report")
-  public ApiResponse<CharacterReportResponse> getCharacterReport(
+  public ApiResponse<CharacterValueReportResponse> getCharacterReport(
       @RequestParam final Long memberId, @RequestParam final Long bundleId) {
-    CharacterReportResponse response =
-        characterService.getCharacterReport(new CharacterReportCommand(memberId, bundleId));
+    CharacterValueReportResponse response =
+        characterService.getCharacterReport(new CharacterValueReportCommand(memberId, bundleId));
     return ApiResponse.success(response);
   }
 }

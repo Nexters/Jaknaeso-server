@@ -81,6 +81,6 @@ public class CharacterService {
             .findWithSurveyBundleByMemberIdAndBundleIdAndDeletedAtIsNull(
                 command.memberId(), command.bundleId())
             .orElseThrow(() -> CustomException.CHARACTER_RECORD_NOT_FOUND);
-    return new CharacterValueReportResponse(characterRecord.getValueReports());
+    return CharacterValueReportResponse.of(characterRecord.getValueReports());
   }
 }
