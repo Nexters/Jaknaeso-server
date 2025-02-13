@@ -182,7 +182,7 @@ class SurveyServiceTest extends IntegrationTest {
   }
 
   @Test
-  void 설문_기록이_없으면_1번_번들을_제공한다() {
+  void 설문_기록이_없으면_접근_할_수_없() {
     // given
     Member member = Member.create("나민혁", "test@test.com");
     memberRepository.save(member);
@@ -212,12 +212,10 @@ class SurveyServiceTest extends IntegrationTest {
         SurveyOption.builder().survey(survey4).scores(scores).content("4점").build();
     surveyOptionRepository.saveAll(List.of(option1, option2, option3, option4, option5, option6));
     // when
-    SurveyHistoryResponse response = surveyService.getSurveyHistory(member.getId());
-
     // then
-    then(response)
-        .extracting("bundleId", "nextSurveyIndex", "surveyHistoryDetails")
-        .containsExactly(1L, 1, List.of());
+    thenThrownBy(() -> surveyService.getSurveyHistory(member.getId()))
+        .isInstanceOf(CustomException.class)
+        .isEqualTo(CustomException.NOT_PROCEED_ONBOARDING);
   }
 
   @Test

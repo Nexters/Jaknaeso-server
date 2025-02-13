@@ -19,8 +19,4 @@ public record SurveyHistoryResponse(
   public static SurveyHistoryResponse createNextBundleSurveyHistory(Long bundleId) {
     return new SurveyHistoryResponse(bundleId, List.of(), 1, false);
   }
-
-  public static SurveyHistoryResponse createInitialSurveyHistory() {
-    return new SurveyHistoryResponse(1L, List.of(), 1, false);
-  }
 }
