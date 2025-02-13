@@ -46,7 +46,9 @@ public enum ErrorType {
 
   ALREADY_COMPLETED_SURVEY_BUNDLE(
       HttpStatus.BAD_REQUEST, ErrorCode.E400, "이미 완료된 설문 번들입니다.", LogLevel.WARN),
-  BUNDLE_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "해당 번들을 찾을 수 없습니다.", LogLevel.WARN);
+  BUNDLE_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "해당 번들을 찾을 수 없습니다.", LogLevel.WARN),
+  NOT_PROCEED_ONBOARDING(
+      HttpStatus.FORBIDDEN, ErrorCode.E403, "온보딩을 진행해야 접근 가능합니다.", LogLevel.ERROR);
 
   private final HttpStatus status;
 

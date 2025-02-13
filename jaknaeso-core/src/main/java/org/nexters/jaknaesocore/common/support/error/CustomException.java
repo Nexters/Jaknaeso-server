@@ -28,6 +28,8 @@ public class CustomException extends RuntimeException {
   public static final CustomException FORBIDDEN_ACCESS = new CustomException(ErrorType.FORBIDDEN);
   public static final CustomException BUNDLE_NOT_FOUND =
       new CustomException(ErrorType.BUNDLE_NOT_FOUND);
+  public static final CustomException NOT_PROCEED_ONBOARDING =
+      new CustomException(ErrorType.NOT_PROCEED_ONBOARDING);
 
   private final ErrorType errorType;
 

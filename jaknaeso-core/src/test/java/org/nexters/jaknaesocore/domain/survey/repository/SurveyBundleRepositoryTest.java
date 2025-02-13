@@ -21,7 +21,7 @@ class SurveyBundleRepositoryTest extends IntegrationTest {
   }
 
   @Test
-  void 주어진_ID_보다_큰_번들_중_가장_작은_ID를_가진_번들을_찾는다() {
+  void 주어진_ID_목록에_없는_번들_중_가장_작은_ID를_가진_번들을_찾는다() {
     // given
     SurveyBundle surveyBundle1 = new SurveyBundle();
     SurveyBundle surveyBundle2 = new SurveyBundle();
@@ -30,9 +30,13 @@ class SurveyBundleRepositoryTest extends IntegrationTest {
 
     surveyBundleRepository.saveAll(
         List.of(surveyBundle1, surveyBundle2, surveyBundle3, surveyBundle4));
+
+    List<Long> excludedIds = List.of(surveyBundle1.getId(), surveyBundle2.getId());
+
     // when
     Optional<SurveyBundle> result =
-        surveyBundleRepository.findFirstByIdGreaterThanOrderByIdAsc(surveyBundle2.getId());
+        surveyBundleRepository.findFirstByIdNotInOrderByIdAsc(excludedIds);
+
     // then
     then(result)
         .hasValueSatisfying(
@@ -40,7 +44,7 @@ class SurveyBundleRepositoryTest extends IntegrationTest {
   }
 
   @Test
-  void 주어진_ID보다_큰_번들이_없으면_빈_값을_반환한다() {
+  void 모든_번들이_제외_목록에_있으면_빈_값을_반환한다() {
     // given
     SurveyBundle surveyBundle1 = new SurveyBundle();
     SurveyBundle surveyBundle2 = new SurveyBundle();
@@ -49,9 +53,18 @@ class SurveyBundleRepositoryTest extends IntegrationTest {
 
     surveyBundleRepository.saveAll(
         List.of(surveyBundle1, surveyBundle2, surveyBundle3, surveyBundle4));
+
+    List<Long> excludedIds =
+        List.of(
+            surveyBundle1.getId(),
+            surveyBundle2.getId(),
+            surveyBundle3.getId(),
+            surveyBundle4.getId());
+
     // when
     Optional<SurveyBundle> result =
-        surveyBundleRepository.findFirstByIdGreaterThanOrderByIdAsc(surveyBundle4.getId());
+        surveyBundleRepository.findFirstByIdNotInOrderByIdAsc(excludedIds);
+
     // then
     then(result).isEmpty();
   }
