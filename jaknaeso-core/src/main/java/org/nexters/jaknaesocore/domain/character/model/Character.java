@@ -1,13 +1,12 @@
 package org.nexters.jaknaesocore.domain.character.model;
 
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.ElementCollection;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,12 +18,13 @@ import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class CharacterRecord extends BaseTimeEntity {
+public class Character extends BaseTimeEntity {
 
   private String characterNo;
 
-  // TODO: 추후 enum으로 변경
-  private String characterType;
+  private String type;
+
+  private String description;
 
   private LocalDate startDate;
 
@@ -38,25 +38,31 @@ public class CharacterRecord extends BaseTimeEntity {
   @JoinColumn(name = "bundle_id")
   private SurveyBundle surveyBundle;
 
-  @ElementCollection
-  @CollectionTable(name = "value_reports", joinColumns = @JoinColumn(name = "character_id"))
-  private List<ValueReport> valueReports;
+  @OneToOne(mappedBy = "character", cascade = CascadeType.ALL, orphanRemoval = true)
+  private CharacterValueReport characterValueReport;
 
   @Builder
-  private CharacterRecord(
+  private Character(
       final String characterNo,
-      final String characterType,
+      final CharacterType characterType,
       final LocalDate startDate,
       final LocalDate endDate,
       final Member member,
-      final SurveyBundle surveyBundle,
-      final List<ValueReport> valueReports) {
+      final SurveyBundle surveyBundle) {
     this.characterNo = characterNo;
-    this.characterType = characterType;
     this.startDate = startDate;
     this.endDate = endDate;
     this.member = member;
     this.surveyBundle = surveyBundle;
-    this.valueReports = valueReports;
+    setCharacterType(characterType);
+  }
+
+  private void setCharacterType(final CharacterType characterType) {
+    this.type = characterType.getName();
+    this.description = characterType.getDescription();
+  }
+
+  public void updateCharacterValueReport(final CharacterValueReport characterValueReport) {
+    this.characterValueReport = characterValueReport;
   }
 }
