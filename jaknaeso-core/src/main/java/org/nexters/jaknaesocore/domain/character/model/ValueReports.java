@@ -1,28 +1,22 @@
 package org.nexters.jaknaesocore.domain.character.model;
 
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Embeddable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Embeddable
 public class ValueReports {
 
   private static final BigDecimal PERCENTAGE100 = BigDecimal.valueOf(100);
 
-  @ElementCollection private List<ValueReport> reports;
+  private List<ValueReport> reports;
 
   private ValueReports(final List<ValueReport> reports) {
     this.reports = reports;
