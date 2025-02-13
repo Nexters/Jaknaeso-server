@@ -15,14 +15,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.SimpleType;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.nexters.jaknaesocore.domain.character.model.Percentage;
 import org.nexters.jaknaesocore.domain.character.model.ValueReport;
-import org.nexters.jaknaesocore.domain.character.service.dto.CharacterReportCommand;
-import org.nexters.jaknaesocore.domain.character.service.dto.CharacterReportResponse;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportCommand;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse;
-import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse.CharacterResponse;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse.SimpleCharacterResponse;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.common.support.WithMockCustomUser;
@@ -34,7 +34,7 @@ class CharacterControllerTest extends ControllerTest {
   void 캐릭터_목록을_조회한다() throws Exception {
 
     given(characterService.getCharacters(1L))
-        .willReturn(new CharactersResponse(List.of(new CharacterResponse("첫번째", 1L))));
+        .willReturn(new CharactersResponse(List.of(new SimpleCharacterResponse("첫번째", 1L))));
 
     mockMvc
         .perform(
@@ -74,15 +74,11 @@ class CharacterControllerTest extends ControllerTest {
   @Test
   void 캐릭터_상세_분석_정보를_조회한다() throws Exception {
     // TODO: 캐릭터 정보 저장 후 테스트 보완
-    given(characterService.getCharacterReport(any(CharacterReportCommand.class)))
+    given(characterService.getCharacterReport(any(CharacterValueReportCommand.class)))
         .willReturn(
-            CharacterReportResponse.builder()
-                .type("캐릭터 타입")
-                .description("캐릭터 설명 두 줄 정도")
-                .startDate(LocalDate.now().minusDays(15))
-                .endDate(LocalDate.now())
-                .valueReports(List.of(ValueReport.of(Keyword.SUCCESS, BigDecimal.valueOf(33.33))))
-                .build());
+            CharacterValueReportResponse.of(
+                List.of(
+                    ValueReport.of(Keyword.SUCCESS, Percentage.of(BigDecimal.valueOf(33.33))))));
     mockMvc
         .perform(
             get("/api/v1/characters/report")
@@ -110,19 +106,11 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
                                 .description("API 요청 결과 (성공/실패)"),
-                            fieldWithPath("data.type")
-                                .type(SimpleType.STRING)
-                                .description("캐릭터 타입"),
-                            fieldWithPath("data.description")
-                                .type(SimpleType.STRING)
-                                .description("캐릭터 설명"),
-                            fieldWithPath("data.startDate").description("시작 일자"),
-                            fieldWithPath("data.endDate").description("종료 일자"),
                             fieldWithPath("data.valueReports[].keyword").description("가치관"),
                             fieldWithPath("data.valueReports[].percentage")
                                 .description("해당 가치관 비율"),
                             fieldWithPath("error").description("에러").optional())
-                        .responseSchema(schema("CharacterReportResponse"))
+                        .responseSchema(schema("CharacterValueReportResponse"))
                         .build())));
   }
 }

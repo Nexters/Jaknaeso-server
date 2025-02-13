@@ -8,7 +8,6 @@ import static org.nexters.jaknaesocore.domain.survey.model.Keyword.STABILITY;
 import static org.nexters.jaknaesocore.domain.survey.model.Keyword.SUCCESS;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -95,23 +94,14 @@ class ValueReportsTest {
     assertAll(
         () ->
             then(actual)
-                .contains(
-                    ValueReport.of(
-                        SELF_DIRECTION, BigDecimal.valueOf(40).setScale(2, RoundingMode.HALF_UP))),
+                .contains(ValueReport.of(SELF_DIRECTION, Percentage.of(BigDecimal.valueOf(40)))),
         () ->
             then(actual)
-                .contains(
-                    ValueReport.of(
-                        STABILITY, BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_UP))),
+                .contains(ValueReport.of(STABILITY, Percentage.of(BigDecimal.valueOf(100)))),
+        () ->
+            then(actual).contains(ValueReport.of(SUCCESS, Percentage.of(BigDecimal.valueOf(100)))),
         () ->
             then(actual)
-                .contains(
-                    ValueReport.of(
-                        SUCCESS, BigDecimal.valueOf(100).setScale(2, RoundingMode.HALF_UP))),
-        () ->
-            then(actual)
-                .contains(
-                    ValueReport.of(
-                        BENEVOLENCE, BigDecimal.valueOf(20).setScale(2, RoundingMode.HALF_UP))));
+                .contains(ValueReport.of(BENEVOLENCE, Percentage.of(BigDecimal.valueOf(20)))));
   }
 }

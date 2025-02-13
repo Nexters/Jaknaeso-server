@@ -28,7 +28,7 @@ public class ValueReports {
 
     List<ValueReport> reports =
         percentage.entrySet().stream()
-            .map(it -> ValueReport.of(it.getKey(), it.getValue()))
+            .map(it -> ValueReport.of(it.getKey(), Percentage.of(it.getValue())))
             .collect(Collectors.toList());
     return new ValueReports(reports);
   }
