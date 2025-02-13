@@ -65,12 +65,13 @@ class CharacterServiceTest extends IntegrationTest {
     memberRepository.deleteAllInBatch();
   }
 
-  private CharacterCommand createCharacterCommand(Long memberId, Long bundleId) {
-    return new CharacterCommand(memberId, bundleId);
+  private CharacterCommand createCharacterCommand(Long memberId, Long characterId) {
+    return new CharacterCommand(memberId, characterId);
   }
 
-  private CharacterValueReportCommand createCharacterReportCommand(Long memberId, Long bundleId) {
-    return new CharacterValueReportCommand(memberId, bundleId);
+  private CharacterValueReportCommand createCharacterReportCommand(
+      Long memberId, Long characterId) {
+    return new CharacterValueReportCommand(memberId, characterId);
   }
 
   @Nested
@@ -82,10 +83,10 @@ class CharacterServiceTest extends IntegrationTest {
     class whenCharacterNotFound {
 
       @Test
-      @DisplayName("CHARACTER_RECORD_NOT_FOUND 예외를 던진다.")
+      @DisplayName("CHARACTER_NOT_FOUND 예외를 던진다.")
       void shouldThrowException() {
         thenThrownBy(() -> sut.getCharacter(createCharacterCommand(1L, 1L)))
-            .hasMessage(CustomException.CHARACTER_RECORD_NOT_FOUND.getMessage());
+            .hasMessage(CustomException.CHARACTER_NOT_FOUND.getMessage());
       }
     }
 
@@ -130,18 +131,19 @@ class CharacterServiceTest extends IntegrationTest {
         void shouldReturnSpecificCharacter() {
           final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
           final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-          characterRepository.save(
-              Character.builder()
-                  .characterNo("첫번째")
-                  .characterType(CharacterType.SUCCESS)
-                  .startDate(LocalDate.now().minusDays(15))
-                  .endDate(LocalDate.now())
-                  .member(member)
-                  .surveyBundle(bundle)
-                  .build());
+          final Character character =
+              characterRepository.save(
+                  Character.builder()
+                      .characterNo("첫번째")
+                      .characterType(CharacterType.SUCCESS)
+                      .startDate(LocalDate.now().minusDays(15))
+                      .endDate(LocalDate.now())
+                      .member(member)
+                      .surveyBundle(bundle)
+                      .build());
 
           final CharacterResponse actual =
-              sut.getCharacter(createCharacterCommand(member.getId(), bundle.getId()));
+              sut.getCharacter(createCharacterCommand(member.getId(), character.getId()));
 
           then(actual)
               .extracting("characterNo", "characterType")
@@ -207,10 +209,10 @@ class CharacterServiceTest extends IntegrationTest {
     class whenCharacterNotFound {
 
       @Test
-      @DisplayName("CHARACTER_RECORD_NOT_FOUND 예외를 던진다.")
+      @DisplayName("CHARACTER_NOT_FOUND 예외를 던진다.")
       void shouldThrowException() {
         thenThrownBy(() -> sut.getCharacterReport(createCharacterReportCommand(1L, 1L)))
-            .hasMessage(CustomException.CHARACTER_RECORD_NOT_FOUND.getMessage());
+            .hasMessage(CustomException.CHARACTER_NOT_FOUND.getMessage());
       }
     }
 
@@ -263,7 +265,7 @@ class CharacterServiceTest extends IntegrationTest {
                 character, ValueReports.of(weights, List.of(submission)).getReports()));
 
         final CharacterValueReportResponse actual =
-            sut.getCharacterReport(createCharacterReportCommand(member.getId(), bundle.getId()));
+            sut.getCharacterReport(createCharacterReportCommand(member.getId(), character.getId()));
 
         then(actual.valueReports())
             .usingRecursiveComparison()

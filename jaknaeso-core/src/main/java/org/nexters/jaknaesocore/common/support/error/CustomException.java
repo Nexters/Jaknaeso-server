@@ -33,8 +33,10 @@ public class CustomException extends RuntimeException {
   public static final CustomException NOT_PROCEED_ONBOARDING =
       new CustomException(ErrorType.NOT_PROCEED_ONBOARDING);
 
-  public static final CustomException CHARACTER_RECORD_NOT_FOUND =
-      new CustomException(ErrorType.CHARACTER_RECORD_NOT_FOUND);
+  public static final CustomException CHARACTER_NOT_FOUND =
+      new CustomException(ErrorType.CHARACTER_NOT_FOUND);
+  public static final CustomException CHARACTER_VALUE_REPORT_NOT_FOUND =
+      new CustomException(ErrorType.CHARACTER_VALUE_REPORT_NOT_FOUND);
 
   public static final CustomException FORBIDDEN_ACCESS = new CustomException(ErrorType.FORBIDDEN);
 

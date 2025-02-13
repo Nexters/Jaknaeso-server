@@ -14,22 +14,20 @@ public interface CharacterRepository extends JpaRepository<Character, Long> {
   Optional<Character> findTopByMemberIdAndDeletedAtIsNullWithMember(final Long memberId);
 
   @Query(
-      "SELECT c FROM Character c "
-          + "JOIN FETCH c.member cm JOIN FETCH c.surveyBundle cs "
-          + "WHERE cm.id = :memberId AND cs.id = :bundleId AND c.deletedAt IS NULL")
-  Optional<Character> findTopByMemberIdAndBundleIdAndDeletedAtIsNullWithMemberAndSurveyBundle(
-      final Long memberId, final Long bundleId);
-
-  @Query(
-      "SELECT c FROM Character c "
-          + "JOIN FETCH c.member cm JOIN FETCH c.surveyBundle cs JOIN FETCH c.characterValueReport cc JOIN FETCH cc.valueReports "
-          + "WHERE cm.id = :memberId AND cs.id = :bundleId AND c.deletedAt IS NULL")
-  Optional<Character> findByMemberIdAndBundleIdAndDeletedAtIsNullWithMemberAndSurveyBundle(
-      final Long memberId, final Long bundleId);
+      "SELECT c FROM Character c JOIN FETCH c.member cm "
+          + "WHERE c.id = :id AND cm.id = :memberId AND c.deletedAt IS NULL")
+  Optional<Character> findByIdAndMemberIdAndDeletedAtIsNullWithMember(
+      final Long id, final Long memberId);
 
   @Query(
       "SELECT c FROM Character c "
           + "JOIN FETCH c.member cm JOIN FETCH c.surveyBundle "
           + "WHERE cm.id = :memberId AND c.deletedAt IS NULL")
   List<Character> findByMemberIdAndDeletedAtIsNullWithMemberAndSurveyBundle(final Long memberId);
+
+  @Query(
+      "SELECT c FROM Character c JOIN FETCH c.member cm "
+          + "WHERE c.id = :id AND cm.id = :memberId AND c.deletedAt IS NULL")
+  Optional<Character> existsByIdAndMemberIdAndDeletedAtIsNullWithMember(
+      final Long id, final Long memberId);
 }
