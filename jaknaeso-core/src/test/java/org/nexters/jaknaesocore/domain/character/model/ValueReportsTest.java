@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
@@ -94,14 +95,17 @@ class ValueReportsTest {
     assertAll(
         () ->
             then(actual)
-                .contains(ValueReport.of(SELF_DIRECTION, Percentage.of(BigDecimal.valueOf(40)))),
+                .contains(
+                    ValueReport.of(SELF_DIRECTION, ScaledBigDecimal.of(BigDecimal.valueOf(40)))),
         () ->
             then(actual)
-                .contains(ValueReport.of(STABILITY, Percentage.of(BigDecimal.valueOf(100)))),
-        () ->
-            then(actual).contains(ValueReport.of(SUCCESS, Percentage.of(BigDecimal.valueOf(100)))),
+                .contains(ValueReport.of(STABILITY, ScaledBigDecimal.of(BigDecimal.valueOf(100)))),
         () ->
             then(actual)
-                .contains(ValueReport.of(BENEVOLENCE, Percentage.of(BigDecimal.valueOf(20)))));
+                .contains(ValueReport.of(SUCCESS, ScaledBigDecimal.of(BigDecimal.valueOf(100)))),
+        () ->
+            then(actual)
+                .contains(
+                    ValueReport.of(BENEVOLENCE, ScaledBigDecimal.of(BigDecimal.valueOf(20)))));
   }
 }
