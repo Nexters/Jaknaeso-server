@@ -265,4 +265,89 @@ class SurveyControllerTest extends ControllerTest {
                 .with(csrf()))
         .andExpect(status().isForbidden());
   }
+
+  @WithMockCustomUser
+  @Test
+  void 온보딩_설문을_조회한다() throws Exception {
+    OnboardingSurveyResponse response =
+        new OnboardingSurveyResponse(
+            List.of(
+                new SurveyResponse(
+                    1L,
+                    "새로운 아이디어를 갖고 창의적인 것이 그/그녀에게 중요하다. 그/그녀는 일을 자신만의 독특한 방식으로 하는 것을 좋아한다.",
+                    "ONBOARDING",
+                    List.of(
+                        new SurveyOptionsResponse(1L, "전혀 나와 같지 않다."),
+                        new SurveyOptionsResponse(2L, "나와 같지 않다."),
+                        new SurveyOptionsResponse(3L, "나와 조금 같다."),
+                        new SurveyOptionsResponse(4L, "나와 어느정도 같다."),
+                        new SurveyOptionsResponse(5L, "나와 같다."),
+                        new SurveyOptionsResponse(6L, "나와 매우 같다."))),
+                new SurveyResponse(
+                    2L,
+                    "그/그녀에게 부자가 되는 것은 중요하다. 많은 돈과 비싼 물건들을 가지길 원한다.",
+                    "ONBOARDING",
+                    List.of(
+                        new SurveyOptionsResponse(7L, "전혀 나와 같지 않다."),
+                        new SurveyOptionsResponse(8L, "나와 같지 않다."),
+                        new SurveyOptionsResponse(9L, "나와 조금 같다."),
+                        new SurveyOptionsResponse(10L, "나와 어느정도 같다."),
+                        new SurveyOptionsResponse(11L, "나와 같다."),
+                        new SurveyOptionsResponse(12L, "나와 매우 같다."))),
+                new SurveyResponse(
+                    3L,
+                    "세상의 모든 사람들이 평등하게 대우받아야 한다고 생각한다. 그/그녀는 모든 사람이 인생에서 동등한 기회를 가져야 한다고 믿는다.",
+                    "ONBOARDING",
+                    List.of(
+                        new SurveyOptionsResponse(13L, "전혀 나와 같지 않다."),
+                        new SurveyOptionsResponse(14L, "나와 같지 않다."),
+                        new SurveyOptionsResponse(15L, "나와 조금 같다."),
+                        new SurveyOptionsResponse(16L, "나와 어느정도 같다."),
+                        new SurveyOptionsResponse(17L, "나와 같다."),
+                        new SurveyOptionsResponse(18L, "나와 매우 같다."))),
+                new SurveyResponse(
+                    4L,
+                    "그/그녀에게 자신의 능력을 보여주는 것이 매우 중요하다. 사람들이 자신이 하는 일을 인정해주길 바란다.",
+                    "ONBOARDING",
+                    List.of(
+                        new SurveyOptionsResponse(19L, "전혀 나와 같지 않다."),
+                        new SurveyOptionsResponse(20L, "나와 같지 않다."),
+                        new SurveyOptionsResponse(21L, "나와 조금 같다."),
+                        new SurveyOptionsResponse(22L, "나와 어느정도 같다."),
+                        new SurveyOptionsResponse(23L, "나와 같다."),
+                        new SurveyOptionsResponse(24L, "나와 매우 같다.")))));
+    given(surveyService.getOnboardingSurveys()).willReturn(response);
+
+    mockMvc
+        .perform(get("/api/v1/surveys/onboarding").with(csrf()))
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "survey-get-onboarding",
+                resource(
+                    ResourceSnippetParameters.builder()
+                        .description("온보딩 설문 조회")
+                        .tag("Survey Domain")
+                        .responseFields(
+                            fieldWithPath("result").type(SimpleType.STRING).description("결과"),
+                            fieldWithPath("data.surveyResponses").description("온보딩 설문"),
+                            fieldWithPath("data.surveyResponses[].id")
+                                .type(SimpleType.NUMBER)
+                                .description("설문 ID"),
+                            fieldWithPath("data.surveyResponses[].contents")
+                                .type(SimpleType.STRING)
+                                .description("설문 내용"),
+                            fieldWithPath("data.surveyResponses[].surveyType")
+                                .type(SimpleType.STRING)
+                                .description("설문 타입"),
+                            fieldWithPath("data.surveyResponses[].options[].id")
+                                .type(SimpleType.NUMBER)
+                                .description("설문지 옵션 ID"),
+                            fieldWithPath("data.surveyResponses[].options[].optionContents")
+                                .type(SimpleType.STRING)
+                                .description("설문지 옵션 내용"),
+                            fieldWithPath("error").description("에러").optional())
+                        .responseSchema(Schema.schema("onboardingSurveyResponse"))
+                        .build())));
+  }
 }

@@ -62,4 +62,9 @@ public class SurveyController {
         SurveySubmissionHistoryCommand.builder().bundleId(bundleId).memberId(memberId).build();
     return ApiResponse.success(surveyService.getSurveySubmissionHistory(command));
   }
+
+  @GetMapping("/onboarding")
+  public ApiResponse<OnboardingSurveyResponse> getOnboardingSurvey() {
+    return ApiResponse.success(surveyService.getOnboardingSurveys());
+  }
 }
