@@ -13,10 +13,11 @@ public record CharacterResponse(
   @Builder
   public static CharacterResponse of(
       final String characterNo,
-      final String characterType,
+      final String type,
+      final String description,
       final LocalDate startDate,
       final LocalDate endDate) {
     return new CharacterResponse(
-        characterNo, characterType, "TODO: description", startDate.toString(), endDate.toString());
+        characterNo, type, description, startDate.toString(), endDate.toString());
   }
 }

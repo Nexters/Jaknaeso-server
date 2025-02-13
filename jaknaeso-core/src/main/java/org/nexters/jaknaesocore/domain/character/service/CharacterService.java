@@ -3,8 +3,8 @@ package org.nexters.jaknaesocore.domain.character.service;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
-import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
-import org.nexters.jaknaesocore.domain.character.repository.CharacterRecordRepository;
+import org.nexters.jaknaesocore.domain.character.model.Character;
+import org.nexters.jaknaesocore.domain.character.repository.CharacterRepository;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportCommand;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class CharacterService {
 
   private final MemberRepository memberRepository;
-  private final CharacterRecordRepository characterRecordRepository;
+  private final CharacterRepository characterRepository;
 
   @Transactional(readOnly = true)
   public CharacterResponse getCharacter(final CharacterCommand command) {
@@ -31,13 +31,13 @@ public class CharacterService {
   }
 
   private CharacterResponse getCurrentCharacter(final Long memberId) {
-    return characterRecordRepository
-        .findTopWithMemberByMemberIdAndDeletedAtIsNull(memberId)
+    return characterRepository
+        .findTopByMemberIdAndDeletedAtIsNullWithMember(memberId)
         .map(
             it ->
                 CharacterResponse.builder()
                     .characterNo(it.getCharacterNo())
-                    .characterType(it.getCharacterType())
+                    .type(it.getType())
                     .startDate(it.getStartDate())
                     .endDate(it.getEndDate())
                     .build())
@@ -45,13 +45,13 @@ public class CharacterService {
   }
 
   private CharacterResponse getSpecificCharacter(final Long memberId, final Long bundleId) {
-    return characterRecordRepository
-        .findTopWithMemberByMemberIdAndBundleIdAndDeletedAtIsNull(memberId, bundleId)
+    return characterRepository
+        .findTopByMemberIdAndBundleIdAndDeletedAtIsNullWithMemberAndSurveyBundle(memberId, bundleId)
         .map(
             it ->
                 CharacterResponse.builder()
                     .characterNo(it.getCharacterNo())
-                    .characterType(it.getCharacterType())
+                    .type(it.getType())
                     .startDate(it.getStartDate())
                     .endDate(it.getEndDate())
                     .build())
@@ -63,12 +63,16 @@ public class CharacterService {
     memberRepository.findMember(memberId);
 
     final List<SimpleCharacterResponse> characters =
-        characterRecordRepository
-            .findWithSurveyBundleByMemberIdAndDeletedAtIsNull(memberId)
+        characterRepository
+            .findByMemberIdAndDeletedAtIsNullWithMemberAndSurveyBundle(memberId)
             .stream()
             .map(
                 it ->
-                    new SimpleCharacterResponse(it.getCharacterNo(), it.getSurveyBundle().getId()))
+                    SimpleCharacterResponse.builder()
+                        .characterNo(it.getCharacterNo())
+                        .characterId(it.getId())
+                        .bundleId(it.getSurveyBundle().getId())
+                        .build())
             .toList();
     return new CharactersResponse(characters);
   }
@@ -76,11 +80,11 @@ public class CharacterService {
   @Transactional(readOnly = true)
   public CharacterValueReportResponse getCharacterReport(
       final CharacterValueReportCommand command) {
-    final CharacterRecord characterRecord =
-        characterRecordRepository
-            .findWithSurveyBundleByMemberIdAndBundleIdAndDeletedAtIsNull(
+    final Character character =
+        characterRepository
+            .findByMemberIdAndBundleIdAndDeletedAtIsNullWithMemberAndSurveyBundle(
                 command.memberId(), command.bundleId())
             .orElseThrow(() -> CustomException.CHARACTER_RECORD_NOT_FOUND);
-    return CharacterValueReportResponse.of(characterRecord.getValueReports());
+    return CharacterValueReportResponse.of(character.getCharacterValueReport().getValueReports());
   }
 }
