@@ -41,7 +41,10 @@ import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 
+@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 class CharacterServiceTest extends IntegrationTest {
 
   @Autowired private CharacterService sut;
@@ -95,7 +98,7 @@ class CharacterServiceTest extends IntegrationTest {
     class whenCharacterFound {
 
       @Nested
-      @DisplayName("bundleId가 null이라면")
+      @DisplayName("characterId가 null이라면")
       class whenBundleIdIsNull {
 
         @Test
@@ -123,7 +126,7 @@ class CharacterServiceTest extends IntegrationTest {
       }
 
       @Nested
-      @DisplayName("bundleId가 null이 아니라면")
+      @DisplayName("characterId가 null이 아니라면")
       class whenBundleIdIsNotNull {
 
         @Test
