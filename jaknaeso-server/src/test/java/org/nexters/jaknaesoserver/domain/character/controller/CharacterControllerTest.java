@@ -15,10 +15,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.SimpleType;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
+import org.nexters.jaknaesocore.domain.character.model.CharacterType;
 import org.nexters.jaknaesocore.domain.character.model.ValueReport;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharacterCommand;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse;
@@ -82,8 +86,69 @@ class CharacterControllerTest extends ControllerTest {
 
   @WithMockCustomUser
   @Test
-  void 캐릭터_상세_분석_정보를_조회한다() throws Exception {
-    // TODO: 캐릭터 정보 저장 후 테스트 보완
+  void 특정_캐릭터_정보를_조회한다() throws Exception {
+
+    given(characterService.getCharacter(new CharacterCommand(1L, 1L)))
+        .willReturn(
+            CharacterResponse.builder()
+                .characterNo("첫번째")
+                .type(CharacterType.SUCCESS.getName())
+                .description(CharacterType.SUCCESS.getDescription())
+                .startDate(LocalDate.now().minusDays(15))
+                .endDate(LocalDate.now())
+                .build());
+
+    mockMvc
+        .perform(
+            get("/api/v1/characters/{characterId}", 1)
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .queryParam("memberId", "1")
+                .with(csrf()))
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "character-success",
+                resource(
+                    ResourceSnippetParameters.builder()
+                        .description("캐릭터 목록 반환")
+                        .tag("Character Domain")
+                        .pathParameters(
+                            parameterWithName("characterId")
+                                .type(SimpleType.NUMBER)
+                                .description("캐릭터 아이디"))
+                        .queryParameters(
+                            parameterWithName("memberId")
+                                .type(SimpleType.NUMBER)
+                                .description("멤버 아이디"))
+                        .responseFields(
+                            fieldWithPath("result")
+                                .type(SimpleType.STRING)
+                                .description("API 요청 결과 (성공/실패)"),
+                            fieldWithPath("data.characterNo")
+                                .type(SimpleType.NUMBER)
+                                .description("캐릭터 회차"),
+                            fieldWithPath("data.characterType")
+                                .type(SimpleType.NUMBER)
+                                .description("캐릭터 타입"),
+                            fieldWithPath("data.description")
+                                .type(SimpleType.STRING)
+                                .description("캐릭터 설명"),
+                            fieldWithPath("data.startDate")
+                                .type(SimpleType.STRING)
+                                .description("시작 일자"),
+                            fieldWithPath("data.endDate")
+                                .type(SimpleType.STRING)
+                                .description("종료 일자"),
+                            fieldWithPath("error").description("에러").optional())
+                        .responseSchema(schema("CharacterResponse"))
+                        .build())));
+  }
+
+  @WithMockCustomUser
+  @Test
+  void 특정_캐릭터의_가치관_분석_정보를_조회한다() throws Exception {
+
     given(characterService.getCharacterReport(any(CharacterValueReportCommand.class)))
         .willReturn(
             CharacterValueReportResponse.of(
@@ -92,27 +157,27 @@ class CharacterControllerTest extends ControllerTest {
                         Keyword.SUCCESS, ScaledBigDecimal.of(BigDecimal.valueOf(33.33))))));
     mockMvc
         .perform(
-            get("/api/v1/characters/report")
+            get("/api/v1/characters/{characterId}/report", 1)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .queryParam("memberId", "1")
-                .queryParam("bundleId", "1")
                 .with(csrf()))
         .andExpect(status().isOk())
         .andDo(
             document(
-                "character-report-success",
+                "character-value-report-success",
                 resource(
                     ResourceSnippetParameters.builder()
                         .description("캐릭터 분석 정보 반환")
                         .tag("Character Domain")
+                        .pathParameters(
+                            parameterWithName("characterId")
+                                .type(SimpleType.NUMBER)
+                                .description("캐릭터 아이디"))
                         .queryParameters(
                             parameterWithName("memberId")
                                 .type(SimpleType.NUMBER)
-                                .description("멤버 아이디"),
-                            parameterWithName("bundleId")
-                                .type(SimpleType.NUMBER)
-                                .description("설문 번들 아이디"))
+                                .description("멤버 아이디"))
                         .responseFields(
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
