@@ -56,10 +56,16 @@ public class SurveyService {
   private SurveySubmission findLatestSubmission(final Long memberId) {
     return surveySubmissionRepository
         .findTopByMember_IdAndDeletedAtIsNullOrderByCreatedAtDesc(memberId)
-        .orElseThrow(() -> CustomException.NOT_PROCEED_ONBOARDING);
+        .orElse(null);
+    // TODO : 해당 부분 온보딩 작업이 완료되면 주석 orElse 삭제 이후 주석 해제
+    //        .orElseThrow(() -> CustomException.NOT_PROCEED_ONBOARDING);
   }
 
   private SurveyHistoryResponse classifySubmission(SurveySubmission latestSubmission) {
+    // TODO: null 일 경우 온보딩 작업 완료되면 주석 해제
+    if (latestSubmission == null) {
+      return SurveyHistoryResponse.createInitialBundleSurveyHistory();
+    }
     SurveyBundle bundle = latestSubmission.getSurvey().getSurveyBundle();
     List<SurveySubmission> submissions =
         findSubmissionsForBundle(latestSubmission.getMember().getId(), bundle.getId());

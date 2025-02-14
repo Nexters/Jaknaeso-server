@@ -19,4 +19,9 @@ public record SurveyHistoryResponse(
   public static SurveyHistoryResponse createNextBundleSurveyHistory(Long bundleId) {
     return new SurveyHistoryResponse(bundleId, List.of(), 1, false);
   }
+
+  // TODO: 온보딩이 작업이 완료되면 삭제합니다.
+  public static SurveyHistoryResponse createInitialBundleSurveyHistory() {
+    return new SurveyHistoryResponse(1L, List.of(), 1, false);
+  }
 }

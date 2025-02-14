@@ -5,10 +5,7 @@ import static org.assertj.core.api.BDDAssertions.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.member.model.Member;
@@ -182,6 +179,7 @@ class SurveyServiceTest extends IntegrationTest {
     }
   }
 
+  @Disabled("클라이언트의 온보딩 작업이 완료되면 테스트를 진행합니다.")
   @Test
   void 설문_기록이_없으면_접근_할_수_없다() {
     // given
