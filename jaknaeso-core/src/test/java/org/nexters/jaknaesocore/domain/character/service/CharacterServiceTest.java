@@ -32,6 +32,8 @@ import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordStatistics;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordStatistics.KeywordMetrics;
 import org.nexters.jaknaesocore.domain.survey.model.Survey;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
@@ -250,6 +252,8 @@ class CharacterServiceTest extends IntegrationTest {
                     .selectedOption(option)
                     .build());
 
+        final KeywordStatistics statistics = new KeywordStatistics(scores);
+        final Map<Keyword, KeywordMetrics> metrics = statistics.getMetrics();
         final Map<Keyword, BigDecimal> weights = new HashMap<>();
         weights.put(SELF_DIRECTION, BigDecimal.valueOf(100));
 
@@ -265,14 +269,14 @@ class CharacterServiceTest extends IntegrationTest {
                     .build());
         characterValueReportRepository.save(
             new CharacterValueReport(
-                character, ValueReports.of(weights, List.of(submission)).getReports()));
+                character, ValueReports.of(weights, metrics, List.of(submission)).getReports()));
 
         final CharacterValueReportResponse actual =
             sut.getCharacterReport(createCharacterReportCommand(member.getId(), character.getId()));
 
         then(actual.valueReports())
             .usingRecursiveComparison()
-            .isEqualTo(ValueReports.of(weights, List.of(submission)).getReports());
+            .isEqualTo(ValueReports.of(weights, metrics, List.of(submission)).getReports());
       }
     }
   }
