@@ -1,11 +1,6 @@
 package org.nexters.jaknaesocore.domain.character.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -17,6 +12,7 @@ import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "character_record")
 @Entity
 public class Character extends BaseTimeEntity {
 
