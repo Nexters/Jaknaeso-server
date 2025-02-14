@@ -183,7 +183,7 @@ class SurveyServiceTest extends IntegrationTest {
   }
 
   @Test
-  void 설문_기록이_없으면_접근_할_수_없() {
+  void 설문_기록이_없으면_접근_할_수_없다() {
     // given
     Member member = Member.create("나민혁", "test@test.com");
     memberRepository.save(member);
