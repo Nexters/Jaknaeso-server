@@ -16,6 +16,8 @@ import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordStatistics;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordStatistics.KeywordMetrics;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
@@ -29,6 +31,15 @@ class ValueReportsTest {
     weights.put(STABILITY, BigDecimal.valueOf(25));
     weights.put(SUCCESS, BigDecimal.valueOf(25));
     weights.put(BENEVOLENCE, BigDecimal.valueOf(5));
+
+    List<KeywordScore> scores =
+        List.of(
+            KeywordScore.builder().keyword(SELF_DIRECTION).score(BigDecimal.valueOf(1)).build(),
+            KeywordScore.builder().keyword(STABILITY).score(BigDecimal.valueOf(1)).build(),
+            KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.valueOf(1)).build(),
+            KeywordScore.builder().keyword(BENEVOLENCE).score(BigDecimal.valueOf(1)).build());
+    KeywordStatistics statistics = new KeywordStatistics(scores);
+    Map<Keyword, KeywordMetrics> metrics = statistics.getMetrics();
 
     SurveyBundle bundle = new SurveyBundle();
     BalanceSurvey survey1 =
@@ -88,7 +99,7 @@ class ValueReportsTest {
             SurveySubmission.builder().survey(survey4).selectedOption(option4).build(),
             SurveySubmission.builder().survey(survey5).selectedOption(option5).build());
 
-    ValueReports reports = ValueReports.of(weights, submissions);
+    ValueReports reports = ValueReports.of(weights, metrics, submissions);
 
     List<ValueReport> actual = reports.getReports();
 

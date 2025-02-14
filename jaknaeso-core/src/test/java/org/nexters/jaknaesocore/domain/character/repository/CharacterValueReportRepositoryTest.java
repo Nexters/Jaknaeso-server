@@ -23,6 +23,8 @@ import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordStatistics;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordStatistics.KeywordMetrics;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
@@ -124,6 +126,15 @@ class CharacterValueReportRepositoryTest extends IntegrationTest {
     weights.put(SUCCESS, BigDecimal.valueOf(25));
     weights.put(BENEVOLENCE, BigDecimal.valueOf(5));
 
+    final List<KeywordScore> scores =
+        List.of(
+            KeywordScore.builder().keyword(SELF_DIRECTION).score(BigDecimal.valueOf(1)).build(),
+            KeywordScore.builder().keyword(STABILITY).score(BigDecimal.valueOf(1)).build(),
+            KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.valueOf(1)).build(),
+            KeywordScore.builder().keyword(BENEVOLENCE).score(BigDecimal.valueOf(1)).build());
+    final KeywordStatistics statistics = new KeywordStatistics(scores);
+    final Map<Keyword, KeywordMetrics> metrics = statistics.getMetrics();
+
     final Character character =
         characterRepository.save(
             Character.builder()
@@ -135,7 +146,8 @@ class CharacterValueReportRepositoryTest extends IntegrationTest {
                 .surveyBundle(bundle)
                 .build());
     final CharacterValueReport report =
-        new CharacterValueReport(character, ValueReports.of(weights, submissions).getReports());
+        new CharacterValueReport(
+            character, ValueReports.of(weights, metrics, submissions).getReports());
 
     final CharacterValueReport actual =
         sut.findByCharacterIdAndDeletedAtIsNullWithCharacterAndValueReports(character.getId())
@@ -144,6 +156,6 @@ class CharacterValueReportRepositoryTest extends IntegrationTest {
     then(actual)
         .extracting("valueReports")
         .usingRecursiveComparison()
-        .isEqualTo(ValueReports.of(weights, submissions).getReports());
+        .isEqualTo(ValueReports.of(weights, metrics, submissions).getReports());
   }
 }

@@ -9,6 +9,8 @@ import lombok.Getter;
 import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordScoreNormalizer;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordStatistics.KeywordMetrics;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 
 @Getter
@@ -24,8 +26,10 @@ public class ValueReports {
   }
 
   public static ValueReports of(
-      final Map<Keyword, BigDecimal> weights, final List<SurveySubmission> submissions) {
-    Map<Keyword, BigDecimal> percentage = getKeywordPercentage(weights, submissions);
+      final Map<Keyword, BigDecimal> weights,
+      final Map<Keyword, KeywordMetrics> metrics,
+      final List<SurveySubmission> submissions) {
+    Map<Keyword, BigDecimal> percentage = getKeywordPercentage(weights, metrics, submissions);
 
     List<ValueReport> reports =
         percentage.entrySet().stream()
@@ -35,7 +39,9 @@ public class ValueReports {
   }
 
   private static Map<Keyword, BigDecimal> getKeywordPercentage(
-      final Map<Keyword, BigDecimal> weights, final List<SurveySubmission> submissions) {
+      final Map<Keyword, BigDecimal> weights,
+      final Map<Keyword, KeywordMetrics> metrics,
+      final List<SurveySubmission> submissions) {
     Map<Keyword, BigDecimal> percentage = new HashMap<>();
     Map<Keyword, BigDecimal> sum = getKeywordSum(weights, submissions);
 
@@ -43,13 +49,16 @@ public class ValueReports {
     BigDecimal sumPerKeyword = PERCENTAGE100.divide(keywordCnt).getValue();
 
     sum.forEach(
-        (k, v) ->
-            percentage.put(
-                k,
-                ScaledBigDecimal.of(v)
-                    .divide(sumPerKeyword)
-                    .multiply(PERCENTAGE100.getValue())
-                    .getValue()));
+        (k, v) -> {
+          var normalizer = new KeywordScoreNormalizer(weights.get(k), metrics.get(k));
+          var normalizedScore = normalizer.normalize(v);
+          percentage.put(
+              k,
+              ScaledBigDecimal.of(normalizedScore)
+                  .divide(sumPerKeyword)
+                  .multiply(PERCENTAGE100.getValue())
+                  .getValue());
+        });
     return percentage;
   }
 
