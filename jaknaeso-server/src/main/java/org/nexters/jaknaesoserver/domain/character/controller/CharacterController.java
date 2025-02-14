@@ -3,10 +3,13 @@ package org.nexters.jaknaesoserver.domain.character.controller;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
 import org.nexters.jaknaesocore.domain.character.service.CharacterService;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharacterCommand;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,11 +27,19 @@ public class CharacterController {
     return ApiResponse.success(response);
   }
 
-  @GetMapping("/report")
+  @GetMapping("/{characterId}")
+  public ApiResponse<CharacterResponse> getCharacter(
+      @RequestParam final Long memberId, @PathVariable final Long characterId) {
+    CharacterResponse response =
+        characterService.getCharacter(new CharacterCommand(memberId, characterId));
+    return ApiResponse.success(response);
+  }
+
+  @GetMapping("/{characterId}/report")
   public ApiResponse<CharacterValueReportResponse> getCharacterReport(
-      @RequestParam final Long memberId, @RequestParam final Long bundleId) {
+      @RequestParam final Long memberId, @PathVariable final Long characterId) {
     CharacterValueReportResponse response =
-        characterService.getCharacterReport(new CharacterValueReportCommand(memberId, bundleId));
+        characterService.getCharacterReport(new CharacterValueReportCommand(memberId, characterId));
     return ApiResponse.success(response);
   }
 }
