@@ -1,8 +1,7 @@
 package org.nexters.jaknaesoserver.domain.survey.controller;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
-import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
-import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
+import static com.epages.restdocs.apispec.ResourceDocumentation.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
@@ -282,46 +281,43 @@ class SurveyControllerTest extends ControllerTest {
                         new SurveyOptionsResponse(1L, "전혀 나와 같지 않다."),
                         new SurveyOptionsResponse(2L, "나와 같지 않다."),
                         new SurveyOptionsResponse(3L, "나와 조금 같다."),
-                        new SurveyOptionsResponse(4L, "나와 어느정도 같다."),
-                        new SurveyOptionsResponse(5L, "나와 같다."),
-                        new SurveyOptionsResponse(6L, "나와 매우 같다."))),
+                        new SurveyOptionsResponse(4L, "나와 같다."),
+                        new SurveyOptionsResponse(5L, "나와 매우 같다."))),
                 new SurveyResponse(
                     2L,
                     "그/그녀에게 부자가 되는 것은 중요하다. 많은 돈과 비싼 물건들을 가지길 원한다.",
                     "ONBOARDING",
                     List.of(
-                        new SurveyOptionsResponse(7L, "전혀 나와 같지 않다."),
-                        new SurveyOptionsResponse(8L, "나와 같지 않다."),
-                        new SurveyOptionsResponse(9L, "나와 조금 같다."),
-                        new SurveyOptionsResponse(10L, "나와 어느정도 같다."),
-                        new SurveyOptionsResponse(11L, "나와 같다."),
-                        new SurveyOptionsResponse(12L, "나와 매우 같다."))),
+                        new SurveyOptionsResponse(6L, "전혀 나와 같지 않다."),
+                        new SurveyOptionsResponse(7L, "나와 같지 않다."),
+                        new SurveyOptionsResponse(8L, "나와 조금 같다."),
+                        new SurveyOptionsResponse(9L, "나와 같다."),
+                        new SurveyOptionsResponse(10L, "나와 매우 같다."))),
                 new SurveyResponse(
                     3L,
                     "세상의 모든 사람들이 평등하게 대우받아야 한다고 생각한다. 그/그녀는 모든 사람이 인생에서 동등한 기회를 가져야 한다고 믿는다.",
                     "ONBOARDING",
                     List.of(
-                        new SurveyOptionsResponse(13L, "전혀 나와 같지 않다."),
-                        new SurveyOptionsResponse(14L, "나와 같지 않다."),
-                        new SurveyOptionsResponse(15L, "나와 조금 같다."),
-                        new SurveyOptionsResponse(16L, "나와 어느정도 같다."),
-                        new SurveyOptionsResponse(17L, "나와 같다."),
-                        new SurveyOptionsResponse(18L, "나와 매우 같다."))),
+                        new SurveyOptionsResponse(11L, "전혀 나와 같지 않다."),
+                        new SurveyOptionsResponse(12L, "나와 같지 않다."),
+                        new SurveyOptionsResponse(13L, "나와 조금 같다."),
+                        new SurveyOptionsResponse(14L, "나와 같다."),
+                        new SurveyOptionsResponse(15L, "나와 매우 같다."))),
                 new SurveyResponse(
                     4L,
                     "그/그녀에게 자신의 능력을 보여주는 것이 매우 중요하다. 사람들이 자신이 하는 일을 인정해주길 바란다.",
                     "ONBOARDING",
                     List.of(
-                        new SurveyOptionsResponse(19L, "전혀 나와 같지 않다."),
-                        new SurveyOptionsResponse(20L, "나와 같지 않다."),
-                        new SurveyOptionsResponse(21L, "나와 조금 같다."),
-                        new SurveyOptionsResponse(22L, "나와 어느정도 같다."),
-                        new SurveyOptionsResponse(23L, "나와 같다."),
-                        new SurveyOptionsResponse(24L, "나와 매우 같다.")))));
+                        new SurveyOptionsResponse(16L, "전혀 나와 같지 않다."),
+                        new SurveyOptionsResponse(17L, "나와 같지 않다."),
+                        new SurveyOptionsResponse(18L, "나와 조금 같다."),
+                        new SurveyOptionsResponse(19L, "나와 같다."),
+                        new SurveyOptionsResponse(20L, "나와 매우 같다.")))));
     given(surveyService.getOnboardingSurveys()).willReturn(response);
 
     mockMvc
-        .perform(get("/api/v1/surveys/onboarding").with(csrf()))
+        .perform(
+            get("/api/v1/surveys/onboarding").with(csrf()).header("Authorization", "Bearer token"))
         .andExpect(status().isOk())
         .andDo(
             document(
@@ -330,6 +326,10 @@ class SurveyControllerTest extends ControllerTest {
                     ResourceSnippetParameters.builder()
                         .description("온보딩 설문 조회")
                         .tag("Survey Domain")
+                        .requestHeaders(
+                            headerWithName("Authorization")
+                                .type(SimpleType.STRING)
+                                .description("Bearer 토큰"))
                         .responseFields(
                             fieldWithPath("result").type(SimpleType.STRING).description("결과"),
                             fieldWithPath("data.surveyResponses").description("온보딩 설문"),
@@ -372,6 +372,7 @@ class SurveyControllerTest extends ControllerTest {
             post("/api/v1/surveys/onboarding/submission")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request))
+                .header("Authorization", "Bearer token")
                 .with(csrf()))
         .andExpect(status().isNoContent())
         .andDo(
@@ -381,6 +382,10 @@ class SurveyControllerTest extends ControllerTest {
                     ResourceSnippetParameters.builder()
                         .description("온보딩 설문 제출")
                         .tag("Survey Domain")
+                        .requestHeaders(
+                            headerWithName("Authorization")
+                                .type(SimpleType.STRING)
+                                .description("Bearer 토큰"))
                         .requestFields(
                             fieldWithPath("submissionsInfo[].surveyId")
                                 .type(SimpleType.NUMBER)
