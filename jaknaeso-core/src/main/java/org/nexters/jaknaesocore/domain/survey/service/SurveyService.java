@@ -3,6 +3,7 @@ package org.nexters.jaknaesocore.domain.survey.service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseEntity;
@@ -81,8 +82,14 @@ public class SurveyService {
 
   private SurveyHistoryResponse createCurrentBundleSurveyHistory(
       Long bundleId, List<SurveySubmission> submissions, boolean isSubmittedToday) {
+
+    AtomicInteger indexCounter = new AtomicInteger(1);
+
     List<SurveyHistoryDetailResponse> historyDetails =
-        submissions.stream().map(BaseEntity::getId).map(SurveyHistoryDetailResponse::of).toList();
+        submissions.stream()
+            .map(BaseEntity::getId)
+            .map(id -> SurveyHistoryDetailResponse.of(id, indexCounter.getAndIncrement()))
+            .toList();
     if (isSubmittedToday) {
       return SurveyHistoryResponse.of(bundleId, historyDetails, historyDetails.size(), true);
     }

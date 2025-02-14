@@ -90,7 +90,7 @@ class SurveyControllerTest extends ControllerTest {
     SurveyHistoryResponse response =
         new SurveyHistoryResponse(
             1L,
-            List.of(new SurveyHistoryDetailResponse(1L), new SurveyHistoryDetailResponse(2L)),
+            List.of(new SurveyHistoryDetailResponse(1L, 1), new SurveyHistoryDetailResponse(2L, 1)),
             3,
             false);
 
@@ -114,6 +114,9 @@ class SurveyControllerTest extends ControllerTest {
                             fieldWithPath("data.surveyHistoryDetails[].submissionId")
                                 .type(SimpleType.NUMBER)
                                 .description("제출 ID"),
+                            fieldWithPath("data.surveyHistoryDetails[].index")
+                                .type(SimpleType.NUMBER)
+                                .description("설문 회차 정보 인덱스 값"),
                             fieldWithPath("data.nextSurveyIndex")
                                 .type(SimpleType.NUMBER)
                                 .description("다음 설문 인덱스"),

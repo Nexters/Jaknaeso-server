@@ -274,8 +274,8 @@ class SurveyServiceTest extends IntegrationTest {
         .containsExactly(surveyBundle.getId(), 3, false);
 
     then(response.surveyHistoryDetails())
-        .extracting("submissionId")
-        .containsExactly(submission1.getId(), submission2.getId());
+        .extracting("submissionId", "index")
+        .containsExactly(tuple(submission1.getId(), 1), tuple(submission2.getId(), 2));
   }
 
   @Test
@@ -348,9 +348,12 @@ class SurveyServiceTest extends IntegrationTest {
         .containsExactly(surveyBundle.getId(), 4, true);
 
     then(response.surveyHistoryDetails())
-        .extracting("submissionId")
+        .extracting("submissionId", "index")
         .containsExactly(
-            submission1.getId(), submission2.getId(), submission3.getId(), submission4.getId());
+            tuple(submission1.getId(), 1),
+            tuple(submission2.getId(), 2),
+            tuple(submission3.getId(), 3),
+            tuple(submission4.getId(), 4));
   }
 
   @Test
