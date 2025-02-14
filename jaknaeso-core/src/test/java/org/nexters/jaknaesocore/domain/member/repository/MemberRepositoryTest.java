@@ -12,11 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 class MemberRepositoryTest extends RepositoryTest {
 
-  @Autowired MemberRepository memberRepository;
+  private @Autowired MemberRepository memberRepository;
 
   @Test
   void 아이디에_해당하는_멤버를_조회한다() {
-    Member member = memberRepository.save(Member.create("name", "email"));
+    Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
 
     then(memberRepository.findMember(member.getId())).isEqualTo(member);
   }

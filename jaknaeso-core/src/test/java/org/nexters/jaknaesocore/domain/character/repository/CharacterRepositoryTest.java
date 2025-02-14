@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import java.time.LocalDate;
 import java.util.List;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.domain.character.model.Character;
@@ -18,8 +17,11 @@ import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.transaction.annotation.Transactional;
 
+@DirtiesContext(classMode = ClassMode.BEFORE_CLASS)
 class CharacterRepositoryTest extends IntegrationTest {
 
   @Autowired private CharacterRepository sut;
@@ -31,18 +33,6 @@ class CharacterRepositoryTest extends IntegrationTest {
   @Autowired private SurveyOptionRepository surveyOptionRepository;
   @Autowired private SurveySubmissionRepository surveySubmissionRepository;
 
-  @AfterEach
-  void tearDown() {
-    characterValueReportRepository.deleteAllInBatch();
-    sut.deleteAllInBatch();
-    surveySubmissionRepository.deleteAllInBatch();
-    surveyOptionRepository.deleteAllInBatch();
-    surveyRepository.deleteAllInBatch();
-    surveyBundleRepository.deleteAllInBatch();
-    memberRepository.deleteAllInBatch();
-  }
-
-  @Transactional
   @Test
   void 회원의_현재_캐릭터를_조회한다() {
     final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
@@ -75,7 +65,6 @@ class CharacterRepositoryTest extends IntegrationTest {
         .containsExactly("두번째", CharacterType.SECURITY.getName());
   }
 
-  @Transactional
   @Test
   void 회원의_특정_캐릭터를_조회한다() {
     final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
