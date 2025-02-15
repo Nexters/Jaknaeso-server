@@ -88,7 +88,7 @@ class CharacterControllerTest extends ControllerTest {
   @Test
   void 특정_캐릭터_정보를_조회한다() throws Exception {
 
-    CharacterType characterType = new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명");
+    CharacterType characterType = new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS);
     given(characterService.getCharacter(new CharacterCommand(1L, 1L)))
         .willReturn(
             CharacterResponse.builder()
@@ -152,7 +152,7 @@ class CharacterControllerTest extends ControllerTest {
   @Test
   void 현재_캐릭터_정보를_조회한다() throws Exception {
 
-    CharacterType characterType = new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명");
+    CharacterType characterType = new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS);
     given(characterService.getCurrentCharacter(1L))
         .willReturn(
             CharacterResponse.builder()
