@@ -71,4 +71,8 @@ public class SurveySubmission extends BaseTimeEntity {
   public String getYearMonthDay() {
     return submittedAt.getYearMonthDay();
   }
+
+  public boolean isOnboardingSurvey() {
+    return survey.getSurveyType().equals(SurveyType.ONBOARDING);
+  }
 }
