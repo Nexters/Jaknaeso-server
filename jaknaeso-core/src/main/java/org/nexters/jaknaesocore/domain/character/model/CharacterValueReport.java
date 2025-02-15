@@ -19,17 +19,20 @@ public class CharacterValueReport extends BaseTimeEntity {
 
   @OneToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "character_id")
-  private Character character;
+  private CharacterRecord characterRecord;
 
+  // TODO: 추후 대체
+  //  @OneToMany(mappedBy = "characterValueReport", cascade = CascadeType.ALL, orphanRemoval = true)
   @ElementCollection
   @CollectionTable(
       name = "value_reports",
       joinColumns = @JoinColumn(name = "character_value_report_id"))
   private List<ValueReport> valueReports;
 
-  public CharacterValueReport(final Character character, final List<ValueReport> valueReports) {
-    this.character = character;
+  public CharacterValueReport(
+      final CharacterRecord characterRecord, final List<ValueReport> valueReports) {
+    this.characterRecord = characterRecord;
     this.valueReports = valueReports;
-    character.updateCharacterValueReport(this);
+    characterRecord.updateCharacterValueReport(this);
   }
 }

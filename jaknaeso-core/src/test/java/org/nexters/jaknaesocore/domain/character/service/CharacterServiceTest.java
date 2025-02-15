@@ -15,11 +15,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
-import org.nexters.jaknaesocore.domain.character.model.Character;
+import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
 import org.nexters.jaknaesocore.domain.character.model.CharacterType;
 import org.nexters.jaknaesocore.domain.character.model.CharacterValueReport;
 import org.nexters.jaknaesocore.domain.character.model.ValueReports;
-import org.nexters.jaknaesocore.domain.character.repository.CharacterRepository;
+import org.nexters.jaknaesocore.domain.character.repository.CharacterRecordRepository;
+import org.nexters.jaknaesocore.domain.character.repository.CharacterTypeRepository;
 import org.nexters.jaknaesocore.domain.character.repository.CharacterValueReportRepository;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
@@ -52,7 +53,8 @@ class CharacterServiceTest extends IntegrationTest {
   @Autowired private CharacterService sut;
 
   @Autowired private MemberRepository memberRepository;
-  @Autowired private CharacterRepository characterRepository;
+  @Autowired private CharacterTypeRepository characterTypeRepository;
+  @Autowired private CharacterRecordRepository characterRecordRepository;
   @Autowired private CharacterValueReportRepository characterValueReportRepository;
   @Autowired private SurveyBundleRepository surveyBundleRepository;
   @Autowired private SurveyRepository surveyRepository;
@@ -62,7 +64,8 @@ class CharacterServiceTest extends IntegrationTest {
   @AfterEach
   void tearDown() {
     characterValueReportRepository.deleteAllInBatch();
-    characterRepository.deleteAllInBatch();
+    characterRecordRepository.deleteAllInBatch();
+    characterTypeRepository.deleteAllInBatch();
     surveySubmissionRepository.deleteAllInBatch();
     surveyOptionRepository.deleteAllInBatch();
     surveyRepository.deleteAllInBatch();
@@ -80,12 +83,12 @@ class CharacterServiceTest extends IntegrationTest {
   }
 
   @Nested
-  @DisplayName("getCharacter 메소드는")
-  class getCharacter {
+  @DisplayName("getCharacterRecord 메소드는")
+  class getCharacterRecord {
 
     @Nested
     @DisplayName("캐릭터 기록을 찾지 못하면")
-    class whenCharacterNotFound {
+    class whenCharacterRecordNotFound {
 
       @Test
       @DisplayName("CHARACTER_NOT_FOUND 예외를 던진다.")
@@ -97,18 +100,20 @@ class CharacterServiceTest extends IntegrationTest {
 
     @Nested
     @DisplayName("캐릭터 기록을 찾으면")
-    class whenCharacterFound {
+    class whenCharacterRecordFound {
 
       @Test
       @DisplayName("회원의 특정 캐릭터 정보를 반환한다.")
       void shouldReturnCharacter() {
         final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
         final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-        final Character character =
-            characterRepository.save(
-                Character.builder()
+        final CharacterType characterType =
+            characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명"));
+        final CharacterRecord characterRecord =
+            characterRecordRepository.save(
+                CharacterRecord.builder()
                     .characterNo("첫번째")
-                    .characterType(CharacterType.SUCCESS)
+                    .characterType(characterType)
                     .startDate(LocalDate.now().minusDays(15))
                     .endDate(LocalDate.now())
                     .member(member)
@@ -116,22 +121,22 @@ class CharacterServiceTest extends IntegrationTest {
                     .build());
 
         final CharacterResponse actual =
-            sut.getCharacter(createCharacterCommand(member.getId(), character.getId()));
+            sut.getCharacter(createCharacterCommand(member.getId(), characterRecord.getId()));
 
         then(actual)
             .extracting("characterNo", "characterType")
-            .containsExactly("첫번째", CharacterType.SUCCESS.getName());
+            .containsExactly("첫번째", characterType.getName());
       }
     }
   }
 
   @Nested
-  @DisplayName("getCurrentCharacter 메소드는")
-  class getCurrentCharacter {
+  @DisplayName("getCurrentCharacterRecord 메소드는")
+  class getCurrentCharacterRecord {
 
     @Nested
     @DisplayName("캐릭터 기록을 찾지 못하면")
-    class whenCharacterNotFound {
+    class whenCharacterRecordNotFound {
 
       @Test
       @DisplayName("CHARACTER_NOT_FOUND 예외를 던진다.")
@@ -143,17 +148,19 @@ class CharacterServiceTest extends IntegrationTest {
 
     @Nested
     @DisplayName("캐릭터 기록을 찾으면")
-    class whenCharacterFound {
+    class whenCharacterRecordFound {
 
       @Test
       @DisplayName("회원의 현재 캐릭터 정보를 반환한다.")
       void shouldReturnCharacter() {
         final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
         final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-        characterRepository.save(
-            Character.builder()
+        final CharacterType characterType =
+            characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명"));
+        characterRecordRepository.save(
+            CharacterRecord.builder()
                 .characterNo("첫번째")
-                .characterType(CharacterType.SUCCESS)
+                .characterType(characterType)
                 .startDate(LocalDate.now().minusDays(15))
                 .endDate(LocalDate.now())
                 .member(member)
@@ -164,7 +171,7 @@ class CharacterServiceTest extends IntegrationTest {
 
         then(actual)
             .extracting("characterNo", "characterType")
-            .containsExactly("첫번째", CharacterType.SUCCESS.getName());
+            .containsExactly("첫번째", characterType.getName());
       }
     }
   }
@@ -194,10 +201,12 @@ class CharacterServiceTest extends IntegrationTest {
       void shouldReturnCharacters() {
         final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
         final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-        characterRepository.save(
-            Character.builder()
+        final CharacterType characterType =
+            characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명"));
+        characterRecordRepository.save(
+            CharacterRecord.builder()
                 .characterNo("첫번째")
-                .characterType(CharacterType.SUCCESS)
+                .characterType(characterType)
                 .startDate(LocalDate.now().minusDays(15))
                 .endDate(LocalDate.now())
                 .member(member)
@@ -217,12 +226,12 @@ class CharacterServiceTest extends IntegrationTest {
   }
 
   @Nested
-  @DisplayName("getCharacterReport 메소드는")
-  class getCharacterReport {
+  @DisplayName("getCharacterRecordReport 메소드는")
+  class getCharacterRecordReport {
 
     @Nested
     @DisplayName("캐릭터 기록을 찾지 못하면")
-    class whenCharacterNotFound {
+    class whenCharacterRecordNotFound {
 
       @Test
       @DisplayName("CHARACTER_NOT_FOUND 예외를 던진다.")
@@ -234,7 +243,7 @@ class CharacterServiceTest extends IntegrationTest {
 
     @Nested
     @DisplayName("캐릭터 기록을 찾으면")
-    class whenCharacterFound {
+    class whenCharacterRecordFound {
 
       @Test
       @DisplayName("회원의 캐릭터 가치관 분석 정보를 반환한다.")
@@ -266,11 +275,13 @@ class CharacterServiceTest extends IntegrationTest {
         final Map<Keyword, KeywordMetrics> metricsMap = KeywordMetricsMap.generate(scores);
         final Map<Keyword, BigDecimal> weightMap = KeywordWeightMap.generate(metricsMap);
 
-        final Character character =
-            characterRepository.save(
-                Character.builder()
+        final CharacterType characterType =
+            characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명"));
+        final CharacterRecord characterRecord =
+            characterRecordRepository.save(
+                CharacterRecord.builder()
                     .characterNo("첫번째")
-                    .characterType(CharacterType.SELF_DIRECTION)
+                    .characterType(characterType)
                     .startDate(LocalDate.now().minusDays(15))
                     .endDate(LocalDate.now())
                     .member(member)
@@ -278,11 +289,12 @@ class CharacterServiceTest extends IntegrationTest {
                     .build());
         characterValueReportRepository.save(
             new CharacterValueReport(
-                character,
+                characterRecord,
                 ValueReports.of(weightMap, metricsMap, List.of(submission)).getReports()));
 
         final CharacterValueReportResponse actual =
-            sut.getCharacterReport(createCharacterReportCommand(member.getId(), character.getId()));
+            sut.getCharacterReport(
+                createCharacterReportCommand(member.getId(), characterRecord.getId()));
 
         then(actual.valueReports())
             .usingRecursiveComparison()

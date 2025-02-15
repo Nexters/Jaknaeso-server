@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.character.model.CharacterValueReport;
-import org.nexters.jaknaesocore.domain.character.repository.CharacterRepository;
+import org.nexters.jaknaesocore.domain.character.repository.CharacterRecordRepository;
 import org.nexters.jaknaesocore.domain.character.repository.CharacterValueReportRepository;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
@@ -21,18 +21,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class CharacterService {
 
   private final MemberRepository memberRepository;
-  private final CharacterRepository characterRepository;
+  private final CharacterRecordRepository characterRecordRepository;
   private final CharacterValueReportRepository characterValueReportRepository;
 
   @Transactional(readOnly = true)
   public CharacterResponse getCharacter(final CharacterCommand command) {
-    return characterRepository
+    return characterRecordRepository
         .findByIdAndMemberIdAndDeletedAtIsNullWithMember(command.memberId(), command.characterId())
         .map(
             it ->
                 CharacterResponse.builder()
                     .characterNo(it.getCharacterNo())
-                    .type(it.getType())
+                    .characterType(it.getCharacterType())
+                    .name(it.getCharacterType().getName())
+                    .description(it.getCharacterType().getDescription())
                     .startDate(it.getStartDate())
                     .endDate(it.getEndDate())
                     .build())
@@ -41,13 +43,15 @@ public class CharacterService {
 
   @Transactional(readOnly = true)
   public CharacterResponse getCurrentCharacter(final Long memberId) {
-    return characterRepository
+    return characterRecordRepository
         .findTopByMemberIdAndDeletedAtIsNullWithMember(memberId)
         .map(
             it ->
                 CharacterResponse.builder()
                     .characterNo(it.getCharacterNo())
-                    .type(it.getType())
+                    .characterType(it.getCharacterType())
+                    .name(it.getCharacterType().getName())
+                    .description(it.getCharacterType().getDescription())
                     .startDate(it.getStartDate())
                     .endDate(it.getEndDate())
                     .build())
@@ -59,7 +63,7 @@ public class CharacterService {
     memberRepository.findMember(memberId);
 
     final List<SimpleCharacterResponse> characters =
-        characterRepository
+        characterRecordRepository
             .findByMemberIdAndDeletedAtIsNullWithMemberAndSurveyBundle(memberId)
             .stream()
             .map(
@@ -76,7 +80,7 @@ public class CharacterService {
   @Transactional(readOnly = true)
   public CharacterValueReportResponse getCharacterReport(
       final CharacterValueReportCommand command) {
-    characterRepository
+    characterRecordRepository
         .findByIdAndMemberIdAndDeletedAtIsNullWithMember(command.characterId(), command.memberId())
         .orElseThrow(() -> CustomException.CHARACTER_NOT_FOUND);
 

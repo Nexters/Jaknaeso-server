@@ -1,6 +1,11 @@
 package org.nexters.jaknaesocore.domain.character.model;
 
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -12,15 +17,14 @@ import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "character_record")
 @Entity
-public class Character extends BaseTimeEntity {
+public class CharacterRecord extends BaseTimeEntity {
 
   private String characterNo;
 
-  private String type;
-
-  private String description;
+  @ManyToOne
+  @JoinColumn(name = "character_type_id")
+  private CharacterType characterType;
 
   private LocalDate startDate;
 
@@ -34,11 +38,11 @@ public class Character extends BaseTimeEntity {
   @JoinColumn(name = "bundle_id")
   private SurveyBundle surveyBundle;
 
-  @OneToOne(mappedBy = "character", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToOne(mappedBy = "characterRecord", cascade = CascadeType.ALL, orphanRemoval = true)
   private CharacterValueReport characterValueReport;
 
   @Builder
-  private Character(
+  private CharacterRecord(
       final String characterNo,
       final CharacterType characterType,
       final LocalDate startDate,
@@ -46,16 +50,11 @@ public class Character extends BaseTimeEntity {
       final Member member,
       final SurveyBundle surveyBundle) {
     this.characterNo = characterNo;
+    this.characterType = characterType;
     this.startDate = startDate;
     this.endDate = endDate;
     this.member = member;
     this.surveyBundle = surveyBundle;
-    setCharacterType(characterType);
-  }
-
-  private void setCharacterType(final CharacterType characterType) {
-    this.type = characterType.getName();
-    this.description = characterType.getDescription();
   }
 
   public void updateCharacterValueReport(final CharacterValueReport characterValueReport) {
