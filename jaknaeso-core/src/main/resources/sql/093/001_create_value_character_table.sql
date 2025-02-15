@@ -1,4 +1,4 @@
-create table if not exists character_type
+create table if not exists value_character
 (
   id              bigint        auto_increment primary key,
   name            varchar(50),
