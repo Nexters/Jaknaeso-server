@@ -83,8 +83,8 @@ class CharacterServiceTest extends IntegrationTest {
   }
 
   @Nested
-  @DisplayName("getCharacterRecord 메소드는")
-  class getCharacterRecord {
+  @DisplayName("getCharacter 메소드는")
+  class getCharacter {
 
     @Nested
     @DisplayName("캐릭터 기록을 찾지 못하면")
@@ -132,8 +132,8 @@ class CharacterServiceTest extends IntegrationTest {
   }
 
   @Nested
-  @DisplayName("getCurrentCharacterRecord 메소드는")
-  class getCurrentCharacterRecord {
+  @DisplayName("getCurrentCharacter 메소드는")
+  class getCurrentCharacter {
 
     @Nested
     @DisplayName("캐릭터 기록을 찾지 못하면")
