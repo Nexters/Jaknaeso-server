@@ -9,7 +9,7 @@ public interface CharacterValueReportRepository extends JpaRepository<CharacterV
 
   @Query(
       "SELECT c FROM CharacterValueReport c "
-          + "JOIN FETCH c.character cc JOIN FETCH c.valueReports "
+          + "JOIN FETCH c.characterRecord cc JOIN FETCH c.valueReports "
           + "WHERE cc.id = :characterId AND c.deletedAt IS NULL")
   Optional<CharacterValueReport> findByCharacterIdAndDeletedAtIsNullWithCharacterAndValueReports(
       final Long characterId);

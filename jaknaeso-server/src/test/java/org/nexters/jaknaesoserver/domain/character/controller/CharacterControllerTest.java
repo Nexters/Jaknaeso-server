@@ -88,12 +88,14 @@ class CharacterControllerTest extends ControllerTest {
   @Test
   void 특정_캐릭터_정보를_조회한다() throws Exception {
 
+    CharacterType characterType = new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명");
     given(characterService.getCharacter(new CharacterCommand(1L, 1L)))
         .willReturn(
             CharacterResponse.builder()
                 .characterNo("첫번째")
-                .type(CharacterType.SUCCESS.getName())
-                .description(CharacterType.SUCCESS.getDescription())
+                .characterType(characterType)
+                .name(characterType.getName())
+                .description(characterType.getDescription())
                 .startDate(LocalDate.now().minusDays(15))
                 .endDate(LocalDate.now())
                 .build());
@@ -128,9 +130,10 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("data.characterNo")
                                 .type(SimpleType.NUMBER)
                                 .description("캐릭터 회차"),
-                            fieldWithPath("data.characterType")
-                                .type(SimpleType.NUMBER)
-                                .description("캐릭터 타입"),
+                            fieldWithPath("data.characterType").description("캐릭터 타입"),
+                            fieldWithPath("data.name")
+                                .type(SimpleType.STRING)
+                                .description("캐릭터 이름"),
                             fieldWithPath("data.description")
                                 .type(SimpleType.STRING)
                                 .description("캐릭터 설명"),
@@ -149,12 +152,14 @@ class CharacterControllerTest extends ControllerTest {
   @Test
   void 현재_캐릭터_정보를_조회한다() throws Exception {
 
+    CharacterType characterType = new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명");
     given(characterService.getCurrentCharacter(1L))
         .willReturn(
             CharacterResponse.builder()
                 .characterNo("첫번째")
-                .type(CharacterType.SUCCESS.getName())
-                .description(CharacterType.SUCCESS.getDescription())
+                .characterType(characterType)
+                .name(characterType.getName())
+                .description(characterType.getDescription())
                 .startDate(LocalDate.now().minusDays(15))
                 .endDate(LocalDate.now())
                 .build());
@@ -185,9 +190,10 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("data.characterNo")
                                 .type(SimpleType.NUMBER)
                                 .description("캐릭터 회차"),
-                            fieldWithPath("data.characterType")
-                                .type(SimpleType.NUMBER)
-                                .description("캐릭터 타입"),
+                            fieldWithPath("data.characterType").description("캐릭터 타입"),
+                            fieldWithPath("data.name")
+                                .type(SimpleType.STRING)
+                                .description("캐릭터 이름"),
                             fieldWithPath("data.description")
                                 .type(SimpleType.STRING)
                                 .description("캐릭터 설명"),
