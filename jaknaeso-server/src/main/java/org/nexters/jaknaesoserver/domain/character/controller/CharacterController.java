@@ -35,6 +35,12 @@ public class CharacterController {
     return ApiResponse.success(response);
   }
 
+  @GetMapping("/latest")
+  public ApiResponse<CharacterResponse> getCurrentCharacter(@RequestParam final Long memberId) {
+    CharacterResponse response = characterService.getCurrentCharacter(memberId);
+    return ApiResponse.success(response);
+  }
+
   @GetMapping("/{characterId}/report")
   public ApiResponse<CharacterValueReportResponse> getCharacterReport(
       @RequestParam final Long memberId, @PathVariable final Long characterId) {

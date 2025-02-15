@@ -26,15 +26,8 @@ public class CharacterService {
 
   @Transactional(readOnly = true)
   public CharacterResponse getCharacter(final CharacterCommand command) {
-    if (command.characterId() == null) {
-      return getCurrentCharacter(command.memberId());
-    }
-    return getSpecificCharacter(command.memberId(), command.characterId());
-  }
-
-  private CharacterResponse getCurrentCharacter(final Long memberId) {
     return characterRepository
-        .findTopByMemberIdAndDeletedAtIsNullWithMember(memberId)
+        .findByIdAndMemberIdAndDeletedAtIsNullWithMember(command.memberId(), command.characterId())
         .map(
             it ->
                 CharacterResponse.builder()
@@ -46,9 +39,10 @@ public class CharacterService {
         .orElseThrow(() -> CustomException.CHARACTER_NOT_FOUND);
   }
 
-  private CharacterResponse getSpecificCharacter(final Long memberId, final Long characterId) {
+  @Transactional(readOnly = true)
+  public CharacterResponse getCurrentCharacter(final Long memberId) {
     return characterRepository
-        .findByIdAndMemberIdAndDeletedAtIsNullWithMember(memberId, characterId)
+        .findTopByMemberIdAndDeletedAtIsNullWithMember(memberId)
         .map(
             it ->
                 CharacterResponse.builder()
