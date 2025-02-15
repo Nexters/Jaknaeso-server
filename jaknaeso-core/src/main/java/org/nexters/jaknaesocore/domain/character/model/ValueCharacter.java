@@ -3,7 +3,6 @@ package org.nexters.jaknaesocore.domain.character.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,17 +24,5 @@ public class ValueCharacter extends BaseEntity {
   public ValueCharacter(final String name, final String description, final Keyword keyword) {
     this.name = name;
     this.description = description;
-  }
-
-  @Override
-  public final boolean equals(Object o) {
-    if (this == o) {
-      return true;
-    }
-    if (o == null) {
-      return false;
-    }
-    ValueCharacter that = (ValueCharacter) o;
-    return getId() != null && Objects.equals(getId(), that.getId());
   }
 }
