@@ -96,64 +96,75 @@ class CharacterServiceTest extends IntegrationTest {
     }
 
     @Nested
-    @DisplayName("캐릭터 기록을 찾았고")
+    @DisplayName("캐릭터 기록을 찾으면")
     class whenCharacterFound {
 
-      @Nested
-      @DisplayName("characterId가 null이라면")
-      class whenBundleIdIsNull {
+      @Test
+      @DisplayName("회원의 특정 캐릭터 정보를 반환한다.")
+      void shouldReturnCharacter() {
+        final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+        final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+        final Character character =
+            characterRepository.save(
+                Character.builder()
+                    .characterNo("첫번째")
+                    .characterType(CharacterType.SUCCESS)
+                    .startDate(LocalDate.now().minusDays(15))
+                    .endDate(LocalDate.now())
+                    .member(member)
+                    .surveyBundle(bundle)
+                    .build());
 
-        @Test
-        @DisplayName("회원의 현재 캐릭터 정보를 반환한다.")
-        void shouldReturnCurrentCharacter() {
-          final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
-          final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-          characterRepository.save(
-              Character.builder()
-                  .characterNo("첫번째")
-                  .characterType(CharacterType.SUCCESS)
-                  .startDate(LocalDate.now().minusDays(15))
-                  .endDate(LocalDate.now())
-                  .member(member)
-                  .surveyBundle(bundle)
-                  .build());
+        final CharacterResponse actual =
+            sut.getCharacter(createCharacterCommand(member.getId(), character.getId()));
 
-          final CharacterResponse actual =
-              sut.getCharacter(createCharacterCommand(member.getId(), null));
-
-          then(actual)
-              .extracting("characterNo", "characterType")
-              .containsExactly("첫번째", CharacterType.SUCCESS.getName());
-        }
+        then(actual)
+            .extracting("characterNo", "characterType")
+            .containsExactly("첫번째", CharacterType.SUCCESS.getName());
       }
+    }
+  }
 
-      @Nested
-      @DisplayName("characterId가 null이 아니라면")
-      class whenBundleIdIsNotNull {
+  @Nested
+  @DisplayName("getCurrentCharacter 메소드는")
+  class getCurrentCharacter {
 
-        @Test
-        @DisplayName("회원의 특정 캐릭터 정보를 반환한다.")
-        void shouldReturnSpecificCharacter() {
-          final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
-          final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-          final Character character =
-              characterRepository.save(
-                  Character.builder()
-                      .characterNo("첫번째")
-                      .characterType(CharacterType.SUCCESS)
-                      .startDate(LocalDate.now().minusDays(15))
-                      .endDate(LocalDate.now())
-                      .member(member)
-                      .surveyBundle(bundle)
-                      .build());
+    @Nested
+    @DisplayName("캐릭터 기록을 찾지 못하면")
+    class whenCharacterNotFound {
 
-          final CharacterResponse actual =
-              sut.getCharacter(createCharacterCommand(member.getId(), character.getId()));
+      @Test
+      @DisplayName("CHARACTER_NOT_FOUND 예외를 던진다.")
+      void shouldThrowException() {
+        thenThrownBy(() -> sut.getCharacter(createCharacterCommand(1L, 1L)))
+            .hasMessage(CustomException.CHARACTER_NOT_FOUND.getMessage());
+      }
+    }
 
-          then(actual)
-              .extracting("characterNo", "characterType")
-              .containsExactly("첫번째", CharacterType.SUCCESS.getName());
-        }
+    @Nested
+    @DisplayName("캐릭터 기록을 찾으면")
+    class whenCharacterFound {
+
+      @Test
+      @DisplayName("회원의 현재 캐릭터 정보를 반환한다.")
+      void shouldReturnCharacter() {
+        final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+        final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+        characterRepository.save(
+            Character.builder()
+                .characterNo("첫번째")
+                .characterType(CharacterType.SUCCESS)
+                .startDate(LocalDate.now().minusDays(15))
+                .endDate(LocalDate.now())
+                .member(member)
+                .surveyBundle(bundle)
+                .build());
+
+        final CharacterResponse actual = sut.getCurrentCharacter(member.getId());
+
+        then(actual)
+            .extracting("characterNo", "characterType")
+            .containsExactly("첫번째", CharacterType.SUCCESS.getName());
       }
     }
   }

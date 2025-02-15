@@ -147,6 +147,63 @@ class CharacterControllerTest extends ControllerTest {
 
   @WithMockCustomUser
   @Test
+  void 현재_캐릭터_정보를_조회한다() throws Exception {
+
+    given(characterService.getCurrentCharacter(1L))
+        .willReturn(
+            CharacterResponse.builder()
+                .characterNo("첫번째")
+                .type(CharacterType.SUCCESS.getName())
+                .description(CharacterType.SUCCESS.getDescription())
+                .startDate(LocalDate.now().minusDays(15))
+                .endDate(LocalDate.now())
+                .build());
+
+    mockMvc
+        .perform(
+            get("/api/v1/characters/latest")
+                .accept(APPLICATION_JSON)
+                .contentType(APPLICATION_JSON)
+                .queryParam("memberId", "1")
+                .with(csrf()))
+        .andExpect(status().isOk())
+        .andDo(
+            document(
+                "character-success",
+                resource(
+                    ResourceSnippetParameters.builder()
+                        .description("캐릭터 목록 반환")
+                        .tag("Character Domain")
+                        .queryParameters(
+                            parameterWithName("memberId")
+                                .type(SimpleType.NUMBER)
+                                .description("멤버 아이디"))
+                        .responseFields(
+                            fieldWithPath("result")
+                                .type(SimpleType.STRING)
+                                .description("API 요청 결과 (성공/실패)"),
+                            fieldWithPath("data.characterNo")
+                                .type(SimpleType.NUMBER)
+                                .description("캐릭터 회차"),
+                            fieldWithPath("data.characterType")
+                                .type(SimpleType.NUMBER)
+                                .description("캐릭터 타입"),
+                            fieldWithPath("data.description")
+                                .type(SimpleType.STRING)
+                                .description("캐릭터 설명"),
+                            fieldWithPath("data.startDate")
+                                .type(SimpleType.STRING)
+                                .description("시작 일자"),
+                            fieldWithPath("data.endDate")
+                                .type(SimpleType.STRING)
+                                .description("종료 일자"),
+                            fieldWithPath("error").description("에러").optional())
+                        .responseSchema(schema("CharacterResponse"))
+                        .build())));
+  }
+
+  @WithMockCustomUser
+  @Test
   void 특정_캐릭터의_가치관_분석_정보를_조회한다() throws Exception {
 
     given(characterService.getCharacterReport(any(CharacterValueReportCommand.class)))
