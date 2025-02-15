@@ -47,7 +47,7 @@ public class OauthService {
   private String clientSecret;
 
   @Transactional
-  public Long kakaoLogin(final KakaoLoginCommand command) {
+  public Member kakaoLogin(final KakaoLoginCommand command) {
     final KakaoTokenResponse token =
         getKakaoToken(command.authorizationCode(), command.redirectUri());
     final KakaoUserInfoResponse userInfo = getKakaoUserInfo(token.accessToken());
@@ -57,7 +57,7 @@ public class OauthService {
   }
 
   @Transactional
-  public Long kakaoLoginWithToken(final KakaoLoginWithTokenCommand command) {
+  public Member kakaoLoginWithToken(final KakaoLoginWithTokenCommand command) {
     final KakaoUserInfoResponse userInfo = getKakaoUserInfo(command.accessToken());
 
     final String oauthId = userInfo.id().toString();
@@ -79,26 +79,26 @@ public class OauthService {
     return kakaoAuthClient.requestToken(params);
   }
 
-  private Long kakaoSignInOrSignUp(final String oauthId, final KakaoAccount kakaoAccount) {
+  private Member kakaoSignInOrSignUp(final String oauthId, final KakaoAccount kakaoAccount) {
     return socialAccountRepository
         .findByOauthIdAndSocialProviderAndDeletedAtIsNull(oauthId, SocialProvider.KAKAO)
         .map(SocialAccount::getMember)
         .map(
             it -> {
               it.updateUserInfo(kakaoAccount.name(), kakaoAccount.email());
-              return it.getId();
+              return it;
             })
         .orElseGet(() -> kakaoSignUp(oauthId, kakaoAccount.name(), kakaoAccount.email()));
   }
 
-  private Long kakaoSignUp(final String oauthId, final String name, final String email) {
+  private Member kakaoSignUp(final String oauthId, final String name, final String email) {
     final Member member = memberRepository.save(Member.create(name, email));
     socialAccountRepository.save(SocialAccount.kakaoSignup(oauthId, member));
-    return member.getId();
+    return member;
   }
 
   @Transactional
-  public Long appleLogin(final AppleLoginCommand command) {
+  public Member appleLogin(final AppleLoginCommand command) {
     AppleIdToken appleIdToken = AppleIdToken.of(command.idToken());
     final String jwtClaims = appleIdToken.decodePayload();
     final AppleAuthorization authorization = decodeAppleIdTokenPayload(jwtClaims);
@@ -106,7 +106,7 @@ public class OauthService {
     return socialAccountRepository
         .findByOauthIdAndSocialProviderAndDeletedAtIsNull(
             authorization.getSub(), SocialProvider.APPLE)
-        .map(account -> account.getMember().getId())
+        .map(SocialAccount::getMember)
         .orElseGet(
             () -> appleSignup(authorization.getSub(), command.name(), authorization.getEmail()));
   }
@@ -121,9 +121,9 @@ public class OauthService {
     }
   }
 
-  private Long appleSignup(final String oauthId, final String name, final String email) {
+  private Member appleSignup(final String oauthId, final String name, final String email) {
     final Member member = memberRepository.save(Member.create(name, email));
     socialAccountRepository.save(SocialAccount.appleSignUp(oauthId, member));
-    return member.getId();
+    return member;
   }
 }

@@ -20,7 +20,8 @@ import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.domain.auth.controller.dto.AppleLoginRequest;
 import org.nexters.jaknaesoserver.domain.auth.controller.dto.KakaoLoginRequest;
 import org.nexters.jaknaesoserver.domain.auth.controller.dto.KakaoLoginWithTokenRequest;
-import org.nexters.jaknaesoserver.domain.auth.dto.TokenResponse;
+import org.nexters.jaknaesoserver.domain.auth.service.dto.LoginResponse;
+import org.nexters.jaknaesoserver.domain.auth.service.dto.TokenResponse;
 import org.springframework.security.test.context.support.WithMockUser;
 
 class AuthControllerTest extends ControllerTest {
@@ -30,7 +31,7 @@ class AuthControllerTest extends ControllerTest {
     AppleLoginRequest request = new AppleLoginRequest("123456", "홍길동");
 
     given(authFacadeService.appleLogin(request.toServiceDto()))
-        .willReturn(new TokenResponse(1L, "accessToken", "refreshToken"));
+        .willReturn(new LoginResponse(1L, false, new TokenResponse("accessToken", "refreshToken")));
 
     mockMvc
         .perform(
@@ -59,10 +60,13 @@ class AuthControllerTest extends ControllerTest {
                             fieldWithPath("data.memberId")
                                 .type(SimpleType.NUMBER)
                                 .description("유저 ID"),
-                            fieldWithPath("data.accessToken")
+                            fieldWithPath("data.isCompletedOnboarding")
+                                .type(SimpleType.BOOLEAN)
+                                .description("온보딩 완료 여부"),
+                            fieldWithPath("data.tokenInfo.accessToken")
                                 .type(SimpleType.STRING)
                                 .description("액세스 토큰"),
-                            fieldWithPath("data.refreshToken")
+                            fieldWithPath("data.tokenInfo.refreshToken")
                                 .type(SimpleType.STRING)
                                 .description("리프레시 토큰"),
                             fieldWithPath("error").description("에러").optional())
@@ -76,7 +80,7 @@ class AuthControllerTest extends ControllerTest {
     KakaoLoginRequest request = new KakaoLoginRequest("authorization code", "redirect-uri");
 
     given(authFacadeService.kakaoLogin(request.toServiceDto()))
-        .willReturn(new TokenResponse(1L, "accessToken", "refreshToken"));
+        .willReturn(new LoginResponse(1L, false, new TokenResponse("accessToken", "refreshToken")));
 
     mockMvc
         .perform(
@@ -105,10 +109,13 @@ class AuthControllerTest extends ControllerTest {
                             fieldWithPath("data.memberId")
                                 .type(SimpleType.NUMBER)
                                 .description("유저 ID"),
-                            fieldWithPath("data.accessToken")
+                            fieldWithPath("data.isCompletedOnboarding")
+                                .type(SimpleType.BOOLEAN)
+                                .description("온보딩 완료 여부"),
+                            fieldWithPath("data.tokenInfo.accessToken")
                                 .type(SimpleType.STRING)
                                 .description("액세스 토큰"),
-                            fieldWithPath("data.refreshToken")
+                            fieldWithPath("data.tokenInfo.refreshToken")
                                 .type(SimpleType.STRING)
                                 .description("리프레시 토큰"),
                             fieldWithPath("error").description("에러").optional())
@@ -122,7 +129,7 @@ class AuthControllerTest extends ControllerTest {
     KakaoLoginWithTokenRequest request = new KakaoLoginWithTokenRequest("access token");
 
     given(authFacadeService.kakaoLoginWithToken(request.toServiceDto()))
-        .willReturn(new TokenResponse(1L, "accessToken", "refreshToken"));
+        .willReturn(new LoginResponse(1L, false, new TokenResponse("accessToken", "refreshToken")));
 
     mockMvc
         .perform(
@@ -150,10 +157,13 @@ class AuthControllerTest extends ControllerTest {
                             fieldWithPath("data.memberId")
                                 .type(SimpleType.NUMBER)
                                 .description("유저 ID"),
-                            fieldWithPath("data.accessToken")
+                            fieldWithPath("data.isCompletedOnboarding")
+                                .type(SimpleType.BOOLEAN)
+                                .description("온보딩 완료 여부"),
+                            fieldWithPath("data.tokenInfo.accessToken")
                                 .type(SimpleType.STRING)
                                 .description("액세스 토큰"),
-                            fieldWithPath("data.refreshToken")
+                            fieldWithPath("data.tokenInfo.refreshToken")
                                 .type(SimpleType.STRING)
                                 .description("리프레시 토큰"),
                             fieldWithPath("error").description("에러").optional())
@@ -167,7 +177,7 @@ class AuthControllerTest extends ControllerTest {
   @Test
   void reissueToken() throws Exception {
     given(authFacadeService.reissueToken(any()))
-        .willReturn(new TokenResponse(1L, "accessToken", "refreshToken"));
+        .willReturn(new TokenResponse("accessToken", "refreshToken"));
 
     mockMvc
         .perform(
@@ -185,9 +195,6 @@ class AuthControllerTest extends ControllerTest {
                         .requestHeaders(headerWithName("Refresh-Token").description("리프레시 토큰"))
                         .responseFields(
                             fieldWithPath("result").type(SimpleType.STRING).description("결과"),
-                            fieldWithPath("data.memberId")
-                                .type(SimpleType.NUMBER)
-                                .description("유저 ID"),
                             fieldWithPath("data.accessToken")
                                 .type(SimpleType.STRING)
                                 .description("액세스 토큰"),
