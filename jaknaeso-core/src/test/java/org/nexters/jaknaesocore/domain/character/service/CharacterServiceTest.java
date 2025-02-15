@@ -7,7 +7,6 @@ import static org.nexters.jaknaesocore.domain.survey.model.Keyword.SELF_DIRECTIO
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -31,9 +30,10 @@ import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordMetrics;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordMetricsMap;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
-import org.nexters.jaknaesocore.domain.survey.model.KeywordStatistics;
-import org.nexters.jaknaesocore.domain.survey.model.KeywordStatistics.KeywordMetrics;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordWeightMap;
 import org.nexters.jaknaesocore.domain.survey.model.Survey;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
@@ -96,75 +96,64 @@ class CharacterServiceTest extends IntegrationTest {
     }
 
     @Nested
-    @DisplayName("캐릭터 기록을 찾으면")
+    @DisplayName("캐릭터 기록을 찾았고")
     class whenCharacterFound {
 
-      @Test
-      @DisplayName("회원의 특정 캐릭터 정보를 반환한다.")
-      void shouldReturnCharacter() {
-        final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
-        final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-        final Character character =
-            characterRepository.save(
-                Character.builder()
-                    .characterNo("첫번째")
-                    .characterType(CharacterType.SUCCESS)
-                    .startDate(LocalDate.now().minusDays(15))
-                    .endDate(LocalDate.now())
-                    .member(member)
-                    .surveyBundle(bundle)
-                    .build());
+      @Nested
+      @DisplayName("characterId가 null이라면")
+      class whenBundleIdIsNull {
 
-        final CharacterResponse actual =
-            sut.getCharacter(createCharacterCommand(member.getId(), character.getId()));
+        @Test
+        @DisplayName("회원의 현재 캐릭터 정보를 반환한다.")
+        void shouldReturnCurrentCharacter() {
+          final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+          final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+          characterRepository.save(
+              Character.builder()
+                  .characterNo("첫번째")
+                  .characterType(CharacterType.SUCCESS)
+                  .startDate(LocalDate.now().minusDays(15))
+                  .endDate(LocalDate.now())
+                  .member(member)
+                  .surveyBundle(bundle)
+                  .build());
 
-        then(actual)
-            .extracting("characterNo", "characterType")
-            .containsExactly("첫번째", CharacterType.SUCCESS.getName());
+          final CharacterResponse actual =
+              sut.getCharacter(createCharacterCommand(member.getId(), null));
+
+          then(actual)
+              .extracting("characterNo", "characterType")
+              .containsExactly("첫번째", CharacterType.SUCCESS.getName());
+        }
       }
-    }
-  }
 
-  @Nested
-  @DisplayName("getCurrentCharacter 메소드는")
-  class getCurrentCharacter {
+      @Nested
+      @DisplayName("characterId가 null이 아니라면")
+      class whenBundleIdIsNotNull {
 
-    @Nested
-    @DisplayName("캐릭터 기록을 찾지 못하면")
-    class whenCharacterNotFound {
+        @Test
+        @DisplayName("회원의 특정 캐릭터 정보를 반환한다.")
+        void shouldReturnSpecificCharacter() {
+          final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+          final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+          final Character character =
+              characterRepository.save(
+                  Character.builder()
+                      .characterNo("첫번째")
+                      .characterType(CharacterType.SUCCESS)
+                      .startDate(LocalDate.now().minusDays(15))
+                      .endDate(LocalDate.now())
+                      .member(member)
+                      .surveyBundle(bundle)
+                      .build());
 
-      @Test
-      @DisplayName("CHARACTER_NOT_FOUND 예외를 던진다.")
-      void shouldThrowException() {
-        thenThrownBy(() -> sut.getCharacter(createCharacterCommand(1L, 1L)))
-            .hasMessage(CustomException.CHARACTER_NOT_FOUND.getMessage());
-      }
-    }
+          final CharacterResponse actual =
+              sut.getCharacter(createCharacterCommand(member.getId(), character.getId()));
 
-    @Nested
-    @DisplayName("캐릭터 기록을 찾으면")
-    class whenCharacterFound {
-
-      @Test
-      @DisplayName("회원의 현재 캐릭터 정보를 반환한다.")
-      void shouldReturnCharacter() {
-        final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
-        final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-        characterRepository.save(
-            Character.builder()
-                .characterNo("첫번째")
-                .characterType(CharacterType.SUCCESS)
-                .startDate(LocalDate.now().minusDays(15))
-                .endDate(LocalDate.now())
-                .member(member)
-                .surveyBundle(bundle)
-                .build());
-
-        final CharacterResponse actual = sut.getCurrentCharacter(member.getId());
-
-        then(actual)
-            .extracting("characterNo", "characterType")
-            .containsExactly("첫번째", CharacterType.SUCCESS.getName());
+          then(actual)
+              .extracting("characterNo", "characterType")
+              .containsExactly("첫번째", CharacterType.SUCCESS.getName());
+        }
       }
     }
   }
@@ -263,10 +252,8 @@ class CharacterServiceTest extends IntegrationTest {
                     .selectedOption(option)
                     .build());
 
-        final KeywordStatistics statistics = new KeywordStatistics(scores);
-        final Map<Keyword, KeywordMetrics> metrics = statistics.getMetrics();
-        final Map<Keyword, BigDecimal> weights = new HashMap<>();
-        weights.put(SELF_DIRECTION, BigDecimal.valueOf(100));
+        final Map<Keyword, KeywordMetrics> metricsMap = KeywordMetricsMap.generate(scores);
+        final Map<Keyword, BigDecimal> weightMap = KeywordWeightMap.generate(metricsMap);
 
         final Character character =
             characterRepository.save(
@@ -280,14 +267,15 @@ class CharacterServiceTest extends IntegrationTest {
                     .build());
         characterValueReportRepository.save(
             new CharacterValueReport(
-                character, ValueReports.of(weights, metrics, List.of(submission)).getReports()));
+                character,
+                ValueReports.of(weightMap, metricsMap, List.of(submission)).getReports()));
 
         final CharacterValueReportResponse actual =
             sut.getCharacterReport(createCharacterReportCommand(member.getId(), character.getId()));
 
         then(actual.valueReports())
             .usingRecursiveComparison()
-            .isEqualTo(ValueReports.of(weights, metrics, List.of(submission)).getReports());
+            .isEqualTo(ValueReports.of(weightMap, metricsMap, List.of(submission)).getReports());
       }
     }
   }
