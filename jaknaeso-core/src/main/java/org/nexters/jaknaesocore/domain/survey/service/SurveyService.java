@@ -171,6 +171,7 @@ public class SurveyService {
         createSubmissionsBy(submittedAt, surveyToSelectedOption, member);
 
     surveySubmissionRepository.saveAll(submissions);
+    member.completeOnboarding(submittedAt);
   }
 
   private Member getMember(Long memberId) {

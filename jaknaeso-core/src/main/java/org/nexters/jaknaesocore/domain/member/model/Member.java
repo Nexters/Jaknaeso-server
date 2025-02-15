@@ -3,6 +3,7 @@ package org.nexters.jaknaesocore.domain.member.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -23,6 +24,8 @@ public class Member extends BaseTimeEntity {
 
   private String email;
 
+  private LocalDateTime completedOnboardingAt;
+
   private Member(final String name, final String email) {
     this.name = name;
     this.email = email;
@@ -42,5 +45,9 @@ public class Member extends BaseTimeEntity {
   public void updateUserInfo(final String name, final String email) {
     this.name = name;
     this.email = email;
+  }
+
+  public void completeOnboarding(LocalDateTime onboardingAt) {
+    this.completedOnboardingAt = onboardingAt;
   }
 }
