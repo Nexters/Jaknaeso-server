@@ -22,6 +22,7 @@ import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 class SurveyServiceTest extends IntegrationTest {
 
@@ -634,6 +635,7 @@ class SurveyServiceTest extends IntegrationTest {
                 "ONBOARDING"));
   }
 
+  @Transactional
   @Test
   void 온보딩_설문을_제출한다() {
     // given
@@ -696,5 +698,6 @@ class SurveyServiceTest extends IntegrationTest {
             tuple(member.getId(), survey2.getId(), option2.getId(), submittedAt),
             tuple(member.getId(), survey3.getId(), option3.getId(), submittedAt),
             tuple(member.getId(), survey4.getId(), option4.getId(), submittedAt));
+    then(member).extracting("completedOnboardingAt").isEqualTo(submittedAt);
   }
 }
