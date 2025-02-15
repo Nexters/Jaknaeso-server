@@ -25,7 +25,7 @@ public record CharacterResponse(
     return new CharacterResponse(
         characterId,
         characterNo,
-        valueCharacter.getName(),
+        valueCharacter.getKeyword().name(),
         name,
         description,
         startDate.toString(),
