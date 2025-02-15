@@ -108,7 +108,8 @@ class CharacterServiceTest extends IntegrationTest {
         final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
         final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
         final CharacterType characterType =
-            characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명"));
+            characterTypeRepository.save(
+                new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
         final CharacterRecord characterRecord =
             characterRecordRepository.save(
                 CharacterRecord.builder()
@@ -156,7 +157,8 @@ class CharacterServiceTest extends IntegrationTest {
         final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
         final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
         final CharacterType characterType =
-            characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명"));
+            characterTypeRepository.save(
+                new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
         characterRecordRepository.save(
             CharacterRecord.builder()
                 .characterNo("첫번째")
@@ -202,7 +204,8 @@ class CharacterServiceTest extends IntegrationTest {
         final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
         final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
         final CharacterType characterType =
-            characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명"));
+            characterTypeRepository.save(
+                new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
         characterRecordRepository.save(
             CharacterRecord.builder()
                 .characterNo("첫번째")
@@ -276,7 +279,8 @@ class CharacterServiceTest extends IntegrationTest {
         final Map<Keyword, BigDecimal> weightMap = KeywordWeightMap.generate(metricsMap);
 
         final CharacterType characterType =
-            characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명"));
+            characterTypeRepository.save(
+                new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
         final CharacterRecord characterRecord =
             characterRecordRepository.save(
                 CharacterRecord.builder()

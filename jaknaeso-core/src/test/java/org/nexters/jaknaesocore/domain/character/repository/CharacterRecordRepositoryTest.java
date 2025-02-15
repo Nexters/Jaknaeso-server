@@ -11,6 +11,7 @@ import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
 import org.nexters.jaknaesocore.domain.character.model.CharacterType;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
+import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
@@ -39,9 +40,9 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
     final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
     final CharacterType characterType1 =
-        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명"));
+        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
     final CharacterType characterType2 =
-        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명"));
+        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
     final CharacterRecord characterRecord1 =
         CharacterRecord.builder()
             .characterNo("첫번째")
@@ -73,7 +74,7 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
     final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
     final CharacterType characterType =
-        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명"));
+        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
     final CharacterRecord characterRecord =
         sut.save(
             CharacterRecord.builder()
@@ -98,7 +99,7 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
     final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
     final CharacterType characterType =
-        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명"));
+        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
     sut.save(
         CharacterRecord.builder()
             .characterNo("첫번째")

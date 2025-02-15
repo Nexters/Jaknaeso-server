@@ -1,6 +1,8 @@
 package org.nexters.jaknaesocore.domain.character.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -18,12 +20,11 @@ public class CharacterType extends BaseEntity {
 
   private String description;
 
-  public CharacterType(final String name, final String description) {
+  @Enumerated(EnumType.STRING)
+  private Keyword keyword;
+
+  public CharacterType(final String name, final String description, final Keyword keyword) {
     this.name = name;
     this.description = description;
-  }
-
-  public Keyword toKeyword() {
-    return Keyword.valueOf(this.name);
   }
 }
