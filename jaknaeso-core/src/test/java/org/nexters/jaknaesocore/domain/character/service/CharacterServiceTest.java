@@ -126,7 +126,7 @@ class CharacterServiceTest extends IntegrationTest {
 
         then(actual)
             .extracting("characterNo", "characterType")
-            .containsExactly("첫번째", valueCharacter.getName());
+            .containsExactly("첫번째", valueCharacter.getKeyword().name());
       }
     }
   }
@@ -173,7 +173,7 @@ class CharacterServiceTest extends IntegrationTest {
 
         then(actual)
             .extracting("characterNo", "characterType")
-            .containsExactly("첫번째", valueCharacter.getName());
+            .containsExactly("첫번째", valueCharacter.getKeyword().name());
       }
     }
   }

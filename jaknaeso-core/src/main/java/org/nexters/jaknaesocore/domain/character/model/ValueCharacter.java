@@ -24,5 +24,6 @@ public class ValueCharacter extends BaseEntity {
   public ValueCharacter(final String name, final String description, final Keyword keyword) {
     this.name = name;
     this.description = description;
+    this.keyword = keyword;
   }
 }
