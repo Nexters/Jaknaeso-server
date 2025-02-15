@@ -2,7 +2,7 @@ package org.nexters.jaknaesocore.domain.character.service.dto;
 
 import java.time.LocalDate;
 import lombok.Builder;
-import org.nexters.jaknaesocore.domain.character.model.CharacterType;
+import org.nexters.jaknaesocore.domain.character.model.ValueCharacter;
 
 public record CharacterResponse(
     Long characterId,
@@ -17,7 +17,7 @@ public record CharacterResponse(
   public static CharacterResponse of(
       final Long characterId,
       final String characterNo,
-      final CharacterType characterType,
+      final ValueCharacter valueCharacter,
       final String name,
       final String description,
       final LocalDate startDate,
@@ -25,7 +25,7 @@ public record CharacterResponse(
     return new CharacterResponse(
         characterId,
         characterNo,
-        characterType.getName(),
+        valueCharacter.getName(),
         name,
         description,
         startDate.toString(),

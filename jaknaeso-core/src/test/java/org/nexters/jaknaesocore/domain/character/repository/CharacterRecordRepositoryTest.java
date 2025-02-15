@@ -8,7 +8,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
-import org.nexters.jaknaesocore.domain.character.model.CharacterType;
+import org.nexters.jaknaesocore.domain.character.model.ValueCharacter;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
@@ -27,7 +27,7 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
 
   @Autowired private CharacterRecordRepository sut;
 
-  @Autowired private CharacterTypeRepository characterTypeRepository;
+  @Autowired private ValueCharacterRepository valueCharacterRepository;
   @Autowired private CharacterValueReportRepository characterValueReportRepository;
   @Autowired private MemberRepository memberRepository;
   @Autowired private SurveyBundleRepository surveyBundleRepository;
@@ -39,14 +39,16 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
   void 회원의_현재_캐릭터를_조회한다() {
     final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-    final CharacterType characterType1 =
-        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
-    final CharacterType characterType2 =
-        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
+    final ValueCharacter valueCharacter1 =
+        valueCharacterRepository.save(
+            new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
+    final ValueCharacter valueCharacter2 =
+        valueCharacterRepository.save(
+            new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
     final CharacterRecord characterRecord1 =
         CharacterRecord.builder()
             .characterNo("첫번째")
-            .characterType(characterType1)
+            .valueCharacter(valueCharacter1)
             .startDate(LocalDate.now().minusDays(31))
             .endDate(LocalDate.now().minusDays(16))
             .member(member)
@@ -55,7 +57,7 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
     final CharacterRecord characterRecord2 =
         CharacterRecord.builder()
             .characterNo("두번째")
-            .characterType(characterType2)
+            .valueCharacter(valueCharacter2)
             .startDate(LocalDate.now().minusDays(15))
             .endDate(LocalDate.now())
             .member(member)
@@ -66,20 +68,23 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
     final CharacterRecord actual =
         sut.findTopByMemberIdAndDeletedAtIsNullWithMember(member.getId()).get();
 
-    then(actual).extracting("characterNo", "characterType").containsExactly("두번째", characterType2);
+    then(actual)
+        .extracting("characterNo", "valueCharacter")
+        .containsExactly("두번째", valueCharacter2);
   }
 
   @Test
   void 회원의_특정_캐릭터를_조회한다() {
     final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-    final CharacterType characterType =
-        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
+    final ValueCharacter valueCharacter =
+        valueCharacterRepository.save(
+            new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
     final CharacterRecord characterRecord =
         sut.save(
             CharacterRecord.builder()
                 .characterNo("첫번째")
-                .characterType(characterType)
+                .valueCharacter(valueCharacter)
                 .startDate(LocalDate.now().minusDays(31))
                 .endDate(LocalDate.now().minusDays(16))
                 .member(member)
@@ -90,7 +95,7 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
         sut.findByIdAndMemberIdAndDeletedAtIsNullWithMember(member.getId(), characterRecord.getId())
             .get();
 
-    then(actual).extracting("characterNo", "characterType").containsExactly("첫번째", characterType);
+    then(actual).extracting("characterNo", "valueCharacter").containsExactly("첫번째", valueCharacter);
   }
 
   @Transactional
@@ -98,12 +103,13 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
   void 회원의_캐릭터를_설문_번들과_함께_조회한다() {
     final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-    final CharacterType characterType =
-        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
+    final ValueCharacter valueCharacter =
+        valueCharacterRepository.save(
+            new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
     sut.save(
         CharacterRecord.builder()
             .characterNo("첫번째")
-            .characterType(characterType)
+            .valueCharacter(valueCharacter)
             .startDate(LocalDate.now().minusDays(15))
             .endDate(LocalDate.now())
             .member(member)

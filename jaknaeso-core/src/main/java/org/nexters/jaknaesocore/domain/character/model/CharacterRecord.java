@@ -23,8 +23,8 @@ public class CharacterRecord extends BaseTimeEntity {
   private String characterNo;
 
   @ManyToOne
-  @JoinColumn(name = "character_type_id")
-  private CharacterType characterType;
+  @JoinColumn(name = "value_character_id")
+  private ValueCharacter valueCharacter;
 
   private LocalDate startDate;
 
@@ -44,13 +44,13 @@ public class CharacterRecord extends BaseTimeEntity {
   @Builder
   private CharacterRecord(
       final String characterNo,
-      final CharacterType characterType,
+      final ValueCharacter valueCharacter,
       final LocalDate startDate,
       final LocalDate endDate,
       final Member member,
       final SurveyBundle surveyBundle) {
     this.characterNo = characterNo;
-    this.characterType = characterType;
+    this.valueCharacter = valueCharacter;
     this.startDate = startDate;
     this.endDate = endDate;
     this.member = member;
