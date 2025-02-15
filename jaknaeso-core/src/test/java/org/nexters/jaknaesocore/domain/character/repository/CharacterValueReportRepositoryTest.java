@@ -14,7 +14,7 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
-import org.nexters.jaknaesocore.domain.character.model.Character;
+import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
 import org.nexters.jaknaesocore.domain.character.model.CharacterType;
 import org.nexters.jaknaesocore.domain.character.model.CharacterValueReport;
 import org.nexters.jaknaesocore.domain.character.model.ValueReports;
@@ -40,7 +40,8 @@ class CharacterValueReportRepositoryTest extends IntegrationTest {
 
   @Autowired private CharacterValueReportRepository sut;
 
-  @Autowired private CharacterRepository characterRepository;
+  @Autowired private CharacterTypeRepository characterTypeRepository;
+  @Autowired private CharacterRecordRepository characterRecordRepository;
   @Autowired private MemberRepository memberRepository;
   @Autowired private SurveyBundleRepository surveyBundleRepository;
   @Autowired private SurveyRepository surveyRepository;
@@ -50,7 +51,8 @@ class CharacterValueReportRepositoryTest extends IntegrationTest {
   @AfterEach
   void tearDown() {
     sut.deleteAllInBatch();
-    characterRepository.deleteAllInBatch();
+    characterRecordRepository.deleteAllInBatch();
+    characterTypeRepository.deleteAllInBatch();
     surveySubmissionRepository.deleteAllInBatch();
     surveyOptionRepository.deleteAllInBatch();
     surveyRepository.deleteAllInBatch();
@@ -137,11 +139,13 @@ class CharacterValueReportRepositoryTest extends IntegrationTest {
     final Map<Keyword, KeywordMetrics> metricsMap = KeywordMetricsMap.generate(scores);
     final Map<Keyword, BigDecimal> weightMap = KeywordWeightMap.generate(metricsMap);
 
-    final Character character =
-        characterRepository.save(
-            Character.builder()
+    final CharacterType characterType =
+        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
+    final CharacterRecord characterRecord =
+        characterRecordRepository.save(
+            CharacterRecord.builder()
                 .characterNo("첫번째")
-                .characterType(CharacterType.SUCCESS)
+                .characterType(characterType)
                 .startDate(LocalDate.now().minusDays(15))
                 .endDate(LocalDate.now())
                 .member(member)
@@ -149,10 +153,10 @@ class CharacterValueReportRepositoryTest extends IntegrationTest {
                 .build());
     final CharacterValueReport report =
         new CharacterValueReport(
-            character, ValueReports.of(weightMap, metricsMap, submissions).getReports());
+            characterRecord, ValueReports.of(weightMap, metricsMap, submissions).getReports());
 
     final CharacterValueReport actual =
-        sut.findByCharacterIdAndDeletedAtIsNullWithCharacterAndValueReports(character.getId())
+        sut.findByCharacterIdAndDeletedAtIsNullWithCharacterAndValueReports(characterRecord.getId())
             .get();
 
     then(actual)
