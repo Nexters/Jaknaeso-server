@@ -1,10 +1,10 @@
 package org.nexters.jaknaesocore.domain.survey.model;
 
+import static org.assertj.core.api.BDDAssertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import org.assertj.core.api.BDDAssertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ class SurveySubmissionTest {
         boolean result = surveySubmission.isSubmittedByDate(date);
 
         // then
-        BDDAssertions.then(result).isTrue();
+        then(result).isTrue();
       }
     }
 
@@ -48,8 +48,23 @@ class SurveySubmissionTest {
         boolean result = surveySubmission.isSubmittedByDate(date);
 
         // then
-        BDDAssertions.then(result).isFalse();
+        then(result).isFalse();
       }
     }
+  }
+
+  @Test
+  void 제출한_설문이_온보딩_설문인지_확인한다() {
+    // given
+    SurveySubmission submission =
+        SurveySubmission.builder()
+            .survey(
+                new OnboardingSurvey(
+                    "즐길 수 있는 모든 기회를 찾는다. 자신에게 즐거움을 주는 일이 중요하다.", new SurveyBundle()))
+            .build();
+    // when
+    boolean result = submission.isOnboardingSurvey();
+    // then
+    then(result).isTrue();
   }
 }

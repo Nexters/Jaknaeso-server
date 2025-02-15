@@ -62,7 +62,7 @@ public class SurveyService {
   }
 
   private SurveyHistoryResponse classifySubmission(SurveySubmission latestSubmission) {
-    // TODO: null 일 경우 온보딩 작업 완료되면 주석 해제
+    // TODO: null 일 경우 온보딩 작업 완료되면 삭제
     if (latestSubmission == null) {
       return SurveyHistoryResponse.createInitialBundleSurveyHistory();
     }
@@ -70,11 +70,13 @@ public class SurveyService {
     List<SurveySubmission> submissions =
         findSubmissionsForBundle(latestSubmission.getMember().getId(), bundle.getId());
 
+    if (latestSubmission.isOnboardingSurvey()) {
+      return getNextBundleHistory(submissions);
+    }
     boolean isCompleted = latestSubmission.isSubmittedByDate(LocalDate.now());
     if (isCompleted) {
       return createCurrentBundleSurveyHistory(bundle.getId(), submissions, isCompleted);
     }
-
     if (bundle.isAllSubmitted(submissions)) {
       return getNextBundleHistory(submissions);
     }
