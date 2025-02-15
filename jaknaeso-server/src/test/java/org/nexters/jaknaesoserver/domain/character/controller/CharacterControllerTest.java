@@ -71,7 +71,7 @@ class CharacterControllerTest extends ControllerTest {
                                 .type(SimpleType.STRING)
                                 .description("API 요청 결과 (성공/실패)"),
                             fieldWithPath("data.characters[].characterNo")
-                                .type(SimpleType.NUMBER)
+                                .type(SimpleType.STRING)
                                 .description("캐릭터 회차"),
                             fieldWithPath("data.characters[].characterId")
                                 .type(SimpleType.NUMBER)
@@ -92,6 +92,7 @@ class CharacterControllerTest extends ControllerTest {
     given(characterService.getCharacter(new CharacterCommand(1L, 1L)))
         .willReturn(
             CharacterResponse.builder()
+                .characterId(1L)
                 .characterNo("첫번째")
                 .characterType(characterType)
                 .name(characterType.getName())
@@ -127,8 +128,11 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
                                 .description("API 요청 결과 (성공/실패)"),
-                            fieldWithPath("data.characterNo")
+                            fieldWithPath("data.characterId")
                                 .type(SimpleType.NUMBER)
+                                .description("캐릭터 아이디"),
+                            fieldWithPath("data.characterNo")
+                                .type(SimpleType.STRING)
                                 .description("캐릭터 회차"),
                             fieldWithPath("data.characterType").description("캐릭터 타입"),
                             fieldWithPath("data.name")
@@ -156,6 +160,7 @@ class CharacterControllerTest extends ControllerTest {
     given(characterService.getCurrentCharacter(1L))
         .willReturn(
             CharacterResponse.builder()
+                .characterId(1L)
                 .characterNo("첫번째")
                 .characterType(characterType)
                 .name(characterType.getName())
@@ -187,8 +192,11 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
                                 .description("API 요청 결과 (성공/실패)"),
-                            fieldWithPath("data.characterNo")
+                            fieldWithPath("data.characterId")
                                 .type(SimpleType.NUMBER)
+                                .description("캐릭터 아이디"),
+                            fieldWithPath("data.characterNo")
+                                .type(SimpleType.STRING)
                                 .description("캐릭터 회차"),
                             fieldWithPath("data.characterType").description("캐릭터 타입"),
                             fieldWithPath("data.name")

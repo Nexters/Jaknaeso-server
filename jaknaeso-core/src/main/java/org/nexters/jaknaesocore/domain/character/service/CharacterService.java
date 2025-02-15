@@ -31,6 +31,7 @@ public class CharacterService {
         .map(
             it ->
                 CharacterResponse.builder()
+                    .characterId(it.getId())
                     .characterNo(it.getCharacterNo())
                     .characterType(it.getCharacterType())
                     .name(it.getCharacterType().getName())
@@ -48,6 +49,7 @@ public class CharacterService {
         .map(
             it ->
                 CharacterResponse.builder()
+                    .characterId(it.getId())
                     .characterNo(it.getCharacterNo())
                     .characterType(it.getCharacterType())
                     .name(it.getCharacterType().getName())
