@@ -1,22 +1,31 @@
 package org.nexters.jaknaesocore.domain.character.repository;
 
+import static org.assertj.core.api.BDDAssertions.then;
 import static org.nexters.jaknaesocore.domain.survey.model.Keyword.BENEVOLENCE;
 import static org.nexters.jaknaesocore.domain.survey.model.Keyword.SELF_DIRECTION;
 import static org.nexters.jaknaesocore.domain.survey.model.Keyword.STABILITY;
 import static org.nexters.jaknaesocore.domain.survey.model.Keyword.SUCCESS;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
+import org.nexters.jaknaesocore.domain.character.model.Character;
+import org.nexters.jaknaesocore.domain.character.model.CharacterType;
+import org.nexters.jaknaesocore.domain.character.model.CharacterValueReport;
+import org.nexters.jaknaesocore.domain.character.model.ValueReports;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordMetrics;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordMetricsMap;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordWeightMap;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
@@ -118,37 +127,37 @@ class CharacterValueReportRepositoryTest extends IntegrationTest {
     weights.put(SUCCESS, BigDecimal.valueOf(25));
     weights.put(BENEVOLENCE, BigDecimal.valueOf(5));
 
-    //    final List<KeywordScore> scores =
-    //        List.of(
-    //
-    // KeywordScore.builder().keyword(SELF_DIRECTION).score(BigDecimal.valueOf(1)).build(),
-    //            KeywordScore.builder().keyword(STABILITY).score(BigDecimal.valueOf(1)).build(),
-    //            KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.valueOf(1)).build(),
-    //            KeywordScore.builder().keyword(BENEVOLENCE).score(BigDecimal.valueOf(1)).build());
-    //    final KeywordStatistics statistics = new KeywordStatistics(scores);
-    //    final Map<Keyword, KeywordMetrics> metrics = statistics.getMetrics();
-    //
-    //    final Character character =
-    //        characterRepository.save(
-    //            Character.builder()
-    //                .characterNo("첫번째")
-    //                .characterType(CharacterType.SUCCESS)
-    //                .startDate(LocalDate.now().minusDays(15))
-    //                .endDate(LocalDate.now())
-    //                .member(member)
-    //                .surveyBundle(bundle)
-    //                .build());
-    //    final CharacterValueReport report =
-    //        new CharacterValueReport(
-    //            character, ValueReports.of(weights, metrics, submissions).getReports());
-    //
-    //    final CharacterValueReport actual =
-    //        sut.findByCharacterIdAndDeletedAtIsNullWithCharacterAndValueReports(character.getId())
-    //            .get();
-    //
-    //    then(actual)
-    //        .extracting("valueReports")
-    //        .usingRecursiveComparison()
-    //        .isEqualTo(ValueReports.of(weights, metrics, submissions).getReports());
+    final List<KeywordScore> scores =
+        List.of(
+            KeywordScore.builder().keyword(SELF_DIRECTION).score(BigDecimal.valueOf(1)).build(),
+            KeywordScore.builder().keyword(STABILITY).score(BigDecimal.valueOf(1)).build(),
+            KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.valueOf(1)).build(),
+            KeywordScore.builder().keyword(BENEVOLENCE).score(BigDecimal.valueOf(1)).build());
+
+    final Map<Keyword, KeywordMetrics> metricsMap = KeywordMetricsMap.generate(scores);
+    final Map<Keyword, BigDecimal> weightMap = KeywordWeightMap.generate(metricsMap);
+
+    final Character character =
+        characterRepository.save(
+            Character.builder()
+                .characterNo("첫번째")
+                .characterType(CharacterType.SUCCESS)
+                .startDate(LocalDate.now().minusDays(15))
+                .endDate(LocalDate.now())
+                .member(member)
+                .surveyBundle(bundle)
+                .build());
+    final CharacterValueReport report =
+        new CharacterValueReport(
+            character, ValueReports.of(weightMap, metricsMap, submissions).getReports());
+
+    final CharacterValueReport actual =
+        sut.findByCharacterIdAndDeletedAtIsNullWithCharacterAndValueReports(character.getId())
+            .get();
+
+    then(actual)
+        .extracting("valueReports")
+        .usingRecursiveComparison()
+        .isEqualTo(ValueReports.of(weightMap, metricsMap, submissions).getReports());
   }
 }
