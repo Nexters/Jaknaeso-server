@@ -5,6 +5,7 @@ import lombok.Builder;
 import org.nexters.jaknaesocore.domain.character.model.CharacterType;
 
 public record CharacterResponse(
+    Long characterId,
     String characterNo,
     String characterType,
     String name,
@@ -14,6 +15,7 @@ public record CharacterResponse(
 
   @Builder
   public static CharacterResponse of(
+      final Long characterId,
       final String characterNo,
       final CharacterType characterType,
       final String name,
@@ -21,6 +23,7 @@ public record CharacterResponse(
       final LocalDate startDate,
       final LocalDate endDate) {
     return new CharacterResponse(
+        characterId,
         characterNo,
         characterType.getName(),
         name,
