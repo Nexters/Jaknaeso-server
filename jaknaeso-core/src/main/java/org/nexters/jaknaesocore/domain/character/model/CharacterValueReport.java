@@ -18,7 +18,7 @@ import org.nexters.jaknaesocore.common.model.BaseTimeEntity;
 public class CharacterValueReport extends BaseTimeEntity {
 
   @OneToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "character_id")
+  @JoinColumn(name = "character_record_id")
   private CharacterRecord characterRecord;
 
   // TODO: 추후 대체

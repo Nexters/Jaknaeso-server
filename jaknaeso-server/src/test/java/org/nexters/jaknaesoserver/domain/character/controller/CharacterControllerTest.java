@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
-import org.nexters.jaknaesocore.domain.character.model.CharacterType;
+import org.nexters.jaknaesocore.domain.character.model.ValueCharacter;
 import org.nexters.jaknaesocore.domain.character.model.ValueReport;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
@@ -88,15 +88,15 @@ class CharacterControllerTest extends ControllerTest {
   @Test
   void 특정_캐릭터_정보를_조회한다() throws Exception {
 
-    CharacterType characterType = new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS);
+    ValueCharacter valueCharacter = new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS);
     given(characterService.getCharacter(new CharacterCommand(1L, 1L)))
         .willReturn(
             CharacterResponse.builder()
                 .characterId(1L)
                 .characterNo("첫번째")
-                .characterType(characterType)
-                .name(characterType.getName())
-                .description(characterType.getDescription())
+                .valueCharacter(valueCharacter)
+                .name(valueCharacter.getName())
+                .description(valueCharacter.getDescription())
                 .startDate(LocalDate.now().minusDays(15))
                 .endDate(LocalDate.now())
                 .build());
@@ -156,15 +156,15 @@ class CharacterControllerTest extends ControllerTest {
   @Test
   void 현재_캐릭터_정보를_조회한다() throws Exception {
 
-    CharacterType characterType = new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS);
+    ValueCharacter valueCharacter = new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS);
     given(characterService.getCurrentCharacter(1L))
         .willReturn(
             CharacterResponse.builder()
                 .characterId(1L)
                 .characterNo("첫번째")
-                .characterType(characterType)
-                .name(characterType.getName())
-                .description(characterType.getDescription())
+                .valueCharacter(valueCharacter)
+                .name(valueCharacter.getName())
+                .description(valueCharacter.getDescription())
                 .startDate(LocalDate.now().minusDays(15))
                 .endDate(LocalDate.now())
                 .build());

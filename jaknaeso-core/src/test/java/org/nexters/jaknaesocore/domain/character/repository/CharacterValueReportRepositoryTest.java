@@ -15,8 +15,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
-import org.nexters.jaknaesocore.domain.character.model.CharacterType;
 import org.nexters.jaknaesocore.domain.character.model.CharacterValueReport;
+import org.nexters.jaknaesocore.domain.character.model.ValueCharacter;
 import org.nexters.jaknaesocore.domain.character.model.ValueReports;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
@@ -40,7 +40,7 @@ class CharacterValueReportRepositoryTest extends IntegrationTest {
 
   @Autowired private CharacterValueReportRepository sut;
 
-  @Autowired private CharacterTypeRepository characterTypeRepository;
+  @Autowired private ValueCharacterRepository valueCharacterRepository;
   @Autowired private CharacterRecordRepository characterRecordRepository;
   @Autowired private MemberRepository memberRepository;
   @Autowired private SurveyBundleRepository surveyBundleRepository;
@@ -52,7 +52,7 @@ class CharacterValueReportRepositoryTest extends IntegrationTest {
   void tearDown() {
     sut.deleteAllInBatch();
     characterRecordRepository.deleteAllInBatch();
-    characterTypeRepository.deleteAllInBatch();
+    valueCharacterRepository.deleteAllInBatch();
     surveySubmissionRepository.deleteAllInBatch();
     surveyOptionRepository.deleteAllInBatch();
     surveyRepository.deleteAllInBatch();
@@ -139,13 +139,14 @@ class CharacterValueReportRepositoryTest extends IntegrationTest {
     final Map<Keyword, KeywordMetrics> metricsMap = KeywordMetricsMap.generate(scores);
     final Map<Keyword, BigDecimal> weightMap = KeywordWeightMap.generate(metricsMap);
 
-    final CharacterType characterType =
-        characterTypeRepository.save(new CharacterType("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
+    final ValueCharacter valueCharacter =
+        valueCharacterRepository.save(
+            new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
     final CharacterRecord characterRecord =
         characterRecordRepository.save(
             CharacterRecord.builder()
                 .characterNo("첫번째")
-                .characterType(characterType)
+                .valueCharacter(valueCharacter)
                 .startDate(LocalDate.now().minusDays(15))
                 .endDate(LocalDate.now())
                 .member(member)

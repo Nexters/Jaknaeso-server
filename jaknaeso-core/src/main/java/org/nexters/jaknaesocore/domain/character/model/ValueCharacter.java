@@ -13,7 +13,7 @@ import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
-public class CharacterType extends BaseEntity {
+public class ValueCharacter extends BaseEntity {
 
   private String name;
 
@@ -22,7 +22,7 @@ public class CharacterType extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private Keyword keyword;
 
-  public CharacterType(final String name, final String description, final Keyword keyword) {
+  public ValueCharacter(final String name, final String description, final Keyword keyword) {
     this.name = name;
     this.description = description;
   }
@@ -35,7 +35,7 @@ public class CharacterType extends BaseEntity {
     if (o == null) {
       return false;
     }
-    CharacterType that = (CharacterType) o;
+    ValueCharacter that = (ValueCharacter) o;
     return getId() != null && Objects.equals(getId(), that.getId());
   }
 }
