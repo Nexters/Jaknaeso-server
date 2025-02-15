@@ -16,6 +16,19 @@ class MemberTest {
     // when
     member.completeOnboarding(completedOnboardingAt);
     // then
-    then(member).extracting("onboardingAt").isEqualTo(LocalDateTime.of(2025, 2, 15, 20, 0));
+    then(member)
+        .extracting("completedOnboardingAt")
+        .isEqualTo(LocalDateTime.of(2025, 2, 15, 20, 0));
+  }
+
+  @Test
+  void 온보딩을_완료했는지_확인한다() {
+    // given
+    LocalDateTime completedOnboardingAt = LocalDateTime.of(2025, 2, 15, 20, 0);
+    Member member = Member.create("나민혁", "nmh9097@gmail.com");
+    // when
+    boolean sut = member.isCompletedOnboarding();
+    // then
+    then(sut).isFalse();
   }
 }

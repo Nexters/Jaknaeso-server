@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +27,7 @@ import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccountFixture;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialProvider;
 import org.nexters.jaknaesocore.domain.socialaccount.repository.SocialAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.util.ReflectionTestUtils;
 
 class OauthServiceIntegrationTest extends IntegrationTest {
 
@@ -159,6 +162,27 @@ class OauthServiceIntegrationTest extends IntegrationTest {
             () -> then(memberRepository.findAll()).hasSize(1),
             () -> then(socialAccountRepository.findAll()).hasSize(1));
       }
+
+      @DisplayName("온보딩을 완료한 사용자가 로그인한다")
+      @Test
+      void completedOnboardingMemberSignIn() {
+        // given
+        Member member = Member.create("홍길동", "test@example.com");
+        LocalDateTime completedOnboardingAt = LocalDateTime.of(2025, 2, 15, 20, 0);
+        ReflectionTestUtils.setField(member, "completedOnboardingAt", completedOnboardingAt);
+        memberRepository.save(member);
+        final String oauthId = "1";
+        socialAccountRepository.save(createSocialAccount(member, oauthId, SocialProvider.KAKAO));
+
+        // when
+        sut.kakaoLogin(createKakaoLoginCommand("카카오 인가 코드", "카카오 로그인 리다이렉트 URI"));
+        // then
+        List<Member> members = memberRepository.findAll();
+        then(members)
+            .hasSize(1)
+            .extracting("completedOnboardingAt")
+            .contains(LocalDateTime.of(2025, 2, 15, 20, 0));
+      }
     }
   }
 
@@ -211,6 +235,27 @@ class OauthServiceIntegrationTest extends IntegrationTest {
         assertAll(
             () -> then(memberRepository.findAll()).hasSize(1),
             () -> then(socialAccountRepository.findAll()).hasSize(1));
+      }
+
+      @DisplayName("온보딩을 완료한 사용자가 로그인한다")
+      @Test
+      void completedOnboardingMemberSignIn() {
+        // given
+        Member member = Member.create("홍길동", "test@example.com");
+        LocalDateTime completedOnboardingAt = LocalDateTime.of(2025, 2, 15, 20, 0);
+        ReflectionTestUtils.setField(member, "completedOnboardingAt", completedOnboardingAt);
+        memberRepository.save(member);
+        final String oauthId = "1";
+        socialAccountRepository.save(createSocialAccount(member, oauthId, SocialProvider.KAKAO));
+
+        // when
+        sut.kakaoLoginWithToken(createKakaoLoginWithTokenCommand("access token"));
+        // then
+        List<Member> members = memberRepository.findAll();
+        then(members)
+            .hasSize(1)
+            .extracting("completedOnboardingAt")
+            .contains(LocalDateTime.of(2025, 2, 15, 20, 0));
       }
     }
   }

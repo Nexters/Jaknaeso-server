@@ -50,4 +50,8 @@ public class Member extends BaseTimeEntity {
   public void completeOnboarding(LocalDateTime onboardingAt) {
     this.completedOnboardingAt = onboardingAt;
   }
+
+  public boolean isCompletedOnboarding() {
+    return this.completedOnboardingAt != null;
+  }
 }
