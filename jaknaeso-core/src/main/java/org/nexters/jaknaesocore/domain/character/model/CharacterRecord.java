@@ -39,27 +39,40 @@ public class CharacterRecord extends BaseTimeEntity {
   @JoinColumn(name = "bundle_id")
   private SurveyBundle surveyBundle;
 
-  @OneToMany(mappedBy = "characterRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "characterRecord", cascade = CascadeType.PERSIST, orphanRemoval = true)
   private List<ValueReport> valueReports;
 
-  @Builder
   private CharacterRecord(
       final String characterNo,
       final ValueCharacter valueCharacter,
       final LocalDate startDate,
       final LocalDate endDate,
       final Member member,
-      final SurveyBundle surveyBundle) {
+      final SurveyBundle surveyBundle,
+      final List<ValueReport> valueReports) {
     this.characterNo = characterNo;
     this.valueCharacter = valueCharacter;
     this.startDate = startDate;
     this.endDate = endDate;
     this.member = member;
     this.surveyBundle = surveyBundle;
+
+    if (valueReports != null) {
+      this.valueReports = valueReports;
+      this.valueReports.forEach(it -> it.updateCharacterRecord(this));
+    }
   }
 
-  public void updateValueReports(final List<ValueReport> valueReports) {
-    valueReports.forEach(it -> it.updateCharacterRecord(this));
-    this.valueReports = valueReports;
+  @Builder
+  public static CharacterRecord of(
+      final String characterNo,
+      final ValueCharacter valueCharacter,
+      final LocalDate startDate,
+      final LocalDate endDate,
+      final Member member,
+      final SurveyBundle surveyBundle,
+      final List<ValueReport> valueReports) {
+    return new CharacterRecord(
+        characterNo, valueCharacter, startDate, endDate, member, surveyBundle, valueReports);
   }
 }
