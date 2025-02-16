@@ -200,7 +200,7 @@ class CharacterServiceTest extends IntegrationTest {
       @DisplayName("회원의 캐릭터 리스트를 반환한다.")
       void shouldReturnCharacters() {
         final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
-        final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+        final SurveyBundle completeBundle = surveyBundleRepository.save(new SurveyBundle());
         final ValueCharacter valueCharacter =
             valueCharacterRepository.save(new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", SUCCESS));
         characterRecordRepository.save(
@@ -210,17 +210,46 @@ class CharacterServiceTest extends IntegrationTest {
                 .startDate(LocalDate.now().minusDays(15))
                 .endDate(LocalDate.now())
                 .member(member)
-                .surveyBundle(bundle)
+                .surveyBundle(completeBundle)
+                .build());
+
+        final SurveyBundle incompleteBundle = surveyBundleRepository.save(new SurveyBundle());
+        final BalanceSurvey survey =
+            surveyRepository.save(
+                new BalanceSurvey(
+                    "꿈에 그리던 드림 기업에 입사했다. 연봉도 좋지만, 무엇보다 회사의 근무 방식이 나와 잘 맞는 것 같다. 우리 회사의 근무 방식은...",
+                    incompleteBundle));
+        final SurveyOption option =
+            surveyOptionRepository.save(
+                SurveyOption.builder()
+                    .survey(survey)
+                    .content("자율 출퇴근제로 원하는 시간에 근무하며 창의적인 성과 내기")
+                    .scores(
+                        List.of(
+                            KeywordScore.builder()
+                                .keyword(SELF_DIRECTION)
+                                .score(BigDecimal.ONE)
+                                .build()))
+                    .build());
+        surveySubmissionRepository.save(
+            SurveySubmission.builder()
+                .survey(survey)
+                .member(member)
+                .selectedOption(option)
                 .build());
 
         final CharactersResponse actual = sut.getCharacters(member.getId());
 
         assertAll(
-            () -> then(actual.characters()).hasSize(1),
+            () -> then(actual.characters()).hasSize(2),
             () ->
                 then(actual.characters().get(0))
                     .extracting("characterNo", "bundleId")
-                    .containsExactly("첫번째", bundle.getId()));
+                    .containsExactly("첫번째", completeBundle.getId()),
+            () ->
+                then(actual.characters().get(1))
+                    .extracting("characterNo", "bundleId")
+                    .containsExactly("TODO", incompleteBundle.getId())); // 추후 같이 수정
       }
     }
   }
