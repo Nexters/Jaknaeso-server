@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
+import org.nexters.jaknaesocore.domain.character.model.CharacterRecords;
 import org.nexters.jaknaesocore.domain.character.model.Characters;
 import org.nexters.jaknaesocore.domain.character.model.ValueCharacter;
 import org.nexters.jaknaesocore.domain.character.repository.CharacterRecordRepository;
@@ -17,9 +18,10 @@ import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse;
-import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse.SimpleCharacterResponse;
+import org.nexters.jaknaesocore.domain.character.service.dto.SimpleCharacterResponses;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
+import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
 import org.nexters.jaknaesocore.domain.survey.service.event.CreateCharacterEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ public class CharacterService {
   private final MemberRepository memberRepository;
   private final CharacterRecordRepository characterRecordRepository;
   private final ValueCharacterRepository valueCharacterRepository;
+  private final SurveySubmissionRepository surveySubmissionRepository;
 
   private Map<Keyword, ValueCharacter> valueCharacters;
 
@@ -85,19 +88,25 @@ public class CharacterService {
   public CharactersResponse getCharacters(final Long memberId) {
     memberRepository.findMember(memberId);
 
-    final List<SimpleCharacterResponse> characters =
-        characterRecordRepository
-            .findByMemberIdAndDeletedAtIsNullWithMemberAndSurveyBundle(memberId)
-            .stream()
-            .map(
-                it ->
-                    SimpleCharacterResponse.builder()
-                        .characterNo(it.getCharacterNo())
-                        .characterId(it.getId())
-                        .bundleId(it.getSurveyBundle().getId())
-                        .build())
-            .toList();
-    return new CharactersResponse(characters);
+    final List<CharacterRecord> records =
+        characterRecordRepository.findByMemberIdAndDeletedAtIsNullWithMemberAndSurveyBundle(
+            memberId);
+    final CharacterRecords characterRecords = new CharacterRecords(records);
+    final Long bundleId = getLatestBundleId(memberId);
+
+    final SimpleCharacterResponses responses = new SimpleCharacterResponses();
+    records.forEach(responses::addCompleteResponse);
+    if (characterRecords.isIncompleteCharacter(bundleId)) {
+      responses.addIncompleteResponse(bundleId);
+    }
+    return new CharactersResponse(responses.getResponses());
+  }
+
+  private Long getLatestBundleId(final Long memberId) {
+    return surveySubmissionRepository
+        .findTopByMember_IdAndDeletedAtIsNullOrderByCreatedAtDesc(memberId)
+        .map(it -> it.getSurvey().getSurveyBundle().getId())
+        .orElse(null);
   }
 
   @Transactional(readOnly = true)
