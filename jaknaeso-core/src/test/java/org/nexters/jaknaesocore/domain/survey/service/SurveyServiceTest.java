@@ -1,27 +1,52 @@
 package org.nexters.jaknaesocore.domain.survey.service;
 
-import static org.assertj.core.api.BDDAssertions.*;
+import static org.assertj.core.api.BDDAssertions.then;
+import static org.assertj.core.api.BDDAssertions.thenThrownBy;
+import static org.assertj.core.api.BDDAssertions.tuple;
+import static org.mockito.BDDMockito.any;
+import static org.mockito.BDDMockito.never;
+import static org.mockito.BDDMockito.verify;
+import static org.nexters.jaknaesocore.domain.survey.model.Keyword.SELF_DIRECTION;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
+import org.nexters.jaknaesocore.domain.character.repository.CharacterRecordRepository;
+import org.nexters.jaknaesocore.domain.character.repository.ValueReportRepository;
+import org.nexters.jaknaesocore.domain.character.service.CharacterService;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
-import org.nexters.jaknaesocore.domain.survey.dto.*;
-import org.nexters.jaknaesocore.domain.survey.model.*;
+import org.nexters.jaknaesocore.domain.survey.dto.OnboardingSubmissionResult;
+import org.nexters.jaknaesocore.domain.survey.dto.OnboardingSubmissionsCommand;
+import org.nexters.jaknaesocore.domain.survey.dto.OnboardingSurveyResponse;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveyHistoryResponse;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionCommand;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionHistoryCommand;
+import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionHistoryResponse;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
+import org.nexters.jaknaesocore.domain.survey.model.MultipleChoiceSurvey;
+import org.nexters.jaknaesocore.domain.survey.model.OnboardingSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
+import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
+import org.nexters.jaknaesocore.domain.survey.service.event.CreateCharacterEvent;
+import org.nexters.jaknaesocore.domain.survey.service.event.CreateCharacterEvent;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
 
 class SurveyServiceTest extends IntegrationTest {
@@ -33,9 +58,15 @@ class SurveyServiceTest extends IntegrationTest {
   @Autowired private SurveyBundleRepository surveyBundleRepository;
   @Autowired private SurveyRepository surveyRepository;
   @Autowired private SurveyOptionRepository surveyOptionRepository;
+  @Autowired private CharacterRecordRepository characterRecordRepository;
+  @Autowired private ValueReportRepository valueReportRepository;
+
+  @MockitoSpyBean private CharacterService characterService;
 
   @AfterEach
   void tearDown() {
+    valueReportRepository.deleteAllInBatch();
+    characterRecordRepository.deleteAllInBatch();
     surveySubmissionRepository.deleteAllInBatch();
     surveyOptionRepository.deleteAllInBatch();
     surveyRepository.deleteAllInBatch();
@@ -75,109 +106,6 @@ class SurveyServiceTest extends IntegrationTest {
     then(survey.options())
         .extracting("id", "optionContents")
         .containsExactly(tuple(option.getId(), "질문 옵션 내용"));
-  }
-
-  @DisplayName("submitSurvey 메서드는")
-  @Nested
-  class submitSurvey {
-
-    @DisplayName("회원이 존재하지 않으면")
-    @Nested
-    class whenMemberNotFound {
-      @Test
-      @DisplayName("예외를 발생시킨다")
-      void throwMemberNotFoundException() {
-        // given
-        Member member = Member.create("나민혁", "test@test.com");
-        memberRepository.save(member);
-        SurveyBundle surveyBundle = new SurveyBundle();
-        surveyBundleRepository.save(surveyBundle);
-        BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
-        surveyRepository.save(balanceSurvey);
-        List<KeywordScore> scores =
-            List.of(
-                KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
-                KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
-        SurveyOption option =
-            SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
-        surveyOptionRepository.save(option);
-
-        SurveySubmissionCommand command =
-            new SurveySubmissionCommand(option.getId(), balanceSurvey.getId(), 0L, "나는 행복한게 좋으니까");
-
-        // when
-        // then
-        thenThrownBy(() -> surveyService.submitSurvey(command, LocalDateTime.now()))
-            .isEqualTo(CustomException.MEMBER_NOT_FOUND);
-      }
-    }
-
-    @DisplayName("설문을 저장한다")
-    @Nested
-    class shouldSubmitted {
-      @Test
-      void 설문에_응답을_제출한다() {
-        // given
-        Member member = Member.create("나민혁", "test@test.com");
-        memberRepository.save(member);
-        SurveyBundle surveyBundle = new SurveyBundle();
-        surveyBundleRepository.save(surveyBundle);
-        BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
-        surveyRepository.save(balanceSurvey);
-        List<KeywordScore> scores =
-            List.of(
-                KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
-                KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
-        SurveyOption option =
-            SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
-        surveyOptionRepository.save(option);
-
-        SurveySubmissionCommand command =
-            new SurveySubmissionCommand(
-                option.getId(), balanceSurvey.getId(), member.getId(), "나는 행복한게 좋으니까");
-
-        // when
-        LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 13, 18, 0, 0);
-        surveyService.submitSurvey(command, submittedAt);
-        // then
-        List<SurveySubmission> submissions = surveySubmissionRepository.findAll();
-        then(submissions).hasSize(1);
-        then(submissions.getFirst())
-            .extracting("member.id", "survey.id", "selectedOption.id", "retrospective")
-            .containsExactly(member.getId(), balanceSurvey.getId(), option.getId(), "나는 행복한게 좋으니까");
-      }
-    }
-
-    @DisplayName("설문이 존재하지 않으면")
-    @Nested
-    class whenSurveyNotFound {
-      @Test
-      @DisplayName("예외를 발생시킨다")
-      void throwSurveyNotFoundException() {
-        // given
-        Member member = Member.create("나민혁", "test@test.com");
-        memberRepository.save(member);
-        SurveyBundle surveyBundle = new SurveyBundle();
-        surveyBundleRepository.save(surveyBundle);
-        BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
-        surveyRepository.save(balanceSurvey);
-        List<KeywordScore> scores =
-            List.of(
-                KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
-                KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
-        SurveyOption option =
-            SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
-        surveyOptionRepository.save(option);
-
-        SurveySubmissionCommand command =
-            new SurveySubmissionCommand(0L, member.getId(), option.getId(), "나는 행복한게 좋으니까");
-
-        // when
-        // then
-        thenThrownBy(() -> surveyService.submitSurvey(command, LocalDateTime.now()))
-            .isEqualTo(CustomException.SURVEY_NOT_FOUND);
-      }
-    }
   }
 
   @Disabled("클라이언트의 온보딩 작업이 완료되면 테스트를 진행합니다.")
@@ -699,6 +627,216 @@ class SurveyServiceTest extends IntegrationTest {
             tuple(member.getId(), survey3.getId(), option3.getId(), submittedAt),
             tuple(member.getId(), survey4.getId(), option4.getId(), submittedAt));
     then(member).extracting("completedOnboardingAt").isEqualTo(submittedAt);
+  }
+
+  @DisplayName("submitSurvey 메서드는")
+  @Nested
+  class submitSurvey {
+
+    @DisplayName("회원이 존재하지 않으면")
+    @Nested
+    class whenMemberNotFound {
+
+      @Test
+      @DisplayName("예외를 발생시킨다")
+      void throwMemberNotFoundException() {
+        // given
+        Member member = Member.create("나민혁", "test@test.com");
+        memberRepository.save(member);
+        SurveyBundle surveyBundle = new SurveyBundle();
+        surveyBundleRepository.save(surveyBundle);
+        BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
+        surveyRepository.save(balanceSurvey);
+        List<KeywordScore> scores =
+            List.of(
+                KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
+                KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
+        SurveyOption option =
+            SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
+        surveyOptionRepository.save(option);
+
+        SurveySubmissionCommand command =
+            new SurveySubmissionCommand(option.getId(), balanceSurvey.getId(), 0L, "나는 행복한게 좋으니까");
+
+        // when
+        // then
+        thenThrownBy(() -> surveyService.submitSurvey(command, LocalDateTime.now()))
+            .isEqualTo(CustomException.MEMBER_NOT_FOUND);
+      }
+    }
+
+    @DisplayName("설문을 저장한다")
+    @Nested
+    class shouldSubmitted {
+
+      @Test
+      void 설문에_응답을_제출한다() {
+        // given
+        Member member = Member.create("나민혁", "test@test.com");
+        memberRepository.save(member);
+        SurveyBundle surveyBundle = new SurveyBundle();
+        surveyBundleRepository.save(surveyBundle);
+        BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
+        surveyRepository.save(balanceSurvey);
+        List<KeywordScore> scores =
+            List.of(
+                KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
+                KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
+        SurveyOption option =
+            SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
+        surveyOptionRepository.save(option);
+
+        SurveySubmissionCommand command =
+            new SurveySubmissionCommand(
+                option.getId(), balanceSurvey.getId(), member.getId(), "나는 행복한게 좋으니까");
+
+        // when
+        LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 13, 18, 0, 0);
+        surveyService.submitSurvey(command, submittedAt);
+        // then
+        List<SurveySubmission> submissions = surveySubmissionRepository.findAll();
+        then(submissions).hasSize(1);
+        then(submissions.getFirst())
+            .extracting("member.id", "survey.id", "selectedOption.id", "retrospective")
+            .containsExactly(member.getId(), balanceSurvey.getId(), option.getId(), "나는 행복한게 좋으니까");
+      }
+    }
+
+    @DisplayName("설문이 존재하지 않으면")
+    @Nested
+    class whenSurveyNotFound {
+
+      @Test
+      @DisplayName("예외를 발생시킨다")
+      void throwSurveyNotFoundException() {
+        // given
+        Member member = Member.create("나민혁", "test@test.com");
+        memberRepository.save(member);
+        SurveyBundle surveyBundle = new SurveyBundle();
+        surveyBundleRepository.save(surveyBundle);
+        BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
+        surveyRepository.save(balanceSurvey);
+        List<KeywordScore> scores =
+            List.of(
+                KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
+                KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
+        SurveyOption option =
+            SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
+        surveyOptionRepository.save(option);
+
+        SurveySubmissionCommand command =
+            new SurveySubmissionCommand(0L, member.getId(), option.getId(), "나는 행복한게 좋으니까");
+
+        // when
+        // then
+        thenThrownBy(() -> surveyService.submitSurvey(command, LocalDateTime.now()))
+            .isEqualTo(CustomException.SURVEY_NOT_FOUND);
+      }
+    }
+
+    @DisplayName("회원과 설문을 찾았고")
+    @Nested
+    class whenMemberAndSurveyFound {
+
+      @DisplayName("설문 번들의 모든 설문 응답을 제출하였다면")
+      @Nested
+      class whenSurveyBundleIsCompleted {
+
+        @DisplayName("캐릭터를 생성한다.")
+        @Test
+        void shouldCreateCharacter() {
+          final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+          final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+
+          final BalanceSurvey survey =
+              surveyRepository.save(
+                  new BalanceSurvey(
+                      "꿈에 그리던 드림 기업에 입사했다. 연봉도 좋지만, 무엇보다 회사의 근무 방식이 나와 잘 맞는 것 같다. 우리 회사의 근무 방식은...",
+                      bundle));
+          final SurveyOption option =
+              surveyOptionRepository.save(
+                  SurveyOption.builder()
+                      .survey(survey)
+                      .content("자율 출퇴근제로 원하는 시간에 근무하며 창의적인 성과 내기")
+                      .scores(
+                          List.of(
+                              KeywordScore.builder()
+                                  .keyword(SELF_DIRECTION)
+                                  .score(BigDecimal.ONE)
+                                  .build()))
+                      .build());
+
+          final SurveySubmissionCommand command =
+              new SurveySubmissionCommand(
+                  option.getId(),
+                  survey.getId(),
+                  member.getId(),
+                  "자유롭게 일하면 집중이 잘되는 시간에 일할 수 있기 때문에 일의 능률이 오를 것 같다.");
+          final LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 17, 0, 0, 0);
+
+          surveyService.submitSurvey(command, submittedAt);
+
+          verify(characterService).createCharacter(any(CreateCharacterEvent.class));
+        }
+      }
+
+      @DisplayName("설문 번들의 설문 응답이 남아있다면")
+      @Nested
+      class whenSurveyBundleIsInProgress {
+
+        @DisplayName("캐릭터를 생성하지 않는다.")
+        @Test
+        void shouldNotCreateCharacter() {
+          final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+          final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+
+          final BalanceSurvey survey1 =
+              surveyRepository.save(
+                  new BalanceSurvey(
+                      "꿈에 그리던 드림 기업에 입사했다. 연봉도 좋지만, 무엇보다 회사의 근무 방식이 나와 잘 맞는 것 같다. 우리 회사의 근무 방식은...",
+                      bundle));
+          final BalanceSurvey survey2 =
+              surveyRepository.save(
+                  new BalanceSurvey("독립에 대한 고민이 깊어지는 요즘... 드디어 결정을 내렸다.", bundle));
+          final SurveyOption option1 =
+              surveyOptionRepository.save(
+                  SurveyOption.builder()
+                      .survey(survey1)
+                      .content("자율 출퇴근제로 원하는 시간에 근무하며 창의적인 성과 내기")
+                      .scores(
+                          List.of(
+                              KeywordScore.builder()
+                                  .keyword(SELF_DIRECTION)
+                                  .score(BigDecimal.ONE)
+                                  .build()))
+                      .build());
+          final SurveyOption option2 =
+              surveyOptionRepository.save(
+                  SurveyOption.builder()
+                      .survey(survey2)
+                      .content("내 취향대로 꾸민 집에서 자유롭게 생활하기")
+                      .scores(
+                          List.of(
+                              KeywordScore.builder()
+                                  .keyword(SELF_DIRECTION)
+                                  .score(BigDecimal.ONE)
+                                  .build()))
+                      .build());
+
+          final SurveySubmissionCommand command =
+              new SurveySubmissionCommand(
+                  option1.getId(),
+                  survey1.getId(),
+                  member.getId(),
+                  "자유롭게 일하면 집중이 잘되는 시간에 일할 수 있기 때문에 일의 능률이 오를 것 같다.");
+          final LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 17, 0, 0, 0);
+
+          surveyService.submitSurvey(command, submittedAt);
+
+          verify(characterService, never()).createCharacter(any(CreateCharacterEvent.class));
+        }
+      }
+    }
   }
 
   @Test
