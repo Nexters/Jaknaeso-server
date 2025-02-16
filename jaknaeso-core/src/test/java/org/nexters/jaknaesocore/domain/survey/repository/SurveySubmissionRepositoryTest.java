@@ -195,8 +195,9 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
         SurveySubmission.builder().member(member).survey(survey).selectedOption(option).build());
 
     List<SurveySubmission> actual =
-        surveySubmissionRepository.findWithSurveyByMemberIdAndBundleIdAndDeletedAtIsNull(
-            member.getId(), bundle.getId());
+        surveySubmissionRepository
+            .findByMemberIdAndBundleIdAndDeletedAtIsNullWithSurveyAndSurveyBundle(
+                member.getId(), bundle.getId());
 
     assertAll(
         () -> then(actual).hasSize(1), () -> then(actual.get(0).getSurvey()).isEqualTo(survey));
@@ -204,7 +205,7 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
 
   @Transactional
   @Test
-  void 회원이_참여한_설문_응답_리스트를_설문_번들과_함께_조회한다() {
+  void 회원이_참여한_설문_응답_리스트를_번들과_설문_옵션과_함께_조회한다() {
     Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
     BalanceSurvey survey =
@@ -228,8 +229,9 @@ class SurveySubmissionRepositoryTest extends IntegrationTest {
         SurveySubmission.builder().member(member).survey(survey).selectedOption(option).build());
 
     List<SurveySubmission> actual =
-        surveySubmissionRepository.findWithSurveyBundlesByMemberIdAndDeletedAtIsNull(
-            member.getId());
+        surveySubmissionRepository
+            .findByMemberIdAndDeletedAtIsNullWithSurveyAndSurveyBundleAndSurveyOption(
+                member.getId());
 
     assertAll(
         () -> then(actual).hasSize(1),

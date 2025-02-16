@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordMetrics;
@@ -13,29 +12,20 @@ import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScoreNormalizer;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 
-@Getter
 public class ValueReports {
 
   private static final ScaledBigDecimal PERCENTAGE100 =
       ScaledBigDecimal.of(BigDecimal.valueOf(100));
 
-  private List<ValueReport> reports;
-
-  private ValueReports(final List<ValueReport> reports) {
-    this.reports = reports;
-  }
-
-  public static ValueReports of(
+  public static List<ValueReport> report(
       final Map<Keyword, BigDecimal> weights,
       final Map<Keyword, KeywordMetrics> metrics,
       final List<SurveySubmission> submissions) {
     Map<Keyword, BigDecimal> percentage = getKeywordPercentage(weights, metrics, submissions);
 
-    List<ValueReport> reports =
-        percentage.entrySet().stream()
-            .map(it -> ValueReport.of(it.getKey(), ScaledBigDecimal.of(it.getValue())))
-            .collect(Collectors.toList());
-    return new ValueReports(reports);
+    return percentage.entrySet().stream()
+        .map(it -> ValueReport.of(it.getKey(), ScaledBigDecimal.of(it.getValue())))
+        .collect(Collectors.toList());
   }
 
   private static Map<Keyword, BigDecimal> getKeywordPercentage(

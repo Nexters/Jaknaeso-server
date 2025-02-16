@@ -26,7 +26,7 @@ import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse;
-import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse.SimpleCharacterResponse;
+import org.nexters.jaknaesocore.domain.character.service.dto.SimpleCharacterResponse;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.common.support.WithMockCustomUser;
@@ -75,10 +75,13 @@ class CharacterControllerTest extends ControllerTest {
                                 .description("캐릭터 회차"),
                             fieldWithPath("data.characters[].characterId")
                                 .type(SimpleType.NUMBER)
-                                .description("캐릭터 아이디"),
+                                .description("캐릭터 아이디 (캐릭터가 완성되지 않은 경우 null)"),
                             fieldWithPath("data.characters[].bundleId")
                                 .type(SimpleType.NUMBER)
                                 .description("설문 번들 아이디"),
+                            fieldWithPath("data.characters[].isCompleted")
+                                .type(SimpleType.BOOLEAN)
+                                .description("설문 번들 완료 여부"),
                             fieldWithPath("error").description("에러").optional())
                         .responseSchema(schema("CharactersResponse"))
                         .build())));

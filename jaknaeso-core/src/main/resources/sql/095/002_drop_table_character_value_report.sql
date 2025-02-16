@@ -1,0 +1,1 @@
+drop table character_value_report;

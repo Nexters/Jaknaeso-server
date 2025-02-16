@@ -2,21 +2,23 @@ package org.nexters.jaknaesocore.domain.character.repository;
 
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.nexters.jaknaesocore.domain.survey.model.Keyword.SELF_DIRECTION;
+import static org.nexters.jaknaesocore.domain.survey.model.Keyword.SUCCESS;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
 import org.nexters.jaknaesocore.domain.character.model.ValueCharacter;
+import org.nexters.jaknaesocore.domain.character.model.ValueReport;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
-import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
-import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
-import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
-import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -27,50 +29,44 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
 
   @Autowired private CharacterRecordRepository sut;
 
+  @Autowired private ValueReportRepository valueReportRepository;
   @Autowired private ValueCharacterRepository valueCharacterRepository;
-  @Autowired private CharacterValueReportRepository characterValueReportRepository;
   @Autowired private MemberRepository memberRepository;
   @Autowired private SurveyBundleRepository surveyBundleRepository;
-  @Autowired private SurveyRepository surveyRepository;
-  @Autowired private SurveyOptionRepository surveyOptionRepository;
-  @Autowired private SurveySubmissionRepository surveySubmissionRepository;
+
+  @AfterEach
+  void tearDown() {
+    valueReportRepository.deleteAllInBatch();
+    sut.deleteAllInBatch();
+    valueCharacterRepository.deleteAllInBatch();
+    surveyBundleRepository.deleteAllInBatch();
+    memberRepository.deleteAllInBatch();
+  }
 
   @Test
   void 회원의_현재_캐릭터를_조회한다() {
     final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-    final ValueCharacter valueCharacter1 =
-        valueCharacterRepository.save(
-            new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
-    final ValueCharacter valueCharacter2 =
-        valueCharacterRepository.save(
-            new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
-    final CharacterRecord characterRecord1 =
-        CharacterRecord.builder()
-            .characterNo("첫번째")
-            .valueCharacter(valueCharacter1)
-            .startDate(LocalDate.now().minusDays(31))
-            .endDate(LocalDate.now().minusDays(16))
-            .member(member)
-            .surveyBundle(bundle)
-            .build();
-    final CharacterRecord characterRecord2 =
-        CharacterRecord.builder()
-            .characterNo("두번째")
-            .valueCharacter(valueCharacter2)
-            .startDate(LocalDate.now().minusDays(15))
-            .endDate(LocalDate.now())
-            .member(member)
-            .surveyBundle(bundle)
-            .build();
-    sut.saveAll(List.of(characterRecord1, characterRecord2));
+
+    sut.saveAll(
+        List.of(
+            CharacterRecord.builder()
+                .characterNo("첫번째")
+                .endDate(LocalDate.now().minusDays(15))
+                .member(member)
+                .surveyBundle(bundle)
+                .build(),
+            CharacterRecord.builder()
+                .characterNo("두번째")
+                .endDate(LocalDate.now())
+                .member(member)
+                .surveyBundle(bundle)
+                .build()));
 
     final CharacterRecord actual =
         sut.findTopByMemberIdAndDeletedAtIsNullWithMember(member.getId()).get();
 
-    then(actual)
-        .extracting("characterNo", "valueCharacter")
-        .containsExactly("두번째", valueCharacter2);
+    then(actual.getCharacterNo()).isEqualTo("두번째");
   }
 
   @Test
@@ -78,15 +74,12 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
     final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
     final ValueCharacter valueCharacter =
-        valueCharacterRepository.save(
-            new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
+        valueCharacterRepository.save(new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", SUCCESS));
     final CharacterRecord characterRecord =
         sut.save(
             CharacterRecord.builder()
                 .characterNo("첫번째")
                 .valueCharacter(valueCharacter)
-                .startDate(LocalDate.now().minusDays(31))
-                .endDate(LocalDate.now().minusDays(16))
                 .member(member)
                 .surveyBundle(bundle)
                 .build());
@@ -103,18 +96,8 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
   void 회원의_캐릭터를_설문_번들과_함께_조회한다() {
     final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
     final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
-    final ValueCharacter valueCharacter =
-        valueCharacterRepository.save(
-            new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS));
-    sut.save(
-        CharacterRecord.builder()
-            .characterNo("첫번째")
-            .valueCharacter(valueCharacter)
-            .startDate(LocalDate.now().minusDays(15))
-            .endDate(LocalDate.now())
-            .member(member)
-            .surveyBundle(bundle)
-            .build());
+
+    sut.save(CharacterRecord.builder().member(member).surveyBundle(bundle).build());
 
     final List<CharacterRecord> actual =
         sut.findByMemberIdAndDeletedAtIsNullWithMemberAndSurveyBundle(member.getId());
@@ -122,5 +105,32 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
     assertAll(
         () -> then(actual).hasSize(1),
         () -> then(actual.get(0).getSurveyBundle()).isEqualTo(bundle));
+  }
+
+  @Transactional
+  @Test
+  void 회원의_캐릭터_분석_결과를_조회한다() {
+    final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+    final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+    final ValueReport valueReport =
+        valueReportRepository.save(
+            ValueReport.of(SELF_DIRECTION, ScaledBigDecimal.of(BigDecimal.valueOf(100))));
+
+    final CharacterRecord characterRecord =
+        sut.save(
+            CharacterRecord.builder()
+                .characterNo("첫번째")
+                .valueReports(List.of(valueReport))
+                .member(member)
+                .surveyBundle(bundle)
+                .build());
+
+    final CharacterRecord actual =
+        sut.findByIdAndDeletedAtIsNullWithValueReports(characterRecord.getId()).get();
+
+    then(actual)
+        .extracting("valueReports")
+        .usingRecursiveComparison()
+        .isEqualTo(List.of(valueReport));
   }
 }

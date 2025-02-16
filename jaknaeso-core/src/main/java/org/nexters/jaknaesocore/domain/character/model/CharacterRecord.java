@@ -5,8 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,26 +39,40 @@ public class CharacterRecord extends BaseTimeEntity {
   @JoinColumn(name = "bundle_id")
   private SurveyBundle surveyBundle;
 
-  @OneToOne(mappedBy = "characterRecord", cascade = CascadeType.ALL, orphanRemoval = true)
-  private CharacterValueReport characterValueReport;
+  @OneToMany(mappedBy = "characterRecord", cascade = CascadeType.PERSIST, orphanRemoval = true)
+  private List<ValueReport> valueReports;
 
-  @Builder
   private CharacterRecord(
       final String characterNo,
       final ValueCharacter valueCharacter,
       final LocalDate startDate,
       final LocalDate endDate,
       final Member member,
-      final SurveyBundle surveyBundle) {
+      final SurveyBundle surveyBundle,
+      final List<ValueReport> valueReports) {
     this.characterNo = characterNo;
     this.valueCharacter = valueCharacter;
     this.startDate = startDate;
     this.endDate = endDate;
     this.member = member;
     this.surveyBundle = surveyBundle;
+
+    if (valueReports != null) {
+      this.valueReports = valueReports;
+      this.valueReports.forEach(it -> it.updateCharacterRecord(this));
+    }
   }
 
-  public void updateCharacterValueReport(final CharacterValueReport characterValueReport) {
-    this.characterValueReport = characterValueReport;
+  @Builder
+  public static CharacterRecord of(
+      final String characterNo,
+      final ValueCharacter valueCharacter,
+      final LocalDate startDate,
+      final LocalDate endDate,
+      final Member member,
+      final SurveyBundle surveyBundle,
+      final List<ValueReport> valueReports) {
+    return new CharacterRecord(
+        characterNo, valueCharacter, startDate, endDate, member, surveyBundle, valueReports);
   }
 }
