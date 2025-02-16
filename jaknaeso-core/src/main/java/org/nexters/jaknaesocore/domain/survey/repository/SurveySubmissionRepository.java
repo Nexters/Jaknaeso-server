@@ -22,12 +22,14 @@ public interface SurveySubmissionRepository extends JpaRepository<SurveySubmissi
       "SELECT s FROM SurveySubmission s "
           + "JOIN FETCH s.member sm JOIN FETCH s.survey ss JOIN FETCH ss.surveyBundle sb "
           + "WHERE sm.id = :memberId AND sb.id = :bundleId AND s.deletedAt IS NULL")
-  List<SurveySubmission> findWithSurveyByMemberIdAndBundleIdAndDeletedAtIsNull(
+  List<SurveySubmission> findByMemberIdAndBundleIdAndDeletedAtIsNullWithSurveyAndSurveyBundle(
       final Long memberId, final Long bundleId);
 
   @Query(
       "SELECT s FROM SurveySubmission s "
-          + "JOIN FETCH s.member sm JOIN FETCH s.survey ss JOIN FETCH ss.surveyBundle sb "
+          + "JOIN FETCH s.member sm JOIN FETCH s.survey ss "
+          + "JOIN FETCH ss.surveyBundle sb JOIN FETCH ss.options "
           + "WHERE sm.id = :memberId AND s.deletedAt IS NULL")
-  List<SurveySubmission> findWithSurveyBundlesByMemberIdAndDeletedAtIsNull(final Long memberId);
+  List<SurveySubmission> findByMemberIdAndDeletedAtIsNullWithSurveyAndSurveyBundleAndSurveyOption(
+      final Long memberId);
 }
