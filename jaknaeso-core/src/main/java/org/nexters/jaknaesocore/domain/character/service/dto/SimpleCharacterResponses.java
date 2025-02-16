@@ -1,31 +1,44 @@
 package org.nexters.jaknaesocore.domain.character.service.dto;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
 
 public class SimpleCharacterResponses {
 
-  private final List<SimpleCharacterResponse> responses = new ArrayList<>();
+  private List<SimpleCharacterResponse> responses;
 
-  public void addCompleteResponse(final CharacterRecord record) {
-    responses.add(
-        SimpleCharacterResponse.builder()
-            .characterNo(record.getCharacterNo())
-            .characterId(record.getId())
-            .bundleId(record.getSurveyBundle().getId())
-            .isCompleted(true)
-            .build());
+  public SimpleCharacterResponses(final Long latestBundleId, final List<CharacterRecord> records) {
+    this.responses = records.stream().map(this::toCompletedResponse).collect(Collectors.toList());
+
+    if (isIncompleteCharacter(latestBundleId, records)) {
+      this.responses.add(toIncompleteResponse(latestBundleId));
+    }
   }
 
-  public void addIncompleteResponse(final Long bundleId) {
-    responses.add(
-        SimpleCharacterResponse.builder()
-            .characterNo("TODO")
-            .characterId(null)
-            .bundleId(bundleId)
-            .isCompleted(false)
-            .build());
+  private boolean isIncompleteCharacter(final Long bundleId, final List<CharacterRecord> records) {
+    return bundleId != null
+        && records.stream()
+            .noneMatch(record -> Objects.equals(record.getSurveyBundle().getId(), bundleId));
+  }
+
+  private SimpleCharacterResponse toCompletedResponse(final CharacterRecord record) {
+    return SimpleCharacterResponse.builder()
+        .characterNo(record.getCharacterNo())
+        .characterId(record.getId())
+        .bundleId(record.getSurveyBundle().getId())
+        .isCompleted(true)
+        .build();
+  }
+
+  private SimpleCharacterResponse toIncompleteResponse(final Long bundleId) {
+    return SimpleCharacterResponse.builder()
+        .characterNo("TODO")
+        .characterId(null)
+        .bundleId(bundleId)
+        .isCompleted(false)
+        .build();
   }
 
   public List<SimpleCharacterResponse> getResponses() {

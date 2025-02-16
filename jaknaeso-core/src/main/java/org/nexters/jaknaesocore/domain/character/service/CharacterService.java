@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
-import org.nexters.jaknaesocore.domain.character.model.CharacterRecords;
 import org.nexters.jaknaesocore.domain.character.model.Characters;
 import org.nexters.jaknaesocore.domain.character.model.ValueCharacter;
 import org.nexters.jaknaesocore.domain.character.repository.CharacterRecordRepository;
@@ -91,14 +90,9 @@ public class CharacterService {
     final List<CharacterRecord> records =
         characterRecordRepository.findByMemberIdAndDeletedAtIsNullWithMemberAndSurveyBundle(
             memberId);
-    final CharacterRecords characterRecords = new CharacterRecords(records);
-    final Long bundleId = getLatestBundleId(memberId);
 
-    final SimpleCharacterResponses responses = new SimpleCharacterResponses();
-    records.forEach(responses::addCompleteResponse);
-    if (characterRecords.isIncompleteCharacter(bundleId)) {
-      responses.addIncompleteResponse(bundleId);
-    }
+    final SimpleCharacterResponses responses =
+        new SimpleCharacterResponses(getLatestBundleId(memberId), records);
     return new CharactersResponse(responses.getResponses());
   }
 
