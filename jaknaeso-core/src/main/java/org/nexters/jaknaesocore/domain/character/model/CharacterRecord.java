@@ -5,8 +5,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -38,8 +39,8 @@ public class CharacterRecord extends BaseTimeEntity {
   @JoinColumn(name = "bundle_id")
   private SurveyBundle surveyBundle;
 
-  @OneToOne(mappedBy = "characterRecord", cascade = CascadeType.ALL, orphanRemoval = true)
-  private CharacterValueReport characterValueReport;
+  @OneToMany(mappedBy = "characterRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ValueReport> valueReports;
 
   @Builder
   private CharacterRecord(
@@ -57,7 +58,8 @@ public class CharacterRecord extends BaseTimeEntity {
     this.surveyBundle = surveyBundle;
   }
 
-  public void updateCharacterValueReport(final CharacterValueReport characterValueReport) {
-    this.characterValueReport = characterValueReport;
+  public void updateValueReports(final List<ValueReport> valueReports) {
+    valueReports.forEach(it -> it.updateCharacterRecord(this));
+    this.valueReports = valueReports;
   }
 }
