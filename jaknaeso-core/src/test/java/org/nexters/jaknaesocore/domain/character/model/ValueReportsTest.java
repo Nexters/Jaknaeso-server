@@ -8,21 +8,53 @@ import static org.nexters.jaknaesocore.domain.survey.model.Keyword.STABILITY;
 import static org.nexters.jaknaesocore.domain.survey.model.Keyword.SUCCESS;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
+import org.nexters.jaknaesocore.common.support.IntegrationTest;
+import org.nexters.jaknaesocore.domain.character.repository.CharacterRecordRepository;
+import org.nexters.jaknaesocore.domain.character.repository.ValueReportRepository;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordMetrics;
-import org.nexters.jaknaesocore.domain.survey.model.KeywordMetricsMap;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
-import org.nexters.jaknaesocore.domain.survey.model.KeywordWeightMap;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
+import org.springframework.beans.factory.annotation.Autowired;
 
-class ValueReportsTest {
+class ValueReportsTest extends IntegrationTest {
+
+  @Autowired private CharacterRecordRepository characterRecordRepository;
+  @Autowired private ValueReportRepository valueReportRepository;
+
+  private Map<Keyword, KeywordMetrics> generateMetricsMap(List<KeywordScore> scores) {
+    return scores.stream()
+        .collect(Collectors.groupingBy(KeywordScore::getKeyword, Collectors.toList()))
+        .entrySet()
+        .stream()
+        .collect(
+            Collectors.toMap(Map.Entry::getKey, entry -> KeywordMetrics.create(entry.getValue())));
+  }
+
+  private Map<Keyword, BigDecimal> generateWeightsMap(
+      final Map<Keyword, KeywordMetrics> metricsMap) {
+    Map<Keyword, BigDecimal> weightMap = new HashMap<>();
+
+    int keywordCnt = metricsMap.size();
+    ScaledBigDecimal sumPerKeyword =
+        ScaledBigDecimal.of(BigDecimal.valueOf(100)).divide(BigDecimal.valueOf(keywordCnt));
+
+    metricsMap.forEach(
+        (k, v) -> {
+          var sum = v.getPositive().subtract(v.getNegative());
+          weightMap.put(k, sumPerKeyword.divide(sum).getValue());
+        });
+    return weightMap;
+  }
 
   @Test
   void 키워드_가중치와_설문_응답_목록으로_가치관_리포트를_반환한다() {
@@ -33,8 +65,8 @@ class ValueReportsTest {
             KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.valueOf(1)).build(),
             KeywordScore.builder().keyword(BENEVOLENCE).score(BigDecimal.valueOf(1)).build());
 
-    final Map<Keyword, KeywordMetrics> metricsMap = KeywordMetricsMap.generate(scores);
-    final Map<Keyword, BigDecimal> weightMap = KeywordWeightMap.generate(metricsMap);
+    final Map<Keyword, KeywordMetrics> metricsMap = generateMetricsMap(scores);
+    final Map<Keyword, BigDecimal> weightMap = generateWeightsMap(metricsMap);
 
     final SurveyBundle bundle = new SurveyBundle();
     final BalanceSurvey survey1 =
@@ -95,9 +127,7 @@ class ValueReportsTest {
             SurveySubmission.builder().survey(survey4).selectedOption(option4).build(),
             SurveySubmission.builder().survey(survey5).selectedOption(option5).build());
 
-    final ValueReports reports = ValueReports.of(weightMap, metricsMap, submissions);
-
-    final List<ValueReport> actual = reports.getReports();
+    final List<ValueReport> actual = ValueReports.report(weightMap, metricsMap, submissions);
 
     assertAll(
         () ->
