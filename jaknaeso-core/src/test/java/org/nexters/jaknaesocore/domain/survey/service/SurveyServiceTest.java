@@ -3,9 +3,6 @@ package org.nexters.jaknaesocore.domain.survey.service;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 import static org.assertj.core.api.BDDAssertions.tuple;
-import static org.mockito.BDDMockito.any;
-import static org.mockito.BDDMockito.never;
-import static org.mockito.BDDMockito.verify;
 import static org.nexters.jaknaesocore.domain.survey.model.Keyword.SELF_DIRECTION;
 
 import java.math.BigDecimal;
@@ -18,7 +15,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
+import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
+import org.nexters.jaknaesocore.domain.character.model.ValueCharacter;
 import org.nexters.jaknaesocore.domain.character.repository.CharacterRecordRepository;
+import org.nexters.jaknaesocore.domain.character.repository.ValueCharacterRepository;
 import org.nexters.jaknaesocore.domain.character.repository.ValueReportRepository;
 import org.nexters.jaknaesocore.domain.character.service.CharacterService;
 import org.nexters.jaknaesocore.domain.member.model.Member;
@@ -43,7 +43,6 @@ import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
-import org.nexters.jaknaesocore.domain.survey.service.event.CreateCharacterEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +58,7 @@ class SurveyServiceTest extends IntegrationTest {
   @Autowired private SurveyOptionRepository surveyOptionRepository;
   @Autowired private CharacterRecordRepository characterRecordRepository;
   @Autowired private ValueReportRepository valueReportRepository;
+  @Autowired private ValueCharacterRepository valueCharacterRepository;
 
   @MockitoSpyBean private CharacterService characterService;
 
@@ -71,6 +71,7 @@ class SurveyServiceTest extends IntegrationTest {
     surveyRepository.deleteAllInBatch();
     surveyBundleRepository.deleteAllInBatch();
     memberRepository.deleteAllInBatch();
+    valueCharacterRepository.deleteAllInBatch();
   }
 
   @DisplayName("설문을 조회한다.")
@@ -664,30 +665,64 @@ class SurveyServiceTest extends IntegrationTest {
       }
     }
 
-    @DisplayName("설문을 저장한다")
+    @DisplayName("첫 설문을 시도하면, ")
     @Nested
-    class shouldSubmitted {
+    class whenFirstSubmitAndNotCompleted {
 
       @Test
-      void 설문에_응답을_제출한다() {
+      void 설문에_응답을_제출하고_빈_캐릭터를_생성한다() {
         // given
         Member member = Member.create("나민혁", "test@test.com");
         memberRepository.save(member);
-        SurveyBundle surveyBundle = new SurveyBundle();
+
+        final ValueCharacter valueCharacter =
+            valueCharacterRepository.save(
+                ValueCharacter.builder()
+                    .name("아낌없이 주는 보금자리 유형")
+                    .description("보금자리 유형 설명")
+                    .keyword(Keyword.BENEVOLENCE)
+                    .build());
+
+        final SurveyBundle onboardingBundle = surveyBundleRepository.save(new SurveyBundle());
+        OnboardingSurvey onboardingSurvey =
+            surveyRepository.save(new OnboardingSurvey("온보딩질문내용1", onboardingBundle));
+        characterRecordRepository.save(
+            CharacterRecord.builder()
+                .valueCharacter(valueCharacter)
+                .ordinalNumber(1)
+                .characterNo("첫번째 캐릭터")
+                .member(member)
+                .surveyBundle(onboardingBundle)
+                .build());
+
+        final SurveyBundle surveyBundle = new SurveyBundle();
         surveyBundleRepository.save(surveyBundle);
-        BalanceSurvey balanceSurvey = new BalanceSurvey("질문내용", surveyBundle);
-        surveyRepository.save(balanceSurvey);
+        BalanceSurvey balanceSurvey1 =
+            surveyRepository.save(new BalanceSurvey("질문내용1", surveyBundle));
+        BalanceSurvey balanceSurvey2 =
+            surveyRepository.save(new BalanceSurvey("질문내용2", surveyBundle));
         List<KeywordScore> scores =
             List.of(
                 KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
                 KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
-        SurveyOption option =
-            SurveyOption.builder().survey(balanceSurvey).scores(scores).content("질문 옵션 내용").build();
-        surveyOptionRepository.save(option);
+        SurveyOption option1 =
+            surveyOptionRepository.save(
+                SurveyOption.builder()
+                    .survey(balanceSurvey1)
+                    .scores(scores)
+                    .content("질문 옵션 내용1")
+                    .build());
+        SurveyOption option2 =
+            surveyOptionRepository.save(
+                SurveyOption.builder()
+                    .survey(balanceSurvey2)
+                    .scores(scores)
+                    .content("질문 옵션 내용2")
+                    .build());
 
         SurveySubmissionCommand command =
             new SurveySubmissionCommand(
-                option.getId(), balanceSurvey.getId(), member.getId(), "나는 행복한게 좋으니까");
+                option1.getId(), balanceSurvey1.getId(), member.getId(), "나는 행복한게 좋으니까");
 
         // when
         LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 13, 18, 0, 0);
@@ -697,7 +732,15 @@ class SurveyServiceTest extends IntegrationTest {
         then(submissions).hasSize(1);
         then(submissions.getFirst())
             .extracting("member.id", "survey.id", "selectedOption.id", "retrospective")
-            .containsExactly(member.getId(), balanceSurvey.getId(), option.getId(), "나는 행복한게 좋으니까");
+            .containsExactly(
+                member.getId(), balanceSurvey1.getId(), option1.getId(), "나는 행복한게 좋으니까");
+        then(characterRecordRepository.findAll())
+            .hasSize(2)
+            .extracting(
+                "ordinalNumber", "characterNo", "member.id", "surveyBundle.id", "valueCharacter")
+            .containsExactly(
+                tuple(1, "첫번째 캐릭터", member.getId(), onboardingBundle.getId(), valueCharacter),
+                tuple(2, "두번째 캐릭터", member.getId(), surveyBundle.getId(), null));
       }
     }
 
@@ -765,6 +808,25 @@ class SurveyServiceTest extends IntegrationTest {
                                   .build()))
                       .build());
 
+          // 가치관 캐릭터
+          final ValueCharacter valueCharacter =
+              valueCharacterRepository.save(
+                  ValueCharacter.builder()
+                      .name("마이웨이 유형")
+                      .description("마이웨이 유형 설명")
+                      .keyword(SELF_DIRECTION)
+                      .build());
+          // 온보딩 캐릭터
+          final SurveyBundle onboardingBundle = surveyBundleRepository.save(new SurveyBundle());
+          characterRecordRepository.save(
+              CharacterRecord.builder()
+                  .ordinalNumber(1)
+                  .characterNo("첫번째 캐릭터")
+                  .valueCharacter(valueCharacter)
+                  .member(member)
+                  .surveyBundle(onboardingBundle)
+                  .build());
+
           final SurveySubmissionCommand command =
               new SurveySubmissionCommand(
                   option.getId(),
@@ -774,8 +836,22 @@ class SurveyServiceTest extends IntegrationTest {
           final LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 17, 0, 0, 0);
 
           surveyService.submitSurvey(command, submittedAt);
-
-          verify(characterService).createCharacter(any(CreateCharacterEvent.class));
+          then(characterRecordRepository.findAll())
+              .hasSize(2)
+              .extracting(
+                  "ordinalNumber",
+                  "characterNo",
+                  "member.id",
+                  "surveyBundle.id",
+                  "valueCharacter.id")
+              .containsExactly(
+                  tuple(
+                      1,
+                      "첫번째 캐릭터",
+                      member.getId(),
+                      onboardingBundle.getId(),
+                      valueCharacter.getId()),
+                  tuple(2, "두번째 캐릭터", member.getId(), bundle.getId(), valueCharacter.getId()));
         }
       }
 
@@ -797,6 +873,7 @@ class SurveyServiceTest extends IntegrationTest {
           final BalanceSurvey survey2 =
               surveyRepository.save(
                   new BalanceSurvey("독립에 대한 고민이 깊어지는 요즘... 드디어 결정을 내렸다.", bundle));
+          final BalanceSurvey survey3 = surveyRepository.save(new BalanceSurvey("세번째 질문", bundle));
           final SurveyOption option1 =
               surveyOptionRepository.save(
                   SurveyOption.builder()
@@ -821,18 +898,37 @@ class SurveyServiceTest extends IntegrationTest {
                                   .score(BigDecimal.ONE)
                                   .build()))
                       .build());
+          final SurveyOption option3 =
+              surveyOptionRepository.save(
+                  SurveyOption.builder()
+                      .survey(survey3)
+                      .content("세번째 답변")
+                      .scores(
+                          List.of(
+                              KeywordScore.builder()
+                                  .keyword(SELF_DIRECTION)
+                                  .score(BigDecimal.ONE)
+                                  .build()))
+                      .build());
+
+          surveySubmissionRepository.save(
+              SurveySubmission.builder()
+                  .survey(survey1)
+                  .member(member)
+                  .selectedOption(option1)
+                  .submittedAt(LocalDateTime.of(2025, 2, 17, 0, 0, 0))
+                  .build());
 
           final SurveySubmissionCommand command =
               new SurveySubmissionCommand(
-                  option1.getId(),
-                  survey1.getId(),
+                  option2.getId(),
+                  survey2.getId(),
                   member.getId(),
                   "자유롭게 일하면 집중이 잘되는 시간에 일할 수 있기 때문에 일의 능률이 오를 것 같다.");
           final LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 17, 0, 0, 0);
 
           surveyService.submitSurvey(command, submittedAt);
-
-          verify(characterService, never()).createCharacter(any(CreateCharacterEvent.class));
+          then(characterRecordRepository.findAll()).hasSize(0);
         }
       }
     }

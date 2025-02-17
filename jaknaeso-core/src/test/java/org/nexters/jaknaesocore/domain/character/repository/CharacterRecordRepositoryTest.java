@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
@@ -43,30 +45,77 @@ class CharacterRecordRepositoryTest extends IntegrationTest {
     memberRepository.deleteAllInBatch();
   }
 
-  @Test
-  void 회원의_현재_캐릭터를_조회한다() {
-    final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
-    final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+  @Nested
+  @DisplayName("findLatestCompletedCharacter 메소드는 ")
+  class findLatestCompletedCharacter {
 
-    sut.saveAll(
-        List.of(
-            CharacterRecord.builder()
-                .characterNo("첫번째")
-                .endDate(LocalDate.now().minusDays(15))
-                .member(member)
-                .surveyBundle(bundle)
-                .build(),
-            CharacterRecord.builder()
-                .characterNo("두번째")
-                .endDate(LocalDate.now())
-                .member(member)
-                .surveyBundle(bundle)
-                .build()));
+    @Nested
+    @DisplayName("모든 데이터에 ValueCharacter가 지정되어 있으면, ")
+    class whenValueCharacterIsNotNull {
 
-    final CharacterRecord actual =
-        sut.findTopByMemberIdAndDeletedAtIsNullWithMember(member.getId()).get();
+      @Test
+      void 가장_최신의_캐릭터를_조회한다() {
+        final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+        final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+        final ValueCharacter valueCharacter =
+            valueCharacterRepository.save(ValueCharacter.builder().build());
 
-    then(actual.getCharacterNo()).isEqualTo("두번째");
+        sut.saveAll(
+            List.of(
+                CharacterRecord.builder()
+                    .characterNo("첫번째")
+                    .endDate(LocalDate.now().minusDays(15))
+                    .member(member)
+                    .surveyBundle(bundle)
+                    .valueCharacter(valueCharacter)
+                    .build(),
+                CharacterRecord.builder()
+                    .characterNo("두번째")
+                    .endDate(LocalDate.now())
+                    .member(member)
+                    .surveyBundle(bundle)
+                    .valueCharacter(valueCharacter)
+                    .build()));
+
+        final CharacterRecord actual = sut.findLatestCompletedCharacter(member.getId()).get();
+
+        then(actual.getCharacterNo()).isEqualTo("두번째");
+      }
+    }
+
+    @Nested
+    @DisplayName("지정된 ValueCharacter가 없는 데이터가 있는 경우, ")
+    class whenValueCharacterIsNull {
+
+      @Test
+      void ValueCharacter가_있는_데이터만_고려하여_가장_최신의_캐릭터를_조회한다() {
+        final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
+        final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
+        final ValueCharacter valueCharacter =
+            valueCharacterRepository.save(ValueCharacter.builder().build());
+
+        sut.saveAll(
+            List.of(
+                CharacterRecord.builder()
+                    .characterNo("첫번째")
+                    .endDate(LocalDate.now().minusDays(15))
+                    .member(member)
+                    .surveyBundle(bundle)
+                    .valueCharacter(valueCharacter)
+                    .build(),
+                CharacterRecord.builder()
+                    .characterNo("두번째")
+                    .endDate(LocalDate.now())
+                    .member(member)
+                    .surveyBundle(bundle)
+                    .valueCharacter(null)
+                    .build()));
+
+        final CharacterRecord actual = sut.findLatestCompletedCharacter(member.getId()).get();
+
+        then(actual.getCharacterNo()).isEqualTo("첫번째");
+      }
+    }
   }
 
   @Test

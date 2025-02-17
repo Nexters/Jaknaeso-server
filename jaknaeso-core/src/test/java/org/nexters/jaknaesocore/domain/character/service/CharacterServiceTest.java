@@ -10,6 +10,7 @@ import static org.nexters.jaknaesocore.domain.survey.model.Keyword.SUCCESS;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,7 +42,6 @@ import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
-import org.nexters.jaknaesocore.domain.survey.service.event.CreateCharacterEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
@@ -304,12 +304,12 @@ class CharacterServiceTest extends IntegrationTest {
   }
 
   @Nested
-  @DisplayName("createCharacter 메소드는")
-  class createCharacter {
+  @DisplayName("createFirstCharacter 메소드는")
+  class createFirstCharacter {
 
     @Transactional
     @Test
-    @DisplayName("회원의 캐릭터를 생성한다.")
+    @DisplayName("온보딩 후 회원의 첫번째 캐릭터를 생성한다.")
     void shouldCreateCharacter() {
       final Member member = memberRepository.save(Member.create("홍길동", "test@example.com"));
       final SurveyBundle bundle = surveyBundleRepository.save(new SurveyBundle());
@@ -388,18 +388,36 @@ class CharacterServiceTest extends IntegrationTest {
       final List<SurveySubmission> submissions =
           surveySubmissionRepository.saveAll(
               List.of(
-                  SurveySubmission.builder().survey(survey1).selectedOption(option1).build(),
-                  SurveySubmission.builder().survey(survey2).selectedOption(option2).build(),
-                  SurveySubmission.builder().survey(survey3).selectedOption(option3).build(),
-                  SurveySubmission.builder().survey(survey4).selectedOption(option4).build(),
-                  SurveySubmission.builder().survey(survey5).selectedOption(option5).build()));
+                  SurveySubmission.builder()
+                      .survey(survey1)
+                      .selectedOption(option1)
+                      .submittedAt(LocalDateTime.of(2025, 2, 11, 0, 0))
+                      .build(),
+                  SurveySubmission.builder()
+                      .survey(survey2)
+                      .selectedOption(option2)
+                      .submittedAt(LocalDateTime.of(2025, 2, 12, 0, 0))
+                      .build(),
+                  SurveySubmission.builder()
+                      .survey(survey3)
+                      .selectedOption(option3)
+                      .submittedAt(LocalDateTime.of(2025, 2, 13, 0, 0))
+                      .build(),
+                  SurveySubmission.builder()
+                      .survey(survey4)
+                      .selectedOption(option4)
+                      .submittedAt(LocalDateTime.of(2025, 2, 14, 0, 0))
+                      .build(),
+                  SurveySubmission.builder()
+                      .survey(survey5)
+                      .selectedOption(option5)
+                      .submittedAt(LocalDateTime.of(2025, 2, 15, 0, 0))
+                      .build()));
 
       final KeywordScores scores =
-          new KeywordScores(List.of(survey1, survey2, survey3, survey4, survey5));
-      final CreateCharacterEvent event =
-          new CreateCharacterEvent(member, bundle, scores.getKeywordScores(), submissions);
+          KeywordScores.of(List.of(survey1, survey2, survey3, survey4, survey5));
 
-      sut.createCharacter(event);
+      sut.createFirstCharacter(member, bundle, scores.getValues(), submissions);
 
       assertAll(
           () -> then(characterRecordRepository.findAll()).hasSize(1),

@@ -6,6 +6,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import java.util.List;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseEntity;
@@ -25,6 +26,7 @@ public class ValueCharacter extends BaseEntity {
 
   @Embedded private CharacterTraits characterTraits = CharacterTraits.empty();
 
+  @Builder
   public ValueCharacter(final String name, final String description, final Keyword keyword) {
     this.name = name;
     this.description = description;

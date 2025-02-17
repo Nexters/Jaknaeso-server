@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseEntity;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
+import org.nexters.jaknaesocore.domain.character.service.CharacterService;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.dto.OnboardingSubmissionResult;
@@ -34,8 +35,6 @@ import org.nexters.jaknaesocore.domain.survey.repository.OnboardingSurveyReposit
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
-import org.nexters.jaknaesocore.domain.survey.service.event.CreateCharacterEvent;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +47,7 @@ public class SurveyService {
   private final SurveySubmissionRepository surveySubmissionRepository;
   private final SurveyRepository surveyRepository;
   private final OnboardingSurveyRepository onboardingSurveyRepository;
-  private final ApplicationEventPublisher eventPublisher;
+  private final CharacterService characterService;
 
   @Transactional(readOnly = true)
   public SurveyResponse getNextSurvey(final Long bundleId, final Long memberId) {
@@ -162,9 +161,20 @@ public class SurveyService {
         surveySubmissionRepository
             .findByMemberIdAndBundleIdAndDeletedAtIsNullWithSurveyAndSurveyBundle(
                 member.getId(), bundle.getId());
-    if (bundle.isAllSubmitted(submissions)) {
-      publishCreateCharacterEvent(member, bundle, submissions);
+    if (SurveySubmissions.of(submissions).isFirstSubmitted()) {
+      characterService.createCharacter(member, bundle, submittedAt.toLocalDate());
     }
+    if (bundle.isAllSubmitted(submissions)) {
+      completeCharacter(member, bundle, submissions);
+    }
+  }
+
+  private void completeCharacter(
+      final Member member, final SurveyBundle bundle, final List<SurveySubmission> submissions) {
+    final List<Survey> surveys = submissions.stream().map(SurveySubmission::getSurvey).toList();
+    final KeywordScores scores = KeywordScores.of(surveys);
+
+    characterService.updateCharacter(member, bundle, scores.getValues(), submissions);
   }
 
   @Transactional(readOnly = true)
@@ -200,22 +210,18 @@ public class SurveyService {
         createSurveyToSelectedOption(command.submissions(), surveyMap);
 
     List<SurveySubmission> submissions =
-        createSubmissionsBy(submittedAt, surveyToSelectedOption, member);
-
-    surveySubmissionRepository.saveAll(submissions);
+        surveySubmissionRepository.saveAll(
+            createSubmissionsBy(submittedAt, surveyToSelectedOption, member));
     member.completeOnboarding(submittedAt);
-
-    //    FIXME: 확인 후 주석 제거 필요 (온보딩 번들 전달)
-    //    createCharacter(member, null, submissions);
-  }
-
-  private void publishCreateCharacterEvent(
-      final Member member, final SurveyBundle bundle, final List<SurveySubmission> submissions) {
-    final List<Survey> surveys = submissions.stream().map(SurveySubmission::getSurvey).toList();
-    final KeywordScores scores = new KeywordScores(surveys);
-
-    eventPublisher.publishEvent(
-        new CreateCharacterEvent(member, bundle, scores.getKeywordScores(), submissions));
+    final SurveyBundle onboardingBundle =
+        onboardingSurveyRepository
+            .findTopBy()
+            .orElseThrow(() -> CustomException.SURVEY_NOT_FOUND)
+            .getSurveyBundle();
+    final KeywordScores scores =
+        KeywordScores.of(submissions.stream().map(SurveySubmission::getSurvey).toList());
+    characterService.createFirstCharacter(
+        member, onboardingBundle, scores.getValues(), submissions);
   }
 
   private Member getMember(Long memberId) {

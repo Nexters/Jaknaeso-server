@@ -1,15 +1,15 @@
 package org.nexters.jaknaesocore.domain.character.service;
 
-import jakarta.annotation.PostConstruct;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
 import org.nexters.jaknaesocore.domain.character.model.Characters;
 import org.nexters.jaknaesocore.domain.character.model.ValueCharacter;
+import org.nexters.jaknaesocore.domain.character.model.ValueCharacters;
+import org.nexters.jaknaesocore.domain.character.model.ValueReport;
 import org.nexters.jaknaesocore.domain.character.repository.CharacterRecordRepository;
 import org.nexters.jaknaesocore.domain.character.repository.ValueCharacterRepository;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterCommand;
@@ -18,13 +18,13 @@ import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueRepor
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.SimpleCharacterResponses;
+import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
-import org.nexters.jaknaesocore.domain.survey.model.Keyword;
+import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
+import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
+import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
-import org.nexters.jaknaesocore.domain.survey.service.event.CreateCharacterEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -37,16 +37,6 @@ public class CharacterService {
   private final ValueCharacterRepository valueCharacterRepository;
   private final SurveySubmissionRepository surveySubmissionRepository;
 
-  private Map<Keyword, ValueCharacter> valueCharacters;
-
-  @PostConstruct
-  void setUp() {
-    valueCharacters =
-        valueCharacterRepository.findAll().stream()
-            .collect(
-                Collectors.toMap(ValueCharacter::getKeyword, valueCharacter -> valueCharacter));
-  }
-
   @Transactional(readOnly = true)
   public CharacterResponse getCharacter(final CharacterCommand command) {
     return characterRecordRepository
@@ -58,7 +48,7 @@ public class CharacterService {
   @Transactional(readOnly = true)
   public CharacterResponse getCurrentCharacter(final Long memberId) {
     return characterRecordRepository
-        .findTopByMemberIdAndDeletedAtIsNullWithMember(memberId)
+        .findLatestCompletedCharacter(memberId)
         .map(CharacterResponse::of)
         .orElseThrow(() -> CustomException.CHARACTER_NOT_FOUND);
   }
@@ -93,22 +83,45 @@ public class CharacterService {
     return CharacterValueReportResponse.of(characterRecord.getValueReports());
   }
 
-  @EventListener
-  @Transactional(propagation = Propagation.MANDATORY)
-  public void createCharacter(final CreateCharacterEvent event) {
+  @Transactional
+  public void createFirstCharacter(
+      Member member,
+      SurveyBundle bundle,
+      List<KeywordScore> scores,
+      List<SurveySubmission> submissions) {
     final Characters characters =
-        Characters.builder()
-            .member(event.member())
-            .bundle(event.bundle())
-            .scores(event.scores())
-            .submissions(event.submissions())
-            .valueCharacters(valueCharacters)
-            .build();
-    characterRecordRepository.save(characters.provideCharacterRecord());
+        Characters.builder().scores(scores).submissions(submissions).build();
+    final List<ValueReport> valueReports = characters.provideCharacterRecord();
+    final ValueCharacter valueCharacter =
+        ValueCharacters.of(valueCharacterRepository.findAll()).findTopValueCharacter(valueReports);
+    characterRecordRepository.save(
+        CharacterRecord.ofFirst(member, bundle, valueCharacter, valueReports, submissions));
+  }
 
-    log.info(
-        "Handled CreateCharacterEvent for memberId {} and bundleId {}",
-        event.member().getId(),
-        event.bundle().getId());
+  @Transactional
+  public void createCharacter(Member member, SurveyBundle bundle, LocalDate startDate) {
+    final CharacterRecord previousRecord =
+        characterRecordRepository
+            .findLatestCompletedCharacter(member.getId())
+            .orElseThrow(() -> CustomException.CHARACTER_NOT_FOUND);
+    characterRecordRepository.save(CharacterRecord.of(previousRecord, member, bundle, startDate));
+  }
+
+  @Transactional
+  public void updateCharacter(
+      Member member,
+      SurveyBundle bundle,
+      List<KeywordScore> scores,
+      List<SurveySubmission> submissions) {
+    final Characters characters =
+        Characters.builder().scores(scores).submissions(submissions).build();
+    final List<ValueReport> valueReports = characters.provideCharacterRecord();
+    final ValueCharacter valueCharacter =
+        ValueCharacters.of(valueCharacterRepository.findAll()).findTopValueCharacter(valueReports);
+    final CharacterRecord characterRecord =
+        characterRecordRepository
+            .findByMemberIdAndBundleId(member.getId(), bundle.getId())
+            .orElseThrow(() -> CustomException.CHARACTER_NOT_FOUND);
+    characterRecord.updateRecord(valueCharacter, valueReports, submissions);
   }
 }
