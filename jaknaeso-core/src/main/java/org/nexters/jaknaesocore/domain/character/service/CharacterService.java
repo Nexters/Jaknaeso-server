@@ -51,17 +51,7 @@ public class CharacterService {
   public CharacterResponse getCharacter(final CharacterCommand command) {
     return characterRecordRepository
         .findByIdAndMemberIdAndDeletedAtIsNullWithMember(command.memberId(), command.characterId())
-        .map(
-            it ->
-                CharacterResponse.builder()
-                    .characterId(it.getId())
-                    .characterNo(it.getCharacterNo())
-                    .valueCharacter(it.getValueCharacter())
-                    .name(it.getValueCharacter().getName())
-                    .description(it.getValueCharacter().getDescription())
-                    .startDate(it.getStartDate())
-                    .endDate(it.getEndDate())
-                    .build())
+        .map(CharacterResponse::of)
         .orElseThrow(() -> CustomException.CHARACTER_NOT_FOUND);
   }
 
@@ -69,17 +59,7 @@ public class CharacterService {
   public CharacterResponse getCurrentCharacter(final Long memberId) {
     return characterRecordRepository
         .findTopByMemberIdAndDeletedAtIsNullWithMember(memberId)
-        .map(
-            it ->
-                CharacterResponse.builder()
-                    .characterId(it.getId())
-                    .characterNo(it.getCharacterNo())
-                    .valueCharacter(it.getValueCharacter())
-                    .name(it.getValueCharacter().getName())
-                    .description(it.getValueCharacter().getDescription())
-                    .startDate(it.getStartDate())
-                    .endDate(it.getEndDate())
-                    .build())
+        .map(CharacterResponse::of)
         .orElseThrow(() -> CustomException.CHARACTER_NOT_FOUND);
   }
 

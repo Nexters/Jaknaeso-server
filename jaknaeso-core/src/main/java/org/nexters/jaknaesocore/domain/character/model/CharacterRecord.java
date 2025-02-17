@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseTimeEntity;
 import org.nexters.jaknaesocore.domain.member.model.Member;
+import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 
 @Getter
@@ -74,5 +75,21 @@ public class CharacterRecord extends BaseTimeEntity {
       final List<ValueReport> valueReports) {
     return new CharacterRecord(
         characterNo, valueCharacter, startDate, endDate, member, surveyBundle, valueReports);
+  }
+
+  public Keyword getKeyword() {
+    return valueCharacter.getKeyword();
+  }
+
+  public String getName() {
+    return valueCharacter.getName();
+  }
+
+  public String getDescription() {
+    return valueCharacter.getDescription();
+  }
+
+  public List<CharacterTrait> getTraitsByType(final CharacterTraitType characterTraitType) {
+    return valueCharacter.getTraitsByType(characterTraitType);
   }
 }
