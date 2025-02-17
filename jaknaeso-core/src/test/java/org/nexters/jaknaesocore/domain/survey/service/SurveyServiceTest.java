@@ -571,6 +571,14 @@ class SurveyServiceTest extends IntegrationTest {
     memberRepository.save(member);
     SurveyBundle surveyBundle = new SurveyBundle();
 
+    final ValueCharacter valueCharacter =
+        valueCharacterRepository.save(
+            ValueCharacter.builder()
+                .name("아낌없이 주는 보금자리 유형")
+                .description("보금자리 유형 설명")
+                .keyword(Keyword.BENEVOLENCE)
+                .build());
+
     surveyBundleRepository.save(surveyBundle);
 
     OnboardingSurvey survey1 =
@@ -588,19 +596,25 @@ class SurveyServiceTest extends IntegrationTest {
 
     surveyRepository.saveAll(List.of(survey1, survey2, survey3, survey4));
 
-    List<KeywordScore> scores =
+    List<KeywordScore> scores1 =
         List.of(
             KeywordScore.builder().keyword(Keyword.ADVENTURE).score(BigDecimal.ONE).build(),
             KeywordScore.builder().keyword(Keyword.BENEVOLENCE).score(BigDecimal.TWO).build());
+    List<KeywordScore> scores2 =
+        List.of(
+            KeywordScore.builder()
+                .keyword(Keyword.ADVENTURE)
+                .score(BigDecimal.valueOf(-1))
+                .build());
 
     SurveyOption option1 =
-        SurveyOption.builder().survey(survey1).scores(scores).content("전혀 나와 같지않다.").build();
+        SurveyOption.builder().survey(survey1).scores(scores1).content("전혀 나와 같지않다.").build();
     SurveyOption option2 =
-        SurveyOption.builder().survey(survey2).scores(scores).content("나와 같지 않다.").build();
+        SurveyOption.builder().survey(survey2).scores(scores1).content("나와 같지 않다.").build();
     SurveyOption option3 =
-        SurveyOption.builder().survey(survey3).scores(scores).content("나와 조금 같다.").build();
+        SurveyOption.builder().survey(survey3).scores(scores2).content("나와 조금 같다.").build();
     SurveyOption option4 =
-        SurveyOption.builder().survey(survey4).scores(scores).content("나와 같다.").build();
+        SurveyOption.builder().survey(survey4).scores(scores2).content("나와 같다.").build();
 
     surveyOptionRepository.saveAll(List.of(option1, option2, option3, option4));
     LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 13, 18, 25, 0);
@@ -627,6 +641,25 @@ class SurveyServiceTest extends IntegrationTest {
             tuple(member.getId(), survey3.getId(), option3.getId(), submittedAt),
             tuple(member.getId(), survey4.getId(), option4.getId(), submittedAt));
     then(member).extracting("completedOnboardingAt").isEqualTo(submittedAt);
+    then(characterRecordRepository.findAll())
+        .hasSize(1)
+        .extracting(
+            "ordinalNumber",
+            "characterNo",
+            "member.id",
+            "surveyBundle.id",
+            "valueCharacter.id",
+            "startDate",
+            "endDate")
+        .containsExactly(
+            tuple(
+                1,
+                "첫번째 캐릭터",
+                member.getId(),
+                surveyBundle.getId(),
+                valueCharacter.getId(),
+                submittedAt.toLocalDate(),
+                submittedAt.toLocalDate()));
   }
 
   @DisplayName("submitSurvey 메서드는")
