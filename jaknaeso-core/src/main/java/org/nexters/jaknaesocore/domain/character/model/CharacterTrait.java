@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseTimeEntity;
@@ -25,4 +26,14 @@ public class CharacterTrait extends BaseTimeEntity {
   @Enumerated(EnumType.STRING)
   @Getter
   private CharacterTraitType type;
+
+  @Builder
+  private CharacterTrait(
+      final ValueCharacter valueCharacter,
+      final String description,
+      final CharacterTraitType type) {
+    this.valueCharacter = valueCharacter;
+    this.description = description;
+    this.type = type;
+  }
 }
