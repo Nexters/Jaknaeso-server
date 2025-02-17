@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
-import org.nexters.jaknaesocore.domain.character.model.Characters;
+import org.nexters.jaknaesocore.domain.character.model.ScoreEvaluator;
 import org.nexters.jaknaesocore.domain.character.model.ValueCharacter;
 import org.nexters.jaknaesocore.domain.character.model.ValueCharacters;
 import org.nexters.jaknaesocore.domain.character.model.ValueReport;
@@ -79,9 +79,8 @@ public class CharacterService {
       SurveyBundle bundle,
       List<KeywordScore> scores,
       List<SurveySubmission> submissions) {
-    final Characters characters =
-        Characters.builder().scores(scores).submissions(submissions).build();
-    final List<ValueReport> valueReports = characters.provideCharacterRecord();
+    final List<ValueReport> valueReports =
+        ScoreEvaluator.of(scores, submissions).generateValueReports();
     final ValueCharacter valueCharacter =
         ValueCharacters.of(valueCharacterRepository.findAll()).findTopValueCharacter(valueReports);
     characterRecordRepository.save(
@@ -103,9 +102,8 @@ public class CharacterService {
       SurveyBundle bundle,
       List<KeywordScore> scores,
       List<SurveySubmission> submissions) {
-    final Characters characters =
-        Characters.builder().scores(scores).submissions(submissions).build();
-    final List<ValueReport> valueReports = characters.provideCharacterRecord();
+    final List<ValueReport> valueReports =
+        ScoreEvaluator.of(scores, submissions).generateValueReports();
     final ValueCharacter valueCharacter =
         ValueCharacters.of(valueCharacterRepository.findAll()).findTopValueCharacter(valueReports);
     final CharacterRecord characterRecord =

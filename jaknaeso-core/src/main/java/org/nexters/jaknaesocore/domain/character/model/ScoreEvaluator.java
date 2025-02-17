@@ -5,28 +5,31 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordMetrics;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public class Characters {
+public class ScoreEvaluator {
 
   private final List<KeywordScore> scores;
   private final List<SurveySubmission> submissions;
 
   @Builder
-  public static Characters of(
+  private ScoreEvaluator(
       final List<KeywordScore> scores, final List<SurveySubmission> submissions) {
-    return new Characters(scores, submissions);
+    this.scores = scores;
+    this.submissions = submissions;
   }
 
-  public List<ValueReport> provideCharacterRecord() {
+  public static ScoreEvaluator of(
+      final List<KeywordScore> scores, final List<SurveySubmission> submissions) {
+    return new ScoreEvaluator(scores, submissions);
+  }
+
+  public List<ValueReport> generateValueReports() {
     final List<ValueReport> valueReports = provideValueReport();
     return valueReports;
   }
