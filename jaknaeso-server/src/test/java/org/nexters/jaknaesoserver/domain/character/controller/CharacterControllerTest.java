@@ -23,6 +23,7 @@ import org.nexters.jaknaesocore.domain.character.model.ValueCharacter;
 import org.nexters.jaknaesocore.domain.character.model.ValueReport;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
+import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse.CharacterTraitResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse;
@@ -90,19 +91,8 @@ class CharacterControllerTest extends ControllerTest {
   @WithMockCustomUser
   @Test
   void 특정_캐릭터_정보를_조회한다() throws Exception {
-
-    ValueCharacter valueCharacter = new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS);
     given(characterService.getCharacter(new CharacterCommand(1L, 1L)))
-        .willReturn(
-            CharacterResponse.builder()
-                .characterId(1L)
-                .characterNo("첫번째")
-                .valueCharacter(valueCharacter)
-                .name(valueCharacter.getName())
-                .description(valueCharacter.getDescription())
-                .startDate(LocalDate.now().minusDays(15))
-                .endDate(LocalDate.now())
-                .build());
+        .willReturn(createCharacterResponse());
 
     mockMvc
         .perform(
@@ -144,6 +134,15 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("data.description")
                                 .type(SimpleType.STRING)
                                 .description("캐릭터 설명"),
+                            fieldWithPath("data.mainTraits[].description")
+                                .type(SimpleType.STRING)
+                                .description("캐릭터 주요 특성"),
+                            fieldWithPath("data.strengths[].description")
+                                .type(SimpleType.STRING)
+                                .description("캐릭터 강점"),
+                            fieldWithPath("data.weaknesses[].description")
+                                .type(SimpleType.STRING)
+                                .description("캐릭터 약점"),
                             fieldWithPath("data.startDate")
                                 .type(SimpleType.STRING)
                                 .description("시작 일자"),
@@ -160,17 +159,7 @@ class CharacterControllerTest extends ControllerTest {
   void 현재_캐릭터_정보를_조회한다() throws Exception {
 
     ValueCharacter valueCharacter = new ValueCharacter("성취를 쫓는 노력가", "성공 캐릭터 설명", Keyword.SUCCESS);
-    given(characterService.getCurrentCharacter(1L))
-        .willReturn(
-            CharacterResponse.builder()
-                .characterId(1L)
-                .characterNo("첫번째")
-                .valueCharacter(valueCharacter)
-                .name(valueCharacter.getName())
-                .description(valueCharacter.getDescription())
-                .startDate(LocalDate.now().minusDays(15))
-                .endDate(LocalDate.now())
-                .build());
+    given(characterService.getCurrentCharacter(1L)).willReturn(createCharacterResponse());
 
     mockMvc
         .perform(
@@ -208,6 +197,15 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("data.description")
                                 .type(SimpleType.STRING)
                                 .description("캐릭터 설명"),
+                            fieldWithPath("data.mainTraits[].description")
+                                .type(SimpleType.STRING)
+                                .description("캐릭터 주요 특성"),
+                            fieldWithPath("data.strengths[].description")
+                                .type(SimpleType.STRING)
+                                .description("캐릭터 강점"),
+                            fieldWithPath("data.weaknesses[].description")
+                                .type(SimpleType.STRING)
+                                .description("캐릭터 약점"),
                             fieldWithPath("data.startDate")
                                 .type(SimpleType.STRING)
                                 .description("시작 일자"),
@@ -262,5 +260,33 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("error").description("에러").optional())
                         .responseSchema(schema("CharacterValueReportResponse"))
                         .build())));
+  }
+
+  private CharacterResponse createCharacterResponse() {
+    return CharacterResponse.builder()
+        .characterId(1L)
+        .characterNo("첫번째")
+        .characterType(Keyword.SUCCESS)
+        .name("성취를 쫓는 노력가")
+        .description(
+            "목표를 이루고 영향력을 가지는 것을 중요하게 여기는\n노력가 유형은 끊임없는 노력과 성과를 내는 것을 중요시 여겨요.\n사회에서 의미 있는 위치를 차지하고 싶어하는 야망가!")
+        .mainTraits(
+            List.of(
+                CharacterTraitResponse.builder()
+                    .description("목표를 이루기 위해 끊임없이 노력하며, 성장하는 과정에서 보람을 느껴요.")
+                    .build()))
+        .strengths(
+            List.of(
+                CharacterTraitResponse.builder()
+                    .description("강한 추진력과 목표 지향적인 태도로 원하는 결과를 만들어내요.")
+                    .build()))
+        .weaknesses(
+            List.of(
+                CharacterTraitResponse.builder()
+                    .description("성과 중심적인 태도가 타인과의 관계에 영향을 줄 수 있어요.")
+                    .build()))
+        .startDate(LocalDate.now().minusDays(15).toString())
+        .endDate(LocalDate.now().toString())
+        .build();
   }
 }

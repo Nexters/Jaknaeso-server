@@ -1,8 +1,10 @@
 package org.nexters.jaknaesocore.domain.character.model;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,9 +23,15 @@ public class ValueCharacter extends BaseEntity {
   @Enumerated(EnumType.STRING)
   private Keyword keyword;
 
+  @Embedded private CharacterTraits characterTraits = CharacterTraits.empty();
+
   public ValueCharacter(final String name, final String description, final Keyword keyword) {
     this.name = name;
     this.description = description;
     this.keyword = keyword;
+  }
+
+  public List<CharacterTrait> getTraitsByType(final CharacterTraitType type) {
+    return characterTraits.getByType(type);
   }
 }
