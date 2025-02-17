@@ -9,5 +9,9 @@ public record KakaoUserInfoResponse(
 
   @JsonIgnoreProperties(ignoreUnknown = true)
   public record KakaoAccount(
-      @JsonProperty("name") String name, @JsonProperty("email") String email) {}
+      @JsonProperty("profile") Profile profile, @JsonProperty("email") String email) {
+
+    @JsonIgnoreProperties(ignoreUnknown = true)
+    public record Profile(@JsonProperty("nickname") String nickname) {}
+  }
 }

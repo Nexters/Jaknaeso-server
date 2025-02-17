@@ -17,6 +17,7 @@ import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoTokenResponse;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse;
 import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse.KakaoAccount;
+import org.nexters.jaknaesocore.domain.auth.restclient.dto.KakaoUserInfoResponse.KakaoAccount.Profile;
 import org.nexters.jaknaesocore.domain.auth.service.dto.AppleLoginCommand;
 import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;
 import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginWithTokenCommand;
@@ -119,7 +120,9 @@ class OauthServiceIntegrationTest extends IntegrationTest {
       given(kakaoAuthClient.requestToken(any()))
           .willReturn(new KakaoTokenResponse("bearer", "access token", 1, "refresh token", 1));
       given(kakaoClient.requestUserInfo("Bearer access token"))
-          .willReturn(new KakaoUserInfoResponse(1L, new KakaoAccount("홍길동", "test@example.com")));
+          .willReturn(
+              new KakaoUserInfoResponse(
+                  1L, new KakaoAccount(new Profile("홍길동"), "test@example.com")));
     }
 
     @Nested
@@ -193,7 +196,9 @@ class OauthServiceIntegrationTest extends IntegrationTest {
     @BeforeEach
     void setUp() {
       given(kakaoClient.requestUserInfo("Bearer access token"))
-          .willReturn(new KakaoUserInfoResponse(1L, new KakaoAccount("홍길동", "test@example.com")));
+          .willReturn(
+              new KakaoUserInfoResponse(
+                  1L, new KakaoAccount(new Profile("홍길동"), "test@example.com")));
     }
 
     @Nested

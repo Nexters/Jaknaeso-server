@@ -85,10 +85,11 @@ public class OauthService {
         .map(SocialAccount::getMember)
         .map(
             it -> {
-              it.updateUserInfo(kakaoAccount.name(), kakaoAccount.email());
+              it.updateUserInfo(kakaoAccount.profile().nickname(), kakaoAccount.email());
               return it;
             })
-        .orElseGet(() -> kakaoSignUp(oauthId, kakaoAccount.name(), kakaoAccount.email()));
+        .orElseGet(
+            () -> kakaoSignUp(oauthId, kakaoAccount.profile().nickname(), kakaoAccount.email()));
   }
 
   private Member kakaoSignUp(final String oauthId, final String name, final String email) {
