@@ -214,6 +214,16 @@ class CharacterServiceTest extends IntegrationTest {
                 .build());
 
         final SurveyBundle incompleteBundle = surveyBundleRepository.save(new SurveyBundle());
+        characterRecordRepository.save(
+            CharacterRecord.builder()
+                .characterNo("두번째")
+                .valueCharacter(null)
+                .startDate(LocalDate.now().minusDays(15))
+                .endDate(LocalDate.now())
+                .member(member)
+                .surveyBundle(incompleteBundle)
+                .build());
+
         final BalanceSurvey survey =
             surveyRepository.save(
                 new BalanceSurvey(
@@ -249,7 +259,7 @@ class CharacterServiceTest extends IntegrationTest {
             () ->
                 then(actual.characters().get(1))
                     .extracting("characterNo", "bundleId")
-                    .containsExactly("TODO", incompleteBundle.getId())); // 추후 같이 수정
+                    .containsExactly("두번째", incompleteBundle.getId())); // 추후 같이 수정
       }
     }
   }

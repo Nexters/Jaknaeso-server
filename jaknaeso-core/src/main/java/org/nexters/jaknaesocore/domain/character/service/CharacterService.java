@@ -17,7 +17,7 @@ import org.nexters.jaknaesocore.domain.character.service.dto.CharacterResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportCommand;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharacterValueReportResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse;
-import org.nexters.jaknaesocore.domain.character.service.dto.SimpleCharacterResponses;
+import org.nexters.jaknaesocore.domain.character.service.dto.SimpleCharacterResponse;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
@@ -60,17 +60,7 @@ public class CharacterService {
     final List<CharacterRecord> records =
         characterRecordRepository.findByMemberIdAndDeletedAtIsNullWithMemberAndSurveyBundle(
             memberId);
-
-    final SimpleCharacterResponses responses =
-        new SimpleCharacterResponses(getLatestBundleId(memberId), records);
-    return new CharactersResponse(responses.getResponses());
-  }
-
-  private Long getLatestBundleId(final Long memberId) {
-    return surveySubmissionRepository
-        .findTopByMember_IdAndDeletedAtIsNullOrderByCreatedAtDesc(memberId)
-        .map(it -> it.getSurvey().getSurveyBundle().getId())
-        .orElse(null);
+    return new CharactersResponse(SimpleCharacterResponse.listOf(records));
   }
 
   @Transactional(readOnly = true)
