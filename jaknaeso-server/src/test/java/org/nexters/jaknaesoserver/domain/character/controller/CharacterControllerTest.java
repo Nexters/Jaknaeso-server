@@ -107,10 +107,10 @@ class CharacterControllerTest extends ControllerTest {
         .andExpect(status().isOk())
         .andDo(
             document(
-                "character-success",
+                "specific-character-success",
                 resource(
                     ResourceSnippetParameters.builder()
-                        .description("캐릭터 목록 반환")
+                        .description("특정 캐릭터 반환")
                         .tag("Character Domain")
                         .pathParameters(
                             parameterWithName("characterId")
@@ -174,10 +174,10 @@ class CharacterControllerTest extends ControllerTest {
         .andExpect(status().isOk())
         .andDo(
             document(
-                "character-success",
+                "latest-character-success",
                 resource(
                     ResourceSnippetParameters.builder()
-                        .description("캐릭터 목록 반환")
+                        .description("최신(현재) 캐릭터 반환")
                         .tag("Character Domain")
                         .queryParameters(
                             parameterWithName("memberId")
