@@ -9,6 +9,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
@@ -17,9 +18,10 @@ import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.domain.member.service.dto.MemberResponse;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.common.support.WithMockCustomUser;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 class MemberControllerTest extends ControllerTest {
+
+  private static final String BEARER_TOKEN = "Bearer {accessToken}";
 
   @WithMockCustomUser
   @Test
@@ -52,7 +54,7 @@ class MemberControllerTest extends ControllerTest {
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.get("/api/v1/members/{memberId}", 1L)
+            get("/api/v1/members/{memberId}", 1L)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .with(csrf()))

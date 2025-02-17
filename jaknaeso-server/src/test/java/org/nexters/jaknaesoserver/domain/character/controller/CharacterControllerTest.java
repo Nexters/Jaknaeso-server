@@ -1,11 +1,13 @@
 package org.nexters.jaknaesoserver.domain.character.controller;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
+import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.Schema.schema;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -34,6 +36,8 @@ import org.nexters.jaknaesoserver.common.support.WithMockCustomUser;
 
 class CharacterControllerTest extends ControllerTest {
 
+  private static final String BEARER_TOKEN = "Bearer {accessToken}";
+
   @WithMockCustomUser
   @Test
   void 캐릭터_목록을_조회한다() throws Exception {
@@ -51,6 +55,7 @@ class CharacterControllerTest extends ControllerTest {
     mockMvc
         .perform(
             get("/api/v1/characters")
+                .header(AUTHORIZATION, BEARER_TOKEN)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .queryParam("memberId", "1")
@@ -58,11 +63,15 @@ class CharacterControllerTest extends ControllerTest {
         .andExpect(status().isOk())
         .andDo(
             document(
-                "character-list-success",
+                "get-character-list-success",
                 resource(
                     ResourceSnippetParameters.builder()
                         .description("캐릭터 목록 반환")
                         .tag("Character Domain")
+                        .requestHeaders(
+                            headerWithName("Authorization")
+                                .type(SimpleType.STRING)
+                                .description("Bearer 토큰"))
                         .queryParameters(
                             parameterWithName("memberId")
                                 .type(SimpleType.NUMBER)
@@ -100,6 +109,7 @@ class CharacterControllerTest extends ControllerTest {
     mockMvc
         .perform(
             get("/api/v1/characters/{characterId}", 1)
+                .header(AUTHORIZATION, BEARER_TOKEN)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .queryParam("memberId", "1")
@@ -107,11 +117,16 @@ class CharacterControllerTest extends ControllerTest {
         .andExpect(status().isOk())
         .andDo(
             document(
-                "specific-character-success",
+                "get-specific-character-success",
                 resource(
                     ResourceSnippetParameters.builder()
-                        .description("특정 캐릭터 반환")
+                        .summary("특정 캐릭터 반환")
+                        .description("캐릭터 아이디에 해당하는 캐릭터를 반환합니다.")
                         .tag("Character Domain")
+                        .requestHeaders(
+                            headerWithName("Authorization")
+                                .type(SimpleType.STRING)
+                                .description("Bearer 토큰"))
                         .pathParameters(
                             parameterWithName("characterId")
                                 .type(SimpleType.NUMBER)
@@ -167,6 +182,7 @@ class CharacterControllerTest extends ControllerTest {
     mockMvc
         .perform(
             get("/api/v1/characters/latest")
+                .header(AUTHORIZATION, BEARER_TOKEN)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .queryParam("memberId", "1")
@@ -174,11 +190,15 @@ class CharacterControllerTest extends ControllerTest {
         .andExpect(status().isOk())
         .andDo(
             document(
-                "latest-character-success",
+                "get-latest-character-success",
                 resource(
                     ResourceSnippetParameters.builder()
                         .description("최신(현재) 캐릭터 반환")
                         .tag("Character Domain")
+                        .requestHeaders(
+                            headerWithName("Authorization")
+                                .type(SimpleType.STRING)
+                                .description("Bearer 토큰"))
                         .queryParameters(
                             parameterWithName("memberId")
                                 .type(SimpleType.NUMBER)
@@ -233,6 +253,7 @@ class CharacterControllerTest extends ControllerTest {
     mockMvc
         .perform(
             get("/api/v1/characters/{characterId}/report", 1)
+                .header(AUTHORIZATION, BEARER_TOKEN)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .queryParam("memberId", "1")
@@ -240,11 +261,21 @@ class CharacterControllerTest extends ControllerTest {
         .andExpect(status().isOk())
         .andDo(
             document(
-                "character-value-report-success",
+                "get-character-value-report-success",
                 resource(
                     ResourceSnippetParameters.builder()
-                        .description("캐릭터 분석 정보 반환")
+                        .summary("캐릭터 가치관 분석 정보 반환")
+                        .description(
+                            """
+                            캐릭터의 가치관 분석 정보를 반환합니다.
+                            - 가치관 키워드와 각 키워드에 대한 퍼센트 리스트를 제공합니다.
+                            - 퍼센트 수치는 전체 가치관 대비 비율이 아닌, 개별 키워드마다 선택한 옵션 수를 기준으로 계산됩니다.
+                            """)
                         .tag("Character Domain")
+                        .requestHeaders(
+                            headerWithName("Authorization")
+                                .type(SimpleType.STRING)
+                                .description("Bearer 토큰"))
                         .pathParameters(
                             parameterWithName("characterId")
                                 .type(SimpleType.NUMBER)
