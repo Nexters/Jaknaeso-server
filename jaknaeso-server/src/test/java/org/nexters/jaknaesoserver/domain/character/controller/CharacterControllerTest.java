@@ -71,6 +71,9 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("result")
                                 .type(SimpleType.STRING)
                                 .description("API 요청 결과 (성공/실패)"),
+                            fieldWithPath("data.characters[].ordinalNumber")
+                                .type(SimpleType.NUMBER)
+                                .description("캐릭터 순서 번호"),
                             fieldWithPath("data.characters[].characterNo")
                                 .type(SimpleType.STRING)
                                 .description("캐릭터 회차"),
