@@ -18,7 +18,7 @@ public record SimpleCharacterResponse(
         .characterNo(record.getCharacterNo())
         .characterId(record.getId())
         .bundleId(record.getSurveyBundle().getId())
-        .isCompleted(true)
+        .isCompleted(record.isCompleted())
         .build();
   }
 }
