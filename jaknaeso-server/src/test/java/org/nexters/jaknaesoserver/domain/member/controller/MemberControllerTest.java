@@ -1,12 +1,10 @@
 package org.nexters.jaknaesoserver.domain.member.controller;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
-import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.Schema.schema;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
-import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -34,7 +32,6 @@ class MemberControllerTest extends ControllerTest {
     mockMvc
         .perform(
             delete("/api/v1/members/{memberId}", 1)
-                .header(AUTHORIZATION, BEARER_TOKEN)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .with(csrf()))
@@ -46,10 +43,6 @@ class MemberControllerTest extends ControllerTest {
                     ResourceSnippetParameters.builder()
                         .description("회원 탈퇴")
                         .tags("Member Domain")
-                        .requestHeaders(
-                            headerWithName("Authorization")
-                                .type(SimpleType.STRING)
-                                .description("Bearer 토큰"))
                         .build())));
   }
 
