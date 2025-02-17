@@ -1,14 +1,17 @@
 package org.nexters.jaknaesoserver.domain.member.controller;
 
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
+import static com.epages.restdocs.apispec.ResourceDocumentation.headerWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static com.epages.restdocs.apispec.Schema.schema;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
@@ -17,9 +20,10 @@ import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.domain.member.service.dto.MemberResponse;
 import org.nexters.jaknaesoserver.common.support.ControllerTest;
 import org.nexters.jaknaesoserver.common.support.WithMockCustomUser;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 class MemberControllerTest extends ControllerTest {
+
+  private static final String BEARER_TOKEN = "Bearer {accessToken}";
 
   @WithMockCustomUser
   @Test
@@ -30,6 +34,7 @@ class MemberControllerTest extends ControllerTest {
     mockMvc
         .perform(
             delete("/api/v1/members/{memberId}", 1)
+                .header(AUTHORIZATION, BEARER_TOKEN)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .with(csrf()))
@@ -41,6 +46,10 @@ class MemberControllerTest extends ControllerTest {
                     ResourceSnippetParameters.builder()
                         .description("회원 탈퇴")
                         .tags("Member Domain")
+                        .requestHeaders(
+                            headerWithName("Authorization")
+                                .type(SimpleType.STRING)
+                                .description("Bearer 토큰"))
                         .build())));
   }
 
@@ -52,7 +61,7 @@ class MemberControllerTest extends ControllerTest {
 
     mockMvc
         .perform(
-            MockMvcRequestBuilders.get("/api/v1/members/{memberId}", 1L)
+            get("/api/v1/members/{memberId}", 1L)
                 .accept(APPLICATION_JSON)
                 .contentType(APPLICATION_JSON)
                 .with(csrf()))
