@@ -140,4 +140,8 @@ public class CharacterRecord extends BaseTimeEntity {
   public List<CharacterTrait> getTraitsByType(final CharacterTraitType characterTraitType) {
     return valueCharacter.getTraitsByType(characterTraitType);
   }
+
+  public boolean isCompleted() {
+    return valueCharacter != null && valueCharacter.getId() != null;
+  }
 }
