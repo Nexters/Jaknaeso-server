@@ -1,8 +1,6 @@
 package org.nexters.jaknaesocore.domain.character.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,47 +9,26 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
-import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordMetrics;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
-import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class Characters {
 
-  private final Long characterNo;
-  private final Member member;
-  private final SurveyBundle bundle;
   private final List<KeywordScore> scores;
   private final List<SurveySubmission> submissions;
-  private final Map<Keyword, ValueCharacter> valueCharacters;
 
   @Builder
   public static Characters of(
-      final Long characterNo,
-      final Member member,
-      final SurveyBundle bundle,
-      final List<KeywordScore> scores,
-      final List<SurveySubmission> submissions,
-      final Map<Keyword, ValueCharacter> valueCharacters) {
-    return new Characters(characterNo, member, bundle, scores, submissions, valueCharacters);
+      final List<KeywordScore> scores, final List<SurveySubmission> submissions) {
+    return new Characters(scores, submissions);
   }
 
-  public CharacterRecord provideCharacterRecord() {
+  public List<ValueReport> provideCharacterRecord() {
     final List<ValueReport> valueReports = provideValueReport();
-    final ValueCharacter valueCharacter = findTopValueCharacter(valueReports);
-    return CharacterRecord.builder()
-        .characterNo("TODO 수정")
-        .valueCharacter(valueCharacter)
-        .valueReports(valueReports)
-        .member(member)
-        .surveyBundle(bundle)
-        .valueReports(valueReports)
-        .startDate(bundle.getCreatedAt().toLocalDate())
-        .endDate(LocalDate.now())
-        .build();
+    return valueReports;
   }
 
   private List<ValueReport> provideValueReport() {
@@ -83,14 +60,5 @@ public class Characters {
           weightMap.put(k, sumPerKeyword.divide(sum).getValue());
         });
     return weightMap;
-  }
-
-  private ValueCharacter findTopValueCharacter(final List<ValueReport> valueReports) {
-    final ValueReport topReport =
-        valueReports.stream()
-            .max(Comparator.comparing(ValueReport::getPercentage))
-            .orElseThrow(() -> new IllegalStateException("ValueReport가 비어 있습니다."));
-
-    return valueCharacters.get(topReport.getKeyword());
   }
 }
