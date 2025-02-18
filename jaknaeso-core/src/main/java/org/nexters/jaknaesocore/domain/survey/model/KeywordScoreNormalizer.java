@@ -12,6 +12,6 @@ public class KeywordScoreNormalizer {
     var numerator = originalScore.subtract(minScore);
     var denominator = maxScore.subtract(minScore);
 
-    return numerator.divide(denominator, 2, RoundingMode.HALF_UP).multiply(originalScore.abs());
+    return numerator.divide(denominator, 2, RoundingMode.HALF_UP);
   }
 }

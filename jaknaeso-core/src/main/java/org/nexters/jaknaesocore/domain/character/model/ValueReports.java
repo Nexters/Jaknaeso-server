@@ -35,20 +35,12 @@ public class ValueReports {
     Map<Keyword, BigDecimal> percentage = new HashMap<>();
     Map<Keyword, BigDecimal> sum = getKeywordSum(submissions);
 
-    BigDecimal keywordCnt = BigDecimal.valueOf(weightMap.size());
-    BigDecimal sumPerKeyword = PERCENTAGE100.divide(keywordCnt).getValue();
-
     sum.forEach(
         (k, v) -> {
-          var score =
-              KeywordScoreNormalizer.normalize(v, metricsMap.get(k)).multiply(weightMap.get(k));
+          var score = KeywordScoreNormalizer.normalize(v, metricsMap.get(k));
 
           percentage.put(
-              k,
-              ScaledBigDecimal.of(score)
-                  .divide(sumPerKeyword)
-                  .multiply(PERCENTAGE100.getValue())
-                  .getValue());
+              k, ScaledBigDecimal.of(score).multiply(PERCENTAGE100.getValue()).getValue());
         });
     return percentage;
   }
