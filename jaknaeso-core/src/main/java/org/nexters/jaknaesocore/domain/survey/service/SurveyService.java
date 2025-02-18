@@ -202,7 +202,9 @@ public class SurveyService {
   public void submitOnboardingSurvey(
       OnboardingSubmissionsCommand command, LocalDateTime submittedAt) {
     Member member = getMember(command.memberId());
-
+    if (member.isCompletedOnboarding()) {
+      throw CustomException.ALREADY_COMPLETED_SURVEY_BUNDLE;
+    }
     List<Long> surveyIds = extractSurveyIdsBy(command);
     Map<Long, Survey> surveyMap = createSurveyMapBy(surveyIds);
 
