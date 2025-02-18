@@ -1,5 +1,6 @@
 package org.nexters.jaknaesocore.domain.character.service.dto;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import lombok.Builder;
 import org.nexters.jaknaesocore.domain.character.model.CharacterRecord;
@@ -21,6 +22,9 @@ public record CharacterResponse(
     String startDate,
     String endDate) {
 
+  private static final DateTimeFormatter DATE_TIME_FORMATTER =
+      DateTimeFormatter.ofPattern("yyyy.MM.dd");
+
   @Builder
   public static CharacterResponse of(final CharacterRecord characterRecord) {
     return new CharacterResponse(
@@ -39,8 +43,8 @@ public record CharacterResponse(
         characterRecord.getTraitsByType(CharacterTraitType.WEAKNESS).stream()
             .map(CharacterTraitResponse::of)
             .toList(),
-        characterRecord.getStartDate().toString(),
-        characterRecord.getEndDate().toString());
+        characterRecord.getStartDate().format(DATE_TIME_FORMATTER),
+        characterRecord.getEndDate().format(DATE_TIME_FORMATTER));
   }
 
   @Builder
