@@ -23,7 +23,6 @@ import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
-import org.nexters.jaknaesocore.domain.survey.repository.SurveySubmissionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +34,6 @@ public class CharacterService {
   private final MemberRepository memberRepository;
   private final CharacterRecordRepository characterRecordRepository;
   private final ValueCharacterRepository valueCharacterRepository;
-  private final SurveySubmissionRepository surveySubmissionRepository;
 
   @Transactional(readOnly = true)
   public CharacterResponse getCharacter(final CharacterCommand command) {

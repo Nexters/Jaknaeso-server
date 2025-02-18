@@ -10,6 +10,7 @@ import org.nexters.jaknaesocore.domain.survey.model.Keyword;
 @Builder
 public record CharacterResponse(
     Long characterId,
+    Long bundleId,
     String characterNo,
     Keyword characterType,
     String name,
@@ -24,6 +25,7 @@ public record CharacterResponse(
   public static CharacterResponse of(final CharacterRecord characterRecord) {
     return new CharacterResponse(
         characterRecord.getId(),
+        characterRecord.getSurveyBundle().getId(),
         characterRecord.getCharacterNo(),
         characterRecord.getKeyword(),
         characterRecord.getName(),
@@ -43,7 +45,6 @@ public record CharacterResponse(
 
   @Builder
   public record CharacterTraitResponse(String description) {
-
     public static CharacterTraitResponse of(final CharacterTrait characterTrait) {
       return new CharacterTraitResponse(characterTrait.getDescription());
     }
