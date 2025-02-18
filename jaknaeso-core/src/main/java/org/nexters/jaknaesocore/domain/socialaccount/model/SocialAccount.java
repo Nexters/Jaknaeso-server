@@ -46,7 +46,7 @@ public class SocialAccount extends BaseTimeEntity {
 
   @Override
   public void softDelete() {
-    this.oauthId = "withdraw_" + this.oauthId;
+    this.oauthId = "withdrawal_" + this.oauthId;
     super.softDelete();
   }
 }
