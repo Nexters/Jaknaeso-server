@@ -35,6 +35,7 @@ public class Member extends BaseTimeEntity {
     return new Member(name, email);
   }
 
+  @Override
   public void softDelete() {
     if (this.socialAccounts != null) {
       this.socialAccounts.forEach(SocialAccount::softDelete);
