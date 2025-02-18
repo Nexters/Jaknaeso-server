@@ -1,0 +1,64 @@
+Configuration:
+  name: jaknaeso-prod
+
+  Properties:
+    Property:
+      - name: "log-path"
+        value: "/var/log/jaknaeso"
+      - name: "pattern"
+        value: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n%throwable"
+      - name: "charset-UTF-8"
+        value: "UTF-8"
+
+  Appenders:
+    Console:
+      name: CONSOLE
+      target: SYSTEM_OUT
+      PatternLayout:
+        pattern: ${pattern}
+        charset: ${charset-UTF-8}
+
+    RollingFile:
+      name: FILE
+      fileName: ${log-path}/app.log
+      filePattern: ${log-path}/app-%d{yyyy-MM-dd}-%i.log.gz
+      PatternLayout:
+        Pattern: ${pattern}
+        charset: ${charset-UTF-8}
+      Policies:
+        TimeBasedTriggeringPolicy:
+          interval: 1
+          modulate: true
+        SizeBasedTriggeringPolicy:
+          size: 100MB
+      DefaultRolloverStrategy:
+        max: 30
+        DELETE:
+          basePath: ${log-path}
+          maxDepth: 1
+          IfFileName:
+            glob: "app-*.log.gz"
+          IfLastModified:
+            age: "7d"
+
+  Loggers:
+    Root:
+      level: info
+      AppenderRef:
+        - ref: CONSOLE
+        - ref: FILE
+
+    Logger:
+      - name: org.springframework
+        additivity: "false"
+        level: INFO
+        AppenderRef:
+          - ref: CONSOLE
+          - ref: FILE
+
+      - name: "org.nexters.jaknaeso"
+        additivity: "false"
+        level: INFO
+        AppenderRef:
+          - ref: CONSOLE
+          - ref: FILE

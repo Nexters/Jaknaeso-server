@@ -1,0 +1,134 @@
+name: CD Dev Pipeline
+
+on:
+  push:
+    branches:
+      - dev
+      - feature/**
+
+env:
+  NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
+  NCP_SECRET_KEY: ${{ secrets.NCP_SECRET_KEY }}
+  NCP_API_URL: https://ncloud.apigw.ntruss.com
+  NCP_VPC_ID: ${{ secrets.NCP_VPC_ID }}
+  NCP_AGC_ID: ${{ secrets.NCP_AGC_ID }}
+  SERVICE_NAME: jaknaeso-dev
+  REGISTRY_URL: ${{ secrets.NCP_CONTAINER_REGISTRY_URL }}
+  NCP_SERVER_HOST: ${{ secrets.NCP_SERVER_HOST }}
+  NCP_SERVER_USERNAME: ${{ secrets.NCP_SERVER_USERNAME }}
+  NCP_SERVER_PASSWORD: ${{ secrets.NCP_SERVER_PASSWORD }}
+  ACCESS_TOKEN_EXPIRATION: ${{ secrets.ACCESS_TOKEN_EXPIRATION }}
+  REFRESH_TOKEN_EXPIRATION: ${{ secrets.REFRESH_TOKEN_EXPIRATION }}
+  SSH_PORT: 22
+  BUILD_NUMBER: ${{ github.sha }}-${{ github.run_id }}
+  SPRING_PROFILES_ACTIVE: dev
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Get Github Actions IP
+        id: ip
+        run: |
+          PUBLIC_IP=$(curl -s https://ifconfig.me)
+          echo "PUBLIC_IP=$PUBLIC_IP" >> $GITHUB_ENV
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to NCP Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY_URL }}
+          username: ${{ env.NCP_ACCESS_KEY }}
+          password: ${{ env.NCP_SECRET_KEY }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./jaknaeso-server/Dockerfile
+          push: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:${{ env.BUILD_NUMBER }}
+            ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:latest
+          cache-from: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:buildcache
+
+      - name: Setting NCP CLI & Credentials
+        run: |
+          cd ~
+          wget https://www.ncloud.com/api/support/download/5/65
+          unzip 65
+          mkdir ~/.ncloud
+          echo -e "[DEFAULT]\nncloud_access_key_id = ${{ env.NCP_ACCESS_KEY }}\nncloud_secret_access_key = ${{ env.NCP_SECRET_KEY }}\nncloud_api_url = ${{ env.NCP_API_URL }}" >> ~/.ncloud/configure
+
+      - name: Add Github Action Ip to Security group
+        run: |
+          chmod -R 777 ~/cli_linux
+          cd ~/cli_linux
+          ./ncloud vserver addAccessControlGroupInboundRule \
+            --regionCode KR --vpcNo ${{ env.NCP_VPC_ID }} \
+            --accessControlGroupNo ${{ env.NCP_AGC_ID }} \
+            --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ env.PUBLIC_IP }}/32', portRange='22'" > /dev/null 2>&1
+
+      - name: Create .env file
+        run: |
+          echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env.dev
+          echo "DATABASE_USER=${{ secrets.DATABASE_USER }}" >> .env.dev
+          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env.dev
+          echo "DATABASE_ROOT_PASSWORD=${{ secrets.DATABASE_ROOT_PASSWORD }}" >> .env.dev
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.dev
+          echo "ACCESS_TOKEN_EXPIRATION=${{ env.ACCESS_TOKEN_EXPIRATION }}" >> .env.dev
+          echo "REFRESH_TOKEN_EXPIRATION=${{ env.REFRESH_TOKEN_EXPIRATION }}" >> .env.dev
+          echo "KAKAO_LOGIN_CLIENT_ID=${{ secrets.KAKAO_LOGIN_CLIENT_ID }}" >> .env.dev
+          echo "KAKAO_LOGIN_CLIENT_SECRET=${{ secrets.KAKAO_LOGIN_CLIENT_SECRET }}" >> .env.dev
+          echo "SPRING_PROFILES_ACTIVE=${{ env.SPRING_PROFILES_ACTIVE }}" >> .env.dev
+          echo "BUILD_NUMBER=${{ env.BUILD_NUMBER }}" >> .env.dev
+          echo "REGISTRY_URL=${{ env.REGISTRY_URL }}" >> .env.dev
+          echo "SERVICE_NAME=${{ env.SERVICE_NAME }}" >> .env.dev
+
+      - name: Transfer files to Server
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ env.NCP_SERVER_HOST}}
+          username: ${{ env.NCP_SERVER_USERNAME }}
+          password: ${{ env.NCP_SERVER_PASSWORD }}
+          port: ${{ env.SSH_PORT }}
+          source: "docker-compose.dev.yml,docker-compose.nginx.yml,.env.dev,nginx/default.conf,scripts/server/*"
+          target: "~/"
+          overwrite: true
+
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ env.NCP_SERVER_HOST }}
+          username: ${{ env.NCP_SERVER_USERNAME }}
+          password: ${{ env.NCP_SERVER_PASSWORD }}
+          port: ${{ env.SSH_PORT }}
+          script: |
+            docker login ${{ env.REGISTRY_URL }} -u ${{ env.NCP_ACCESS_KEY }} -p ${{ env.NCP_SECRET_KEY }}
+
+            docker-compose --env-file .env.dev -f ~/docker-compose.dev.yml pull
+            docker-compose -f ~/docker-compose.nginx.yml pull
+            docker-compose --env-file .env.dev -f ~/docker-compose.dev.yml up -d
+            docker-compose -f ~/docker-compose.nginx.yml up -d
+            docker-compose -f ~/docker-compose.nginx.yml exec nginx nginx -s reload
+            
+            chmod +x ~/scripts/server/register-certbot-cron-job.sh
+            ~/scripts/server/register-certbot-cron-job.sh
+
+      - name: Remove Github Action Ip from Security group
+        if: always()
+        run: |
+          chmod -R 777 ~/cli_linux
+          cd ~/cli_linux
+          ./ncloud vserver removeAccessControlGroupInboundRule \
+            --regionCode KR --vpcNo ${{ env.NCP_VPC_ID }} \
+            --accessControlGroupNo ${{ env.NCP_AGC_ID }} \
+            --accessControlGroupRuleList "protocolTypeCode='TCP', ipBlock='${{ env.PUBLIC_IP }}/32', portRange='22'" > /dev/null 2>&1

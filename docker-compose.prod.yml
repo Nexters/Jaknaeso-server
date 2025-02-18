@@ -1,0 +1,52 @@
+services:
+  prod-mysql:
+    image: mysql:8.0
+    container_name: jaknaeso-prod-mysql
+    env_file:
+      - .env.prod
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: ${DATABASE_NAME}
+      MYSQL_USER: ${DATABASE_USER}
+      MYSQL_PASSWORD: ${DATABASE_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DATABASE_ROOT_PASSWORD}
+    volumes:
+      - ./prod/mysql-data:/var/lib/mysql
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-time-zone=Asia/Seoul
+
+    networks:
+      - jaknaeso-prod-network
+    restart: on-failure
+
+  prod-server:
+    image: ${REGISTRY_URL}/${SERVICE_NAME}:${BUILD_NUMBER}
+    container_name: jaknaeso-prod-server
+    env_file:
+      - .env.prod
+    expose:
+      - "8081"
+    environment:
+      DATABASE_HOST: prod-mysql
+      DATABASE_NAME: ${DATABASE_NAME}
+      DATABASE_USER: ${DATABASE_USER}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ACCESS_TOKEN_EXPIRATION: ${ACCESS_TOKEN_EXPIRATION}
+      REFRESH_TOKEN_EXPIRATION: ${REFRESH_TOKEN_EXPIRATION}
+      KAKAO_LOGIN_CLIENT_ID: ${KAKAO_LOGIN_CLIENT_ID}
+      KAKAO_LOGIN_CLIENT_SECRET: ${KAKAO_LOGIN_CLIENT_SECRET}
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      TZ: Asia/Seoul
+    volumes:
+      - /var/log/jaknaeso/prod:/var/log/jaknaeso
+    depends_on:
+      - prod-mysql
+    networks:
+      - jaknaeso-prod-network
+    restart: on-failure
+
+networks:
+  jaknaeso-prod-network:
+    driver: bridge
+

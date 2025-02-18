@@ -1,9 +1,10 @@
-name: CD Pipeline
+name: CD Prod Pipeline
 
 on:
   push:
     branches:
       - main
+      - feature/**
 
 env:
   NCP_ACCESS_KEY: ${{ secrets.NCP_ACCESS_KEY }}
@@ -20,7 +21,7 @@ env:
   REFRESH_TOKEN_EXPIRATION: ${{ secrets.REFRESH_TOKEN_EXPIRATION }}
   SSH_PORT: 22
   BUILD_NUMBER: ${{ github.sha }}-${{ github.run_id }}
-  SPRING_PROFILES_ACTIVE: dev
+  SPRING_PROFILES_ACTIVE: prod
 
 jobs:
   deploy:
@@ -56,8 +57,8 @@ jobs:
           tags: |
             ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:${{ env.BUILD_NUMBER }}
             ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:latest
-          cache-from: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:buildcache,image-manifest=true,oci-mediatypes=true
-          cache-to: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true
+          cache-from: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:buildcache
 
       - name: Setting NCP CLI & Credentials
         run: |
@@ -78,16 +79,19 @@ jobs:
 
       - name: Create .env file
         run: |
-          echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env
-          echo "DATABASE_USER=${{ secrets.DATABASE_USER }}" >> .env
-          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env
-          echo "DATABASE_ROOT_PASSWORD=${{ secrets.DATABASE_ROOT_PASSWORD }}" >> .env
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env
-          echo "ACCESS_TOKEN_EXPIRATION=${{ env.ACCESS_TOKEN_EXPIRATION }}" >> .env
-          echo "REFRESH_TOKEN_EXPIRATION=${{ env.REFRESH_TOKEN_EXPIRATION }}" >> .env
-          echo "KAKAO_LOGIN_CLIENT_ID=${{ secrets.KAKAO_LOGIN_CLIENT_ID }}" >> .env
-          echo "KAKAO_LOGIN_CLIENT_SECRET=${{ secrets.KAKAO_LOGIN_CLIENT_SECRET }}" >> .env
-          echo "SPRING_PROFILES_ACTIVE=${{ env.SPRING_PROFILES_ACTIVE }}" >> .env
+          echo "DATABASE_NAME=${{ secrets.DATABASE_NAME }}" >> .env.prod
+          echo "DATABASE_USER=${{ secrets.DATABASE_USER }}" >> .env.prod
+          echo "DATABASE_PASSWORD=${{ secrets.DATABASE_PASSWORD }}" >> .env.prod
+          echo "DATABASE_ROOT_PASSWORD=${{ secrets.DATABASE_ROOT_PASSWORD }}" >> .env.prod
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.prod
+          echo "ACCESS_TOKEN_EXPIRATION=${{ env.ACCESS_TOKEN_EXPIRATION }}" >> .env.prod
+          echo "REFRESH_TOKEN_EXPIRATION=${{ env.REFRESH_TOKEN_EXPIRATION }}" >> .env.prod
+          echo "KAKAO_LOGIN_CLIENT_ID=${{ secrets.KAKAO_LOGIN_CLIENT_ID }}" >> .env.prod
+          echo "KAKAO_LOGIN_CLIENT_SECRET=${{ secrets.KAKAO_LOGIN_CLIENT_SECRET }}" >> .env.prod
+          echo "SPRING_PROFILES_ACTIVE=${{ env.SPRING_PROFILES_ACTIVE }}" >> .env.prod
+          echo "BUILD_NUMBER=${{ env.BUILD_NUMBER }}" >> .env.prod
+          echo "REGISTRY_URL=${{ env.REGISTRY_URL }}" >> .env.prod
+          echo "SERVICE_NAME=${{ env.SERVICE_NAME }}" >> .env.prod
 
       - name: Transfer files to Server
         uses: appleboy/scp-action@master
@@ -96,7 +100,7 @@ jobs:
           username: ${{ env.NCP_SERVER_USERNAME }}
           password: ${{ env.NCP_SERVER_PASSWORD }}
           port: ${{ env.SSH_PORT }}
-          source: "docker-compose.yml,.env,nginx/default.conf,scripts/server/*"
+          source: "docker-compose.prod.yml,docker-compose.nginx.yml,.env.prod,nginx/default.conf,scripts/server/*"
           target: "~/"
           overwrite: true
 
@@ -110,9 +114,11 @@ jobs:
           script: |
             docker login ${{ env.REGISTRY_URL }} -u ${{ env.NCP_ACCESS_KEY }} -p ${{ env.NCP_SECRET_KEY }}
 
-            docker-compose -f ~/docker-compose.yml pull
-            docker-compose -f ~/docker-compose.yml up -d --remove-orphans
-            docker-compose exec nginx nginx -s reload
+            docker-compose --env-file .env.prod -f ~/docker-compose.prod.yml pull
+            docker-compose -f ~/docker-compose.nginx.yml pull
+            docker-compose --env-file .env.prod -f ~/docker-compose.prod.yml up -d
+            docker-compose -f ~/docker-compose.nginx.yml up -d
+            docker-compose -f ~/docker-compose.nginx.yml exec nginx nginx -s reload
             
             chmod +x ~/scripts/server/register-certbot-cron-job.sh
             ~/scripts/server/register-certbot-cron-job.sh
