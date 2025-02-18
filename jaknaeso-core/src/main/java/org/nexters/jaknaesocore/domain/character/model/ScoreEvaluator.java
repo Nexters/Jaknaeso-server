@@ -53,8 +53,7 @@ public class ScoreEvaluator {
   private Map<Keyword, BigDecimal> calculateKeywordWeights(
       final Map<Keyword, KeywordMetrics> metricsMap) {
     int keywordCnt = metricsMap.size();
-    ScaledBigDecimal sumPerKeyword =
-        ScaledBigDecimal.of(BigDecimal.valueOf(100)).divide(BigDecimal.valueOf(keywordCnt));
+    ScaledBigDecimal sumPerKeyword = ScaledBigDecimal.of(BigDecimal.valueOf(100));
 
     Map<Keyword, BigDecimal> weightMap = new HashMap<>();
     metricsMap.forEach(
