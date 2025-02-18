@@ -142,6 +142,9 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("data.characterId")
                                 .type(SimpleType.NUMBER)
                                 .description("캐릭터 아이디"),
+                            fieldWithPath("data.bundleId")
+                                .type(SimpleType.NUMBER)
+                                .description("번들 ID"),
                             fieldWithPath("data.characterNo")
                                 .type(SimpleType.STRING)
                                 .description("캐릭터 회차"),
@@ -210,6 +213,9 @@ class CharacterControllerTest extends ControllerTest {
                             fieldWithPath("data.characterId")
                                 .type(SimpleType.NUMBER)
                                 .description("캐릭터 아이디"),
+                            fieldWithPath("data.bundleId")
+                                .type(SimpleType.NUMBER)
+                                .description("번들 ID"),
                             fieldWithPath("data.characterNo")
                                 .type(SimpleType.STRING)
                                 .description("캐릭터 회차"),
