@@ -43,4 +43,10 @@ public class SocialAccount extends BaseTimeEntity {
   public static SocialAccount appleSignUp(final String oauthId, final Member member) {
     return new SocialAccount(oauthId, SocialProvider.APPLE, member);
   }
+
+  @Override
+  public void softDelete() {
+    this.oauthId = "withdraw_" + this.oauthId;
+    super.softDelete();
+  }
 }
