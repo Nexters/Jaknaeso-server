@@ -38,7 +38,7 @@ public class CharacterService {
   @Transactional(readOnly = true)
   public CharacterResponse getCharacter(final CharacterCommand command) {
     return characterRecordRepository
-        .findByIdAndMemberIdAndDeletedAtIsNullWithMember(command.memberId(), command.characterId())
+        .findByIdAndMemberIdAndDeletedAtIsNullWithMember(command.characterId(), command.memberId())
         .map(CharacterResponse::of)
         .orElseThrow(() -> CustomException.CHARACTER_NOT_FOUND);
   }
