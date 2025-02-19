@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 public class KeywordMetrics {
 
-  private int cnt = 0;
   private BigDecimal positive = BigDecimal.ZERO;
   private BigDecimal negative = BigDecimal.ZERO;
 
@@ -18,7 +17,6 @@ public class KeywordMetrics {
   }
 
   private void update(final BigDecimal score) {
-    cnt++;
     if (score.compareTo(BigDecimal.ZERO) > 0) {
       positive = positive.add(score);
     } else if (score.compareTo(BigDecimal.ZERO) < 0) {

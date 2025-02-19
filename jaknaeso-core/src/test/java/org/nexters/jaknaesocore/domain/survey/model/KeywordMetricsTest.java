@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class KeywordMetricsTest {
 
   @Test
-  void 키워드_개수_양의_점수의_합_음의_점수의_합을_계산한다() {
+  void 키워드의_양의_점수의_합_음의_점수의_합을_계산한다() {
     final List<KeywordScore> scores =
         List.of(
             KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.valueOf(1)).build(),
@@ -21,7 +21,7 @@ class KeywordMetricsTest {
     final KeywordMetrics actual = KeywordMetrics.create(scores);
 
     then(actual)
-        .extracting("cnt", "positive", "negative")
-        .containsExactly(4, BigDecimal.valueOf(2), BigDecimal.valueOf(-2));
+        .extracting("positive", "negative")
+        .containsExactly(BigDecimal.valueOf(2), BigDecimal.valueOf(-2));
   }
 }
