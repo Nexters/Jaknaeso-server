@@ -18,10 +18,8 @@ public class ValueReports {
       ScaledBigDecimal.of(BigDecimal.valueOf(100));
 
   public static List<ValueReport> report(
-      final Map<Keyword, BigDecimal> weights,
-      final Map<Keyword, KeywordMetrics> metrics,
-      final List<SurveySubmission> submissions) {
-    Map<Keyword, BigDecimal> percentage = getKeywordPercentage(weights, metrics, submissions);
+      final Map<Keyword, KeywordMetrics> metrics, final List<SurveySubmission> submissions) {
+    Map<Keyword, BigDecimal> percentage = getKeywordPercentage(metrics, submissions);
 
     return percentage.entrySet().stream()
         .map(it -> ValueReport.of(it.getKey(), ScaledBigDecimal.of(it.getValue())))
@@ -29,9 +27,7 @@ public class ValueReports {
   }
 
   private static Map<Keyword, BigDecimal> getKeywordPercentage(
-      final Map<Keyword, BigDecimal> weightMap,
-      final Map<Keyword, KeywordMetrics> metricsMap,
-      final List<SurveySubmission> submissions) {
+      final Map<Keyword, KeywordMetrics> metricsMap, final List<SurveySubmission> submissions) {
     Map<Keyword, BigDecimal> percentage = new HashMap<>();
     Map<Keyword, BigDecimal> sum = getKeywordSum(submissions);
 
