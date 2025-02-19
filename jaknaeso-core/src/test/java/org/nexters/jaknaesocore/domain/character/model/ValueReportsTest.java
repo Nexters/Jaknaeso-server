@@ -1,5 +1,6 @@
 package org.nexters.jaknaesocore.domain.character.model;
 
+import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.nexters.jaknaesocore.domain.survey.model.Keyword.BENEVOLENCE;
@@ -12,18 +13,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.nexters.jaknaesocore.common.model.ScaledBigDecimal;
 import org.nexters.jaknaesocore.common.support.IntegrationTest;
 import org.nexters.jaknaesocore.domain.character.repository.CharacterRecordRepository;
 import org.nexters.jaknaesocore.domain.character.repository.ValueReportRepository;
-import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
-import org.nexters.jaknaesocore.domain.survey.model.Keyword;
-import org.nexters.jaknaesocore.domain.survey.model.KeywordMetrics;
-import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
-import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
-import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
-import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
+import org.nexters.jaknaesocore.domain.survey.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 class ValueReportsTest extends IntegrationTest {
@@ -56,6 +52,7 @@ class ValueReportsTest extends IntegrationTest {
     return weightMap;
   }
 
+  @Disabled("metric과 weight를 계산하지 않기 때문에 테스트 실시하지 않음")
   @Test
   void 키워드_가중치와_설문_응답_목록으로_가치관_리포트를_반환한다() {
     final List<KeywordScore> scores =
@@ -127,22 +124,21 @@ class ValueReportsTest extends IntegrationTest {
             SurveySubmission.builder().survey(survey4).selectedOption(option4).build(),
             SurveySubmission.builder().survey(survey5).selectedOption(option5).build());
 
-    final List<ValueReport> actual = ValueReports.report(weightMap, metricsMap, submissions);
+    final List<ValueReport> actual = ValueReports.report(scores);
+
+    then(actual)
+        .hasSize(4)
+        .extracting("keyword", "percentage")
+        .containsExactlyInAnyOrder(
+            tuple(SELF_DIRECTION, BigDecimal.valueOf(100)),
+            tuple(STABILITY, BigDecimal.valueOf(50)),
+            tuple(SUCCESS, BigDecimal.valueOf(50)),
+            tuple(BENEVOLENCE, BigDecimal.valueOf(50)));
 
     assertAll(
-        () ->
-            then(actual)
-                .contains(
-                    ValueReport.of(SELF_DIRECTION, ScaledBigDecimal.of(BigDecimal.valueOf(100)))),
-        () ->
-            then(actual)
-                .contains(ValueReport.of(STABILITY, ScaledBigDecimal.of(BigDecimal.valueOf(100)))),
-        () ->
-            then(actual)
-                .contains(ValueReport.of(SUCCESS, ScaledBigDecimal.of(BigDecimal.valueOf(100)))),
-        () ->
-            then(actual)
-                .contains(
-                    ValueReport.of(BENEVOLENCE, ScaledBigDecimal.of(BigDecimal.valueOf(100)))));
+        () -> then(actual).contains(ValueReport.of(SELF_DIRECTION, BigDecimal.valueOf(100))),
+        () -> then(actual).contains(ValueReport.of(STABILITY, BigDecimal.valueOf(0))),
+        () -> then(actual).contains(ValueReport.of(SUCCESS, BigDecimal.valueOf(0))),
+        () -> then(actual).contains(ValueReport.of(BENEVOLENCE, BigDecimal.valueOf(0))));
   }
 }

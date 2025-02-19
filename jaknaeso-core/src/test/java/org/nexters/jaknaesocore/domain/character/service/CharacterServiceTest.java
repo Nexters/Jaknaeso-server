@@ -424,10 +424,10 @@ class CharacterServiceTest extends IntegrationTest {
                       .submittedAt(LocalDateTime.of(2025, 2, 15, 0, 0))
                       .build()));
 
-      final KeywordScores scores =
-          KeywordScores.of(List.of(survey1, survey2, survey3, survey4, survey5));
+      final List<KeywordScore> scores =
+          KeywordScores.percentScale(List.of(survey1, survey2, survey3, survey4, survey5));
 
-      sut.createFirstCharacter(member, bundle, scores.getValues(), submissions);
+      sut.createFirstCharacter(member, bundle, scores, submissions);
 
       assertAll(
           () -> then(characterRecordRepository.findAll()).hasSize(1),

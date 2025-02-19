@@ -38,6 +38,10 @@ public class ValueReport extends BaseTimeEntity {
     return new ValueReport(keyword, percentage.getValue());
   }
 
+  public static ValueReport of(final Keyword keyword, final BigDecimal percentage) {
+    return new ValueReport(keyword, percentage);
+  }
+
   public void updateCharacterRecord(final CharacterRecord characterRecord) {
     this.characterRecord = characterRecord;
   }
