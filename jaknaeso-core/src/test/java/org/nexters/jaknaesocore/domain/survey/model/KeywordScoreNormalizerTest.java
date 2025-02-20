@@ -12,13 +12,15 @@ class KeywordScoreNormalizerTest {
 
   @Test
   void 특정_키워드의_점수를_정규화한다() {
+    final Long surveyId = 1L;
     final List<KeywordScore> scores =
         List.of(
-            KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.valueOf(1)).build(),
-            KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.valueOf(1)).build(),
-            KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.valueOf(-1)).build(),
-            KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.valueOf(-1)).build());
-    final KeywordMetrics metrics = KeywordMetrics.create(scores);
+            KeywordScore.of(SUCCESS, BigDecimal.valueOf(2)),
+            KeywordScore.of(SUCCESS, BigDecimal.valueOf(1)),
+            KeywordScore.of(SUCCESS, BigDecimal.valueOf(0)),
+            KeywordScore.of(SUCCESS, BigDecimal.valueOf(-1)),
+            KeywordScore.of(SUCCESS, BigDecimal.valueOf(-2)));
+    final OptionScoreMetrics metrics = OptionScoreMetrics.of(surveyId, scores);
 
     final BigDecimal actual1 = KeywordScoreNormalizer.normalize(BigDecimal.valueOf(-1), metrics);
     final BigDecimal actual2 = KeywordScoreNormalizer.normalize(BigDecimal.valueOf(1), metrics);

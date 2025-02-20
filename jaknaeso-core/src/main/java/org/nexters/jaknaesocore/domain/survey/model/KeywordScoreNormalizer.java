@@ -5,10 +5,15 @@ import java.math.RoundingMode;
 
 public class KeywordScoreNormalizer {
 
-  public static BigDecimal normalize(final BigDecimal originalScore, final KeywordMetrics metrics) {
-    var maxScore = metrics.getPositive();
-    var minScore = metrics.getNegative();
+  public static BigDecimal normalize(
+      final BigDecimal originalScore, final OptionScoreMetrics metrics) {
+    var maxScore = metrics.maxScore();
+    var minScore = metrics.minScore();
+    return normalize(originalScore, maxScore, minScore);
+  }
 
+  public static BigDecimal normalize(
+      final BigDecimal originalScore, final BigDecimal maxScore, final BigDecimal minScore) {
     var numerator = originalScore.subtract(minScore);
     var denominator = maxScore.subtract(minScore);
 
