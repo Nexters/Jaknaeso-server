@@ -165,9 +165,17 @@ public class SurveyService {
   private void completeCharacter(
       final Member member, final SurveyBundle bundle, final List<SurveySubmission> submissions) {
     final List<Survey> surveys = submissions.stream().map(SurveySubmission::getSurvey).toList();
-    final List<KeywordScore> scores = KeywordScores.percentScale(surveys);
+    List<KeywordScore> keywordScores = extractKeywordScores(surveys);
+    final List<KeywordScore> scores = KeywordScores.percentScale(keywordScores);
 
     characterService.updateCharacter(member, bundle, scores, submissions);
+  }
+
+  private List<KeywordScore> extractKeywordScores(List<Survey> surveys) {
+    return surveys.stream()
+        .flatMap(survey -> survey.getOptions().stream())
+        .flatMap(option -> option.getScores().stream())
+        .toList();
   }
 
   @Transactional(readOnly = true)
@@ -213,9 +221,12 @@ public class SurveyService {
             .findTopBy()
             .orElseThrow(() -> CustomException.SURVEY_NOT_FOUND)
             .getSurveyBundle();
-    final List<KeywordScore> scores =
-        KeywordScores.percentScale(submissions.stream().map(SurveySubmission::getSurvey).toList());
-    characterService.createFirstCharacter(member, onboardingBundle, scores, submissions);
+    List<KeywordScore> candidateKeywordScores =
+        extractKeywordScores(submissions.stream().map(SurveySubmission::getSurvey).toList());
+    List<KeywordScore> percentScaleScores = KeywordScores.percentScale(candidateKeywordScores);
+
+    characterService.createFirstCharacter(
+        member, onboardingBundle, percentScaleScores, submissions);
   }
 
   private Member getMember(Long memberId) {

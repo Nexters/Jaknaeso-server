@@ -26,4 +26,8 @@ public class KeywordScore {
     this.keyword = keyword;
     this.score = score;
   }
+
+  public static KeywordScore of(Keyword keyword, BigDecimal score) {
+    return KeywordScore.builder().keyword(keyword).score(score).build();
+  }
 }
