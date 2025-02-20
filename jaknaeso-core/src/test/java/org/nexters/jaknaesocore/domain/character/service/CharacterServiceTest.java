@@ -3,9 +3,9 @@ package org.nexters.jaknaesocore.domain.character.service;
 import static org.assertj.core.api.BDDAssertions.then;
 import static org.assertj.core.api.BDDAssertions.thenThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.nexters.jaknaesocore.domain.survey.model.Keyword.ADVENTURE;
 import static org.nexters.jaknaesocore.domain.survey.model.Keyword.BENEVOLENCE;
 import static org.nexters.jaknaesocore.domain.survey.model.Keyword.SELF_DIRECTION;
-import static org.nexters.jaknaesocore.domain.survey.model.Keyword.STABILITY;
 import static org.nexters.jaknaesocore.domain.survey.model.Keyword.SUCCESS;
 
 import java.math.BigDecimal;
@@ -34,10 +34,10 @@ import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
 import org.nexters.jaknaesocore.domain.survey.model.BalanceSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
-import org.nexters.jaknaesocore.domain.survey.model.KeywordScores;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
+import org.nexters.jaknaesocore.domain.survey.model.Surveys;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyOptionRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
@@ -234,12 +234,7 @@ class CharacterServiceTest extends IntegrationTest {
                 SurveyOption.builder()
                     .survey(survey)
                     .content("자율 출퇴근제로 원하는 시간에 근무하며 창의적인 성과 내기")
-                    .scores(
-                        List.of(
-                            KeywordScore.builder()
-                                .keyword(SELF_DIRECTION)
-                                .score(BigDecimal.ONE)
-                                .build()))
+                    .scores(List.of(KeywordScore.of(SELF_DIRECTION, BigDecimal.ONE)))
                     .build());
         surveySubmissionRepository.save(
             SurveySubmission.builder()
@@ -345,54 +340,35 @@ class CharacterServiceTest extends IntegrationTest {
               SurveyOption.builder()
                   .survey(survey1)
                   .content("자율 출퇴근제로 원하는 시간에 근무하며 창의적인 성과 내기")
-                  .scores(
-                      List.of(
-                          KeywordScore.builder()
-                              .keyword(SELF_DIRECTION)
-                              .score(BigDecimal.ONE)
-                              .build()))
+                  .scores(List.of(KeywordScore.of(SELF_DIRECTION, BigDecimal.ONE)))
                   .build());
       final SurveyOption option2 =
           surveyOptionRepository.save(
               SurveyOption.builder()
                   .survey(survey2)
                   .content("내 취향대로 꾸민 집에서 자유롭게 생활하기")
-                  .scores(
-                      List.of(
-                          KeywordScore.builder()
-                              .keyword(SELF_DIRECTION)
-                              .score(BigDecimal.ONE)
-                              .build()))
+                  .scores(List.of(KeywordScore.of(SELF_DIRECTION, BigDecimal.ONE)))
                   .build());
       final SurveyOption option3 =
           surveyOptionRepository.save(
               SurveyOption.builder()
                   .survey(survey3)
                   .content("매년 새로운 취미에 도전하며 색다른 즐거움 찾기")
-                  .scores(
-                      List.of(
-                          KeywordScore.builder().keyword(STABILITY).score(BigDecimal.ONE).build()))
+                  .scores(List.of(KeywordScore.of(ADVENTURE, BigDecimal.ONE)))
                   .build());
       final SurveyOption option4 =
           surveyOptionRepository.save(
               SurveyOption.builder()
                   .survey(survey4)
                   .content("업무 성과에 따라 차등 보너스를 지급한다")
-                  .scores(
-                      List.of(
-                          KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.ONE).build()))
+                  .scores(List.of(KeywordScore.of(SUCCESS, BigDecimal.ONE)))
                   .build());
       final SurveyOption option5 =
           surveyOptionRepository.save(
               SurveyOption.builder()
                   .survey(survey5)
                   .content("서로의 일상 속에서 따뜻하게 지지하는 관계")
-                  .scores(
-                      List.of(
-                          KeywordScore.builder()
-                              .keyword(BENEVOLENCE)
-                              .score(BigDecimal.ONE)
-                              .build()))
+                  .scores(List.of(KeywordScore.of(BENEVOLENCE, BigDecimal.ONE)))
                   .build());
 
       final List<SurveySubmission> submissions =
@@ -424,10 +400,11 @@ class CharacterServiceTest extends IntegrationTest {
                       .submittedAt(LocalDateTime.of(2025, 2, 15, 0, 0))
                       .build()));
 
-      final KeywordScores scores =
-          KeywordScores.of(List.of(survey1, survey2, survey3, survey4, survey5));
-
-      sut.createFirstCharacter(member, bundle, scores.getValues(), submissions);
+      sut.createFirstCharacter(
+          member,
+          bundle,
+          Surveys.of(List.of(survey1, survey2, survey3, survey4, survey5)),
+          submissions);
 
       assertAll(
           () -> then(characterRecordRepository.findAll()).hasSize(1),

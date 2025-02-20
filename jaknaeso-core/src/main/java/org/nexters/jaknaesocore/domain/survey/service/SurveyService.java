@@ -23,7 +23,6 @@ import org.nexters.jaknaesocore.domain.survey.dto.SurveyResponse;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionCommand;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionHistoryCommand;
 import org.nexters.jaknaesocore.domain.survey.dto.SurveySubmissionHistoryResponse;
-import org.nexters.jaknaesocore.domain.survey.model.KeywordScores;
 import org.nexters.jaknaesocore.domain.survey.model.OnboardingSurvey;
 import org.nexters.jaknaesocore.domain.survey.model.Survey;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
@@ -31,6 +30,7 @@ import org.nexters.jaknaesocore.domain.survey.model.SurveyOption;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyRecord;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmissions;
+import org.nexters.jaknaesocore.domain.survey.model.Surveys;
 import org.nexters.jaknaesocore.domain.survey.repository.OnboardingSurveyRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyBundleRepository;
 import org.nexters.jaknaesocore.domain.survey.repository.SurveyRepository;
@@ -172,9 +172,8 @@ public class SurveyService {
   private void completeCharacter(
       final Member member, final SurveyBundle bundle, final List<SurveySubmission> submissions) {
     final List<Survey> surveys = submissions.stream().map(SurveySubmission::getSurvey).toList();
-    final KeywordScores scores = KeywordScores.of(surveys);
 
-    characterService.updateCharacter(member, bundle, scores.getValues(), submissions);
+    characterService.updateCharacter(member, bundle, Surveys.of(surveys), submissions);
   }
 
   @Transactional(readOnly = true)
@@ -220,10 +219,12 @@ public class SurveyService {
             .findTopBy()
             .orElseThrow(() -> CustomException.SURVEY_NOT_FOUND)
             .getSurveyBundle();
-    final KeywordScores scores =
-        KeywordScores.of(submissions.stream().map(SurveySubmission::getSurvey).toList());
+
     characterService.createFirstCharacter(
-        member, onboardingBundle, scores.getValues(), submissions);
+        member,
+        onboardingBundle,
+        Surveys.of(submissions.stream().map(SurveySubmission::getSurvey).toList()),
+        submissions);
   }
 
   private Member getMember(Long memberId) {

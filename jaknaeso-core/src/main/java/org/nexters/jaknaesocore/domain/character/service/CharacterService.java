@@ -20,9 +20,9 @@ import org.nexters.jaknaesocore.domain.character.service.dto.CharactersResponse;
 import org.nexters.jaknaesocore.domain.character.service.dto.SimpleCharacterResponse;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
-import org.nexters.jaknaesocore.domain.survey.model.KeywordScore;
 import org.nexters.jaknaesocore.domain.survey.model.SurveyBundle;
 import org.nexters.jaknaesocore.domain.survey.model.SurveySubmission;
+import org.nexters.jaknaesocore.domain.survey.model.Surveys;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,12 +73,9 @@ public class CharacterService {
 
   @Transactional
   public void createFirstCharacter(
-      Member member,
-      SurveyBundle bundle,
-      List<KeywordScore> scores,
-      List<SurveySubmission> submissions) {
+      Member member, SurveyBundle bundle, Surveys surveys, List<SurveySubmission> submissions) {
     final List<ValueReport> valueReports =
-        ScoreEvaluator.of(scores, submissions).generateValueReports();
+        ScoreEvaluator.of(surveys, submissions).generateValueReports();
     final ValueCharacter valueCharacter =
         ValueCharacters.of(valueCharacterRepository.findAll()).findTopValueCharacter(valueReports);
     characterRecordRepository.save(
@@ -96,12 +93,9 @@ public class CharacterService {
 
   @Transactional
   public void updateCharacter(
-      Member member,
-      SurveyBundle bundle,
-      List<KeywordScore> scores,
-      List<SurveySubmission> submissions) {
+      Member member, SurveyBundle bundle, Surveys surveys, List<SurveySubmission> submissions) {
     final List<ValueReport> valueReports =
-        ScoreEvaluator.of(scores, submissions).generateValueReports();
+        ScoreEvaluator.of(surveys, submissions).generateValueReports();
     final ValueCharacter valueCharacter =
         ValueCharacters.of(valueCharacterRepository.findAll()).findTopValueCharacter(valueReports);
     final CharacterRecord characterRecord =
