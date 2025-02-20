@@ -1,7 +1,6 @@
 package org.nexters.jaknaesocore.domain.survey.model;
 
 import static org.assertj.core.groups.Tuple.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -23,13 +22,13 @@ class KeywordScoresTest {
         KeywordScore.builder().keyword(Keyword.STABILITY).score(BigDecimal.valueOf(3)).build();
     // when
     List<KeywordScore> scores =
-        KeywordScores.percentScale2(List.of(keywordScore1, keywordScore2, keywordScore3));
+        KeywordScores.percentScale(List.of(keywordScore1, keywordScore2, keywordScore3));
     // then
     BDDAssertions.then(scores)
         .extracting("keyword", "score")
         .containsExactlyInAnyOrder(
-            tuple(Keyword.BENEVOLENCE, BigDecimal.valueOf(0).setScale(2)),
-            tuple(Keyword.SELF_DIRECTION, BigDecimal.valueOf(50).setScale(2)),
-            tuple(Keyword.STABILITY, BigDecimal.valueOf(100.0).setScale(2)));
+            tuple(Keyword.BENEVOLENCE, BigDecimal.valueOf(900, 2)),
+            tuple(Keyword.SELF_DIRECTION, BigDecimal.valueOf(5500, 2)),
+            tuple(Keyword.STABILITY, BigDecimal.valueOf(10000, 2)));
   }
 }

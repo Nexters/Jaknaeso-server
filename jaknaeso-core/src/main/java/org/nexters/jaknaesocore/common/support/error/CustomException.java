@@ -39,6 +39,8 @@ public class CustomException extends RuntimeException {
       new CustomException(ErrorType.CHARACTER_VALUE_REPORT_NOT_FOUND);
 
   public static final CustomException FORBIDDEN_ACCESS = new CustomException(ErrorType.FORBIDDEN);
+  public static final CustomException INVALID_KEYWORD_SCORE =
+      new CustomException(ErrorType.INVALID_KEYWORD_SCORE);
 
   private final ErrorType errorType;
 

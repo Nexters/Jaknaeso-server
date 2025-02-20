@@ -340,59 +340,47 @@ class CharacterServiceTest extends IntegrationTest {
           surveyRepository.save(
               new BalanceSurvey("연애를 시작한지도 어연 3개월, 그 사람과 나의 연애는 꽤 잘 맞는다. 우리의 관계는...", bundle));
 
+      KeywordScore keyword1 =
+          KeywordScore.builder().keyword(SELF_DIRECTION).score(BigDecimal.ONE).build();
       final SurveyOption option1 =
           surveyOptionRepository.save(
               SurveyOption.builder()
                   .survey(survey1)
                   .content("자율 출퇴근제로 원하는 시간에 근무하며 창의적인 성과 내기")
-                  .scores(
-                      List.of(
-                          KeywordScore.builder()
-                              .keyword(SELF_DIRECTION)
-                              .score(BigDecimal.ONE)
-                              .build()))
+                  .scores(List.of(keyword1))
                   .build());
       final SurveyOption option2 =
           surveyOptionRepository.save(
               SurveyOption.builder()
                   .survey(survey2)
                   .content("내 취향대로 꾸민 집에서 자유롭게 생활하기")
-                  .scores(
-                      List.of(
-                          KeywordScore.builder()
-                              .keyword(SELF_DIRECTION)
-                              .score(BigDecimal.ONE)
-                              .build()))
+                  .scores(List.of(keyword1))
                   .build());
+      KeywordScore keyword2 =
+          KeywordScore.builder().keyword(STABILITY).score(BigDecimal.ONE).build();
       final SurveyOption option3 =
           surveyOptionRepository.save(
               SurveyOption.builder()
                   .survey(survey3)
                   .content("매년 새로운 취미에 도전하며 색다른 즐거움 찾기")
-                  .scores(
-                      List.of(
-                          KeywordScore.builder().keyword(STABILITY).score(BigDecimal.ONE).build()))
+                  .scores(List.of(keyword2))
                   .build());
+      KeywordScore keyword3 = KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.ONE).build();
       final SurveyOption option4 =
           surveyOptionRepository.save(
               SurveyOption.builder()
                   .survey(survey4)
                   .content("업무 성과에 따라 차등 보너스를 지급한다")
-                  .scores(
-                      List.of(
-                          KeywordScore.builder().keyword(SUCCESS).score(BigDecimal.ONE).build()))
+                  .scores(List.of(keyword3))
                   .build());
+      KeywordScore keyword4 =
+          KeywordScore.builder().keyword(BENEVOLENCE).score(BigDecimal.ONE).build();
       final SurveyOption option5 =
           surveyOptionRepository.save(
               SurveyOption.builder()
                   .survey(survey5)
                   .content("서로의 일상 속에서 따뜻하게 지지하는 관계")
-                  .scores(
-                      List.of(
-                          KeywordScore.builder()
-                              .keyword(BENEVOLENCE)
-                              .score(BigDecimal.ONE)
-                              .build()))
+                  .scores(List.of(keyword4))
                   .build());
 
       final List<SurveySubmission> submissions =
@@ -425,7 +413,7 @@ class CharacterServiceTest extends IntegrationTest {
                       .build()));
 
       final List<KeywordScore> scores =
-          KeywordScores.percentScale(List.of(survey1, survey2, survey3, survey4, survey5));
+          KeywordScores.percentScale(List.of(keyword1, keyword1, keyword2, keyword3, keyword4));
 
       sut.createFirstCharacter(member, bundle, scores, submissions);
 
