@@ -256,6 +256,7 @@ public class SurveyService {
       List<OnboardingSubmissionResult> submissionResults, Map<Long, Survey> surveyMap) {
     Map<Survey, SurveyOption> surveyOptionMap =
         submissionResults.stream()
+            .distinct()
             .map(
                 submission -> {
                   Survey survey = surveyMap.get(submission.surveyId());
@@ -265,7 +266,11 @@ public class SurveyService {
                   SurveyOption option = survey.getOptionById(submission.optionId());
                   return Map.entry(survey, option);
                 })
-            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            .collect(
+                Collectors.toMap(
+                    Map.Entry::getKey,
+                    Map.Entry::getValue,
+                    (existingOption, newOption) -> newOption));
     return surveyOptionMap;
   }
 }
