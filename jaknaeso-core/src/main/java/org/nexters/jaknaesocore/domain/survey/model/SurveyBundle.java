@@ -16,7 +16,7 @@ import org.nexters.jaknaesocore.common.support.error.CustomException;
 @Entity
 public class SurveyBundle extends BaseTimeEntity {
 
-  @OneToMany(mappedBy = "surveyBundle", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "surveyBundle", cascade = CascadeType.ALL)
   private List<Survey> surveys = new ArrayList<>();
 
   public void addSurvey(final Survey survey) {

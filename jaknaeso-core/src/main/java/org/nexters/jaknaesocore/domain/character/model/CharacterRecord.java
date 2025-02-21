@@ -44,7 +44,7 @@ public class CharacterRecord extends BaseTimeEntity {
   @JoinColumn(name = "bundle_id")
   private SurveyBundle surveyBundle;
 
-  @OneToMany(mappedBy = "characterRecord", cascade = CascadeType.PERSIST, orphanRemoval = true)
+  @OneToMany(mappedBy = "characterRecord", cascade = CascadeType.PERSIST)
   private List<ValueReport> valueReports = new ArrayList<>();
 
   private CharacterRecord(
