@@ -1,10 +1,10 @@
-package org.nexters.jaknaesocore.domain.socialaccount.repository;
+package org.nexters.jaknaesocore.domain.member.repository;
 
 import java.util.Optional;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.common.support.error.ErrorType;
-import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
-import org.nexters.jaknaesocore.domain.socialaccount.model.SocialProvider;
+import org.nexters.jaknaesocore.domain.member.model.SocialAccount;
+import org.nexters.jaknaesocore.domain.member.model.SocialProvider;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

@@ -1,4 +1,4 @@
-package org.nexters.jaknaesocore.domain.socialaccount.model;
+package org.nexters.jaknaesocore.domain.member.model;
 
 import jakarta.persistence.ConstraintMode;
 import jakarta.persistence.Entity;
@@ -8,16 +8,13 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseTimeEntity;
-import org.nexters.jaknaesocore.domain.member.model.Member;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "social_account")
 @Entity
 public class SocialAccount extends BaseTimeEntity {
 
@@ -42,5 +39,11 @@ public class SocialAccount extends BaseTimeEntity {
 
   public static SocialAccount appleSignUp(final String oauthId, final Member member) {
     return new SocialAccount(oauthId, SocialProvider.APPLE, member);
+  }
+
+  @Override
+  public void softDelete() {
+    this.oauthId = "withdrawal_" + this.oauthId;
+    super.softDelete();
   }
 }

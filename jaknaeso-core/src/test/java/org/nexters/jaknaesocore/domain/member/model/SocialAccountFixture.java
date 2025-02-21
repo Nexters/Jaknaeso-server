@@ -1,9 +1,6 @@
-package org.nexters.jaknaesocore.domain.socialaccount.model;
-
-import static org.junit.jupiter.api.Assertions.*;
+package org.nexters.jaknaesocore.domain.member.model;
 
 import lombok.Builder;
-import org.nexters.jaknaesocore.domain.member.model.Member;
 
 public class SocialAccountFixture {
 

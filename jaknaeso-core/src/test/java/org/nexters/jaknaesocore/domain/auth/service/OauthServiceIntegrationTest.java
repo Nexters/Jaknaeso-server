@@ -22,11 +22,12 @@ import org.nexters.jaknaesocore.domain.auth.service.dto.AppleLoginCommand;
 import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginCommand;
 import org.nexters.jaknaesocore.domain.auth.service.dto.KakaoLoginWithTokenCommand;
 import org.nexters.jaknaesocore.domain.member.model.Member;
+import org.nexters.jaknaesocore.domain.member.model.SocialAccount;
+import org.nexters.jaknaesocore.domain.member.model.SocialAccountFixture;
+import org.nexters.jaknaesocore.domain.member.model.SocialProvider;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
-import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
-import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccountFixture;
-import org.nexters.jaknaesocore.domain.socialaccount.model.SocialProvider;
-import org.nexters.jaknaesocore.domain.socialaccount.repository.SocialAccountRepository;
+import org.nexters.jaknaesocore.domain.member.repository.SocialAccountRepository;
+import org.nexters.jaknaesocore.domain.member.repository.WithdrawnMemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -35,11 +36,13 @@ class OauthServiceIntegrationTest extends IntegrationTest {
   @Autowired OauthService sut;
 
   @Autowired MemberRepository memberRepository;
+  @Autowired WithdrawnMemberRepository withdrawnMemberRepository;
   @Autowired SocialAccountRepository socialAccountRepository;
 
   @AfterEach
   void tearDown() {
     socialAccountRepository.deleteAllInBatch();
+    withdrawnMemberRepository.deleteAllInBatch();
     memberRepository.deleteAllInBatch();
   }
 

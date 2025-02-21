@@ -2,20 +2,20 @@ package org.nexters.jaknaesocore.domain.member.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseTimeEntity;
-import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "member")
 @Entity
 public class Member extends BaseTimeEntity {
+
+  private static final String ANONYMIZE_PREFIX = "withdrawn-";
 
   @OneToMany(mappedBy = "member")
   private List<SocialAccount> socialAccounts;
@@ -35,11 +35,19 @@ public class Member extends BaseTimeEntity {
     return new Member(name, email);
   }
 
+  @Override
   public void softDelete() {
     if (this.socialAccounts != null) {
       this.socialAccounts.forEach(SocialAccount::softDelete);
     }
+    this.anonymize();
     super.softDelete();
+  }
+
+  private void anonymize() {
+    final String uniqueSuffix = UUID.randomUUID().toString().substring(0, 8);
+    this.name = ANONYMIZE_PREFIX + uniqueSuffix;
+    this.email = ANONYMIZE_PREFIX + uniqueSuffix;
   }
 
   public void updateUserInfo(final String name, final String email) {
