@@ -1,7 +1,7 @@
 create table if not exists survey_submission
 (
     id            bigint auto_increment   primary key,
-    retrospective varchar(255),
+    retrospective varchar(500),
     member_id     bigint                  not null,
     survey_id     bigint                  not null,
     option_id     bigint                  not null,
