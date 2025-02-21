@@ -21,7 +21,7 @@ public abstract class Survey extends BaseTimeEntity {
   @JoinColumn(name = "bundle_id")
   private SurveyBundle surveyBundle;
 
-  @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL)
   private List<SurveyOption> options = new ArrayList<>();
 
   public Survey(final String content, final SurveyBundle surveyBundle) {
