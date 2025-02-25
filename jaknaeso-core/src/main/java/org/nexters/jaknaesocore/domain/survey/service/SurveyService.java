@@ -1,7 +1,6 @@
 package org.nexters.jaknaesocore.domain.survey.service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +10,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseEntity;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
+import org.nexters.jaknaesocore.common.support.service.LocalDateTimeHolder;
 import org.nexters.jaknaesocore.domain.character.service.CharacterService;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 import org.nexters.jaknaesocore.domain.member.repository.MemberRepository;
@@ -41,6 +41,7 @@ public class SurveyService {
   private final SurveyRepository surveyRepository;
   private final OnboardingSurveyRepository onboardingSurveyRepository;
   private final CharacterService characterService;
+  private final LocalDateTimeHolder localDateTimeHolder;
 
   @Transactional(readOnly = true)
   public SurveyResponse getNextSurvey(final Long bundleId, final Long memberId) {
@@ -133,7 +134,7 @@ public class SurveyService {
   }
 
   @Transactional
-  public void submitSurvey(SurveySubmissionCommand command, LocalDateTime submittedAt) {
+  public void submitSurvey(SurveySubmissionCommand command) {
     Survey survey =
         surveyRepository
             .findByIdWithSurveyBundle(command.surveyId())
@@ -145,7 +146,8 @@ public class SurveyService {
             .orElseThrow(() -> CustomException.MEMBER_NOT_FOUND);
 
     SurveySubmission surveySubmission =
-        SurveySubmission.create(member, survey, surveyOption, command.comment(), submittedAt);
+        SurveySubmission.create(
+            member, survey, surveyOption, command.comment(), localDateTimeHolder);
 
     surveySubmissionRepository.save(surveySubmission);
 
@@ -155,7 +157,8 @@ public class SurveyService {
             .findByMemberIdAndBundleIdAndDeletedAtIsNullWithSurveyAndSurveyBundle(
                 member.getId(), bundle.getId());
     if (SurveySubmissions.of(submissions).isFirstSubmitted()) {
-      characterService.createCharacter(member, bundle, submittedAt.toLocalDate());
+      characterService.createCharacter(
+          member, bundle, surveySubmission.getSubmittedAt().toLocalDate());
     }
     if (bundle.isAllSubmitted(submissions)) {
       completeCharacter(member, bundle, submissions);
@@ -200,8 +203,7 @@ public class SurveyService {
   }
 
   @Transactional
-  public void submitOnboardingSurvey(
-      OnboardingSubmissionsCommand command, LocalDateTime submittedAt) {
+  public void submitOnboardingSurvey(OnboardingSubmissionsCommand command) {
     Member member = getMember(command.memberId());
     if (member.isCompletedOnboarding()) {
       throw CustomException.ALREADY_COMPLETED_SURVEY_BUNDLE;
@@ -213,9 +215,8 @@ public class SurveyService {
         createSurveyToSelectedOption(command.submissions(), surveyMap);
 
     List<SurveySubmission> submissions =
-        surveySubmissionRepository.saveAll(
-            createSubmissionsBy(submittedAt, surveyToSelectedOption, member));
-    member.completeOnboarding(submittedAt);
+        surveySubmissionRepository.saveAll(createSubmissionsBy(surveyToSelectedOption, member));
+    member.completeOnboarding(localDateTimeHolder);
     final SurveyBundle onboardingBundle =
         onboardingSurveyRepository
             .findTopBy()
@@ -239,12 +240,12 @@ public class SurveyService {
   }
 
   private List<SurveySubmission> createSubmissionsBy(
-      LocalDateTime submittedAt, Map<Survey, SurveyOption> surveyToSelectedOption, Member member) {
+      Map<Survey, SurveyOption> surveyToSelectedOption, Member member) {
     return surveyToSelectedOption.entrySet().stream()
         .map(
             entry ->
                 SurveySubmission.create(
-                    member, entry.getKey(), entry.getValue(), null, submittedAt))
+                    member, entry.getKey(), entry.getValue(), null, localDateTimeHolder))
         .toList();
   }
 

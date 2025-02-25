@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseTimeEntity;
+import org.nexters.jaknaesocore.common.support.service.LocalDateTimeHolder;
 import org.nexters.jaknaesocore.domain.member.model.Member;
 
 @Getter
@@ -50,13 +51,13 @@ public class SurveySubmission extends BaseTimeEntity {
       final Survey survey,
       final SurveyOption selectedOption,
       final String retrospective,
-      final LocalDateTime currentDate) {
+      final LocalDateTimeHolder dateTimeHolder) {
     return SurveySubmission.builder()
         .member(member)
         .survey(survey)
         .selectedOption(selectedOption)
         .retrospective(retrospective)
-        .submittedAt(currentDate)
+        .submittedAt(dateTimeHolder.now())
         .build();
   }
 

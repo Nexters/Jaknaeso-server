@@ -1,7 +1,6 @@
 package org.nexters.jaknaesoserver.domain.survey.controller;
 
 import jakarta.validation.Valid;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesocore.common.support.error.CustomException;
 import org.nexters.jaknaesocore.common.support.response.ApiResponse;
@@ -39,7 +38,6 @@ public class SurveyController {
       @AuthenticationPrincipal CustomUserDetails member,
       @PathVariable Long surveyId,
       @Valid @RequestBody SurveySubmissionRequest request) {
-    LocalDateTime submittedAt = LocalDateTime.now();
     SurveySubmissionCommand command =
         SurveySubmissionCommand.builder()
             .surveyId(surveyId)
@@ -47,7 +45,7 @@ public class SurveyController {
             .optionId(request.optionId())
             .comment(request.comment())
             .build();
-    surveyService.submitSurvey(command, submittedAt);
+    surveyService.submitSurvey(command);
     return ApiResponse.success();
   }
 
@@ -74,9 +72,7 @@ public class SurveyController {
   public ApiResponse<?> submitOnboardingSurvey(
       @AuthenticationPrincipal CustomUserDetails member,
       @Valid @RequestBody OnboardingSubmissionRequest request) {
-    LocalDateTime submittedAt = LocalDateTime.now();
-
-    surveyService.submitOnboardingSurvey(request.toCommand(member.getMemberId()), submittedAt);
+    surveyService.submitOnboardingSurvey(request.toCommand(member.getMemberId()));
     return ApiResponse.success();
   }
 }

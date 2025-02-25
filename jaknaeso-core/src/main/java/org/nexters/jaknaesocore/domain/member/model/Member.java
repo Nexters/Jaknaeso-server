@@ -9,6 +9,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.nexters.jaknaesocore.common.model.BaseTimeEntity;
+import org.nexters.jaknaesocore.common.support.service.LocalDateTimeHolder;
 import org.nexters.jaknaesocore.domain.socialaccount.model.SocialAccount;
 
 @Getter
@@ -47,8 +48,8 @@ public class Member extends BaseTimeEntity {
     this.email = email;
   }
 
-  public void completeOnboarding(LocalDateTime onboardingAt) {
-    this.completedOnboardingAt = onboardingAt;
+  public void completeOnboarding(LocalDateTimeHolder dateTimeHolder) {
+    this.completedOnboardingAt = dateTimeHolder.now();
   }
 
   public boolean isCompletedOnboarding() {
