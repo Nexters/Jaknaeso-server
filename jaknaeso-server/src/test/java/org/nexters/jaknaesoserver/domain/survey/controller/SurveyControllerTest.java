@@ -15,7 +15,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import com.epages.restdocs.apispec.SimpleType;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -132,9 +131,7 @@ class SurveyControllerTest extends ControllerTest {
   @Test
   void 설문에_응답을_제출한다() throws Exception {
     SurveySubmissionRequest request = new SurveySubmissionRequest(1L, "나는 행복해요");
-    willDoNothing()
-        .given(surveyService)
-        .submitSurvey(any(SurveySubmissionCommand.class), any(LocalDateTime.class));
+    willDoNothing().given(surveyService).submitSurvey(any(SurveySubmissionCommand.class));
 
     mockMvc
         .perform(
@@ -361,7 +358,7 @@ class SurveyControllerTest extends ControllerTest {
   void 온보딩_설문에_응답을_제출한다() throws Exception {
     willDoNothing()
         .given(surveyService)
-        .submitOnboardingSurvey(any(OnboardingSubmissionsCommand.class), any(LocalDateTime.class));
+        .submitOnboardingSurvey(any(OnboardingSubmissionsCommand.class));
 
     OnboardingSubmissionRequest request =
         new OnboardingSubmissionRequest(
