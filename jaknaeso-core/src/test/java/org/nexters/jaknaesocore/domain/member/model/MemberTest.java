@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
+import org.nexters.jaknaesocore.common.support.mock.TestLocalDateTimeHolder;
 
 class MemberTest {
 
@@ -14,7 +15,7 @@ class MemberTest {
     LocalDateTime completedOnboardingAt = LocalDateTime.of(2025, 2, 15, 20, 0);
     Member member = Member.create("나민혁", "nmh9097@gmail.com");
     // when
-    member.completeOnboarding(completedOnboardingAt);
+    member.completeOnboarding(new TestLocalDateTimeHolder(completedOnboardingAt));
     // then
     then(member)
         .extracting("completedOnboardingAt")

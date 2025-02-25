@@ -629,38 +629,25 @@ class SurveyServiceTest extends IntegrationTest {
                 new OnboardingSubmissionResult(survey4.getId(), option4.getId())),
             member.getId());
     // when
-    surveyService.submitOnboardingSurvey(command, submittedAt);
+    surveyService.submitOnboardingSurvey(command);
     // then
     List<SurveySubmission> submissions = surveySubmissionRepository.findAll();
 
     then(submissions).hasSize(4);
     then(submissions)
-        .extracting("member.id", "survey.id", "selectedOption.id", "submittedAt")
+        .extracting("member.id", "survey.id", "selectedOption.id")
         .containsExactlyInAnyOrder(
-            tuple(member.getId(), survey1.getId(), option1.getId(), submittedAt),
-            tuple(member.getId(), survey2.getId(), option2.getId(), submittedAt),
-            tuple(member.getId(), survey3.getId(), option3.getId(), submittedAt),
-            tuple(member.getId(), survey4.getId(), option4.getId(), submittedAt));
-    then(member).extracting("completedOnboardingAt").isEqualTo(submittedAt);
+            tuple(member.getId(), survey1.getId(), option1.getId()),
+            tuple(member.getId(), survey2.getId(), option2.getId()),
+            tuple(member.getId(), survey3.getId(), option3.getId()),
+            tuple(member.getId(), survey4.getId(), option4.getId()));
+    then(member).isNotNull();
     then(characterRecordRepository.findAll())
         .hasSize(1)
         .extracting(
-            "ordinalNumber",
-            "characterNo",
-            "member.id",
-            "surveyBundle.id",
-            "valueCharacter.id",
-            "startDate",
-            "endDate")
+            "ordinalNumber", "characterNo", "member.id", "surveyBundle.id", "valueCharacter.id")
         .containsExactly(
-            tuple(
-                1,
-                "첫번째 캐릭터",
-                member.getId(),
-                surveyBundle.getId(),
-                valueCharacter.getId(),
-                submittedAt.toLocalDate(),
-                submittedAt.toLocalDate()));
+            tuple(1, "첫번째 캐릭터", member.getId(), surveyBundle.getId(), valueCharacter.getId()));
   }
 
   @Transactional
@@ -731,38 +718,25 @@ class SurveyServiceTest extends IntegrationTest {
                 new OnboardingSubmissionResult(survey4.getId(), option4.getId())),
             member.getId());
     // when
-    surveyService.submitOnboardingSurvey(command, submittedAt);
+    surveyService.submitOnboardingSurvey(command);
     // then
     List<SurveySubmission> submissions = surveySubmissionRepository.findAll();
 
     then(submissions).hasSize(4);
     then(submissions)
-        .extracting("member.id", "survey.id", "selectedOption.id", "submittedAt")
+        .extracting("member.id", "survey.id", "selectedOption.id")
         .containsExactlyInAnyOrder(
-            tuple(member.getId(), survey1.getId(), option1.getId(), submittedAt),
-            tuple(member.getId(), survey2.getId(), option2.getId(), submittedAt),
-            tuple(member.getId(), survey3.getId(), option3.getId(), submittedAt),
-            tuple(member.getId(), survey4.getId(), option4.getId(), submittedAt));
-    then(member).extracting("completedOnboardingAt").isEqualTo(submittedAt);
+            tuple(member.getId(), survey1.getId(), option1.getId()),
+            tuple(member.getId(), survey2.getId(), option2.getId()),
+            tuple(member.getId(), survey3.getId(), option3.getId()),
+            tuple(member.getId(), survey4.getId(), option4.getId()));
+    then(member).isNotNull();
     then(characterRecordRepository.findAll())
         .hasSize(1)
         .extracting(
-            "ordinalNumber",
-            "characterNo",
-            "member.id",
-            "surveyBundle.id",
-            "valueCharacter.id",
-            "startDate",
-            "endDate")
+            "ordinalNumber", "characterNo", "member.id", "surveyBundle.id", "valueCharacter.id")
         .containsExactly(
-            tuple(
-                1,
-                "첫번째 캐릭터",
-                member.getId(),
-                surveyBundle.getId(),
-                valueCharacter.getId(),
-                submittedAt.toLocalDate(),
-                submittedAt.toLocalDate()));
+            tuple(1, "첫번째 캐릭터", member.getId(), surveyBundle.getId(), valueCharacter.getId()));
   }
 
   @Test
@@ -831,7 +805,7 @@ class SurveyServiceTest extends IntegrationTest {
                 new OnboardingSubmissionResult(survey4.getId(), option4.getId())),
             member.getId());
     // when
-    thenThrownBy(() -> surveyService.submitOnboardingSurvey(command, submittedAt))
+    thenThrownBy(() -> surveyService.submitOnboardingSurvey(command))
         .isEqualTo(CustomException.ALREADY_COMPLETED_SURVEY_BUNDLE);
   }
 
@@ -866,7 +840,7 @@ class SurveyServiceTest extends IntegrationTest {
 
         // when
         // then
-        thenThrownBy(() -> surveyService.submitSurvey(command, LocalDateTime.now()))
+        thenThrownBy(() -> surveyService.submitSurvey(command))
             .isEqualTo(CustomException.MEMBER_NOT_FOUND);
       }
     }
@@ -931,8 +905,7 @@ class SurveyServiceTest extends IntegrationTest {
                 option1.getId(), balanceSurvey1.getId(), member.getId(), "나는 행복한게 좋으니까");
 
         // when
-        LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 13, 18, 0, 0);
-        surveyService.submitSurvey(command, submittedAt);
+        surveyService.submitSurvey(command);
         // then
         List<SurveySubmission> submissions = surveySubmissionRepository.findAll();
         then(submissions).hasSize(1);
@@ -977,7 +950,7 @@ class SurveyServiceTest extends IntegrationTest {
 
         // when
         // then
-        thenThrownBy(() -> surveyService.submitSurvey(command, LocalDateTime.now()))
+        thenThrownBy(() -> surveyService.submitSurvey(command))
             .isEqualTo(CustomException.SURVEY_NOT_FOUND);
       }
     }
@@ -1039,9 +1012,8 @@ class SurveyServiceTest extends IntegrationTest {
                   survey.getId(),
                   member.getId(),
                   "자유롭게 일하면 집중이 잘되는 시간에 일할 수 있기 때문에 일의 능률이 오를 것 같다.");
-          final LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 17, 0, 0, 0);
 
-          surveyService.submitSurvey(command, submittedAt);
+          surveyService.submitSurvey(command);
           then(characterRecordRepository.findAll())
               .hasSize(2)
               .extracting(
@@ -1131,9 +1103,8 @@ class SurveyServiceTest extends IntegrationTest {
                   survey2.getId(),
                   member.getId(),
                   "자유롭게 일하면 집중이 잘되는 시간에 일할 수 있기 때문에 일의 능률이 오를 것 같다.");
-          final LocalDateTime submittedAt = LocalDateTime.of(2025, 2, 17, 0, 0, 0);
 
-          surveyService.submitSurvey(command, submittedAt);
+          surveyService.submitSurvey(command);
           then(characterRecordRepository.findAll()).hasSize(0);
         }
       }
