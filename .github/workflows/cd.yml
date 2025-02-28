@@ -56,8 +56,8 @@ jobs:
           tags: |
             ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:${{ env.BUILD_NUMBER }}
             ${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME }}:latest
-          cache-from: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:buildcache,image-manifest=true,oci-mediatypes=true
-          cache-to: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:buildcache,mode=max,image-manifest=true,oci-mediatypes=true
+          cache-from: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY_URL }}/${{ env.SERVICE_NAME}}:buildcache,mode=max
 
       - name: Setting NCP CLI & Credentials
         run: |
@@ -96,7 +96,7 @@ jobs:
           username: ${{ env.NCP_SERVER_USERNAME }}
           password: ${{ env.NCP_SERVER_PASSWORD }}
           port: ${{ env.SSH_PORT }}
-          source: "docker-compose.yml,.env,nginx/default.conf,scripts/server/*"
+          source: "docker-compose.yml,.env,nginx/default.conf,scripts/server/*,logstash.conf,docker-compose.elk.yml"
           target: "~/"
           overwrite: true
 
@@ -111,7 +111,7 @@ jobs:
             docker login ${{ env.REGISTRY_URL }} -u ${{ env.NCP_ACCESS_KEY }} -p ${{ env.NCP_SECRET_KEY }}
 
             docker-compose -f ~/docker-compose.yml pull
-            docker-compose -f ~/docker-compose.yml up -d --remove-orphans
+            docker-compose -f ~/docker-compose.elk.yml up -d -f ~/docker-compose.yml up -d
             docker-compose exec nginx nginx -s reload
             
             chmod +x ~/scripts/server/register-certbot-cron-job.sh

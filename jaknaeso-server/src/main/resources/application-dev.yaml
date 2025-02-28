@@ -1,2 +1,2 @@
 logging:
-  config: classpath:log/log4j2-dev.yml
+  config: classpath:log/logback-dev.xml
