@@ -128,7 +128,7 @@ public class SurveyService {
     SurveyBundle nextBundle =
         surveyBundleRepository
             .findFirstByIdNotInOrderByIdAsc(bundleIds)
-            .orElseThrow(() -> CustomException.NOT_READY_FOR_NEXT_BUNDLE);
+            .orElseThrow(() -> CustomException.COMPLETED_EXIST_SURVEY_BUNDLE);
     return SurveyHistoryResponse.createNextBundleSurveyHistory(nextBundle.getId());
   }
 
