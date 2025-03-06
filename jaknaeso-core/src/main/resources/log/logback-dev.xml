@@ -1,5 +1,6 @@
 <configuration>
     <property name="LOG_FILE" value="application.log"/>
+    <property name="LOG_PATH" value="/var/log/jaknaeso"/>
 
     <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>logstash:5044</destination>
@@ -11,8 +12,9 @@
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${LOG_FILE}</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>application.%d{yyyy-MM-dd_HH-mm}.log.gz</fileNamePattern>
-            <maxHistory>5</maxHistory>
+            <fileNamePattern>app-%d{yyyy-MM-dd}-%i.log.gz</fileNamePattern>
+            <maxHistory>7</maxHistory>
+            <maxFileSize>10MB</maxFileSize>
         </rollingPolicy>
         <encoder>
             <pattern>%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n%throwable</pattern>
