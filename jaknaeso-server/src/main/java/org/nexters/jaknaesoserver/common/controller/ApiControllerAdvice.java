@@ -1,5 +1,6 @@
 package org.nexters.jaknaesoserver.common.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 import java.util.Map;
@@ -23,14 +24,16 @@ import org.springframework.web.servlet.resource.NoResourceFoundException;
 public class ApiControllerAdvice {
 
   @ExceptionHandler(CustomException.class)
-  public ResponseEntity<ApiResponse<?>> handleCustomException(CustomException e) {
+  public ResponseEntity<ApiResponse<?>> handleCustomException(
+      CustomException e, HttpServletRequest request) {
     switch (e.getErrorType().getLogLevel()) {
       case ERROR -> log.error("CustomException : {}", e.getMessage(), e);
       case WARN -> log.warn("CustomException : {}", e.getMessage(), e);
       default -> log.info("CustomException : {}", e.getMessage(), e);
     }
+    String traceId = (String) request.getAttribute("traceId");
     return new ResponseEntity<>(
-        ApiResponse.error(e.getErrorType(), e.getData()), e.getErrorType().getStatus());
+        ApiResponse.error(e.getErrorType(), e.getData(), traceId), e.getErrorType().getStatus());
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -128,9 +131,10 @@ public class ApiControllerAdvice {
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<ApiResponse<?>> handleException(Exception e) {
+  public ResponseEntity<ApiResponse<?>> handleException(Exception e, HttpServletRequest request) {
     log.error("Exception : {}", e.getMessage(), e);
     return new ResponseEntity<>(
-        ApiResponse.error(ErrorType.DEFAULT_ERROR), ErrorType.DEFAULT_ERROR.getStatus());
+        ApiResponse.error(ErrorType.DEFAULT_ERROR, null, (String) request.getAttribute("traceId")),
+        ErrorType.DEFAULT_ERROR.getStatus());
   }
 }

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.nexters.jaknaesoserver.common.controller.PublicEndpoints;
 import org.nexters.jaknaesoserver.domain.auth.filter.JwtAuthFilter;
 import org.nexters.jaknaesoserver.domain.auth.handler.SecurityExceptionHandler;
+import org.nexters.jaknaesoserver.logging.RequestResponseFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,6 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 public class SecurityConfig {
 
   private final SecurityExceptionHandler securityExceptionHandler;
+  private final RequestResponseFilter requestResponseFilter;
   private final JwtAuthFilter jwtAuthFilter;
   private final CorsConfigurationSource corsConfigurationSource;
 
@@ -45,6 +47,7 @@ public class SecurityConfig {
                 exception
                     .authenticationEntryPoint(securityExceptionHandler)
                     .accessDeniedHandler(securityExceptionHandler))
+        .addFilterBefore(requestResponseFilter, UsernamePasswordAuthenticationFilter.class)
         .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
         .build();
   }
