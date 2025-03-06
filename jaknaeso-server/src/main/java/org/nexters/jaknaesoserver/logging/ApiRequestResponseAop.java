@@ -21,6 +21,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 @Aspect
 public class ApiRequestResponseAop {
   private final ObjectMapper objectMapper;
+  private static final ThreadLocal<Boolean> isFirstRequest = ThreadLocal.withInitial(() -> false);
 
   public ApiRequestResponseAop(ObjectMapper objectMapper) {
     this.objectMapper = objectMapper;
@@ -31,6 +32,10 @@ public class ApiRequestResponseAop {
 
   @Around("apiRestPointCut()")
   public Object reqeustResponseLogging(ProceedingJoinPoint joinPoint) throws Throwable {
+    boolean isFirst = !isFirstRequest.get();
+    if (isFirst) {
+      isFirstRequest.set(true);
+    }
     ServletRequestAttributes requestAttributes =
         (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
     HttpServletRequest request = Objects.requireNonNull(requestAttributes).getRequest();
@@ -50,16 +55,24 @@ public class ApiRequestResponseAop {
             null);
     try {
       Object result = joinPoint.proceed();
-      if (result instanceof ResponseEntity) {
-        reqResLogging.updateResponseBody(((ResponseEntity<?>) result).getBody());
-      } else {
-        reqResLogging.updateResponseBody("{}");
+      if (isFirst) {
+        if (result instanceof ResponseEntity) {
+          reqResLogging.updateResponseBody(((ResponseEntity<?>) result).getBody());
+        } else {
+          reqResLogging.updateResponseBody("{}");
+        }
+        log.info(objectMapper.writeValueAsString(result));
       }
-      log.info(objectMapper.writeValueAsString(result));
       return result;
     } catch (Throwable e) {
-      log.info("{}", objectMapper.writeValueAsString(reqResLogging));
+      if (isFirst) {
+        log.info("{}", objectMapper.writeValueAsString(reqResLogging));
+      }
       throw e;
+    } finally {
+      if (isFirst) {
+        isFirstRequest.remove();
+      }
     }
   }
 
