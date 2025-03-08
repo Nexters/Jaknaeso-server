@@ -24,8 +24,8 @@ public class CustomException extends RuntimeException {
       new CustomException(ErrorType.SURVEY_OPTION_NOT_FOUND);
   public static final CustomException SURVEY_NOT_FOUND =
       new CustomException(ErrorType.SURVEY_NOT_FOUND);
-  public static final CustomException COMPLETED_EXIST_SURVEY_BUNDLE =
-      new CustomException(ErrorType.COMPLETED_EXIST_SURVEY_BUNDLE);
+  public static final CustomException NO_MORE_SURVEY_BUNDLES =
+      new CustomException(ErrorType.NO_MORE_SURVEY_BUNDLES);
   public static final CustomException ALREADY_COMPLETED_SURVEY_BUNDLE =
       new CustomException(ErrorType.ALREADY_COMPLETED_SURVEY_BUNDLE);
   public static final CustomException BUNDLE_NOT_FOUND =

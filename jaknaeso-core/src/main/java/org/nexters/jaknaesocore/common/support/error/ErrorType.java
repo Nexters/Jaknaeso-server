@@ -41,8 +41,11 @@ public enum ErrorType {
   SURVEY_NOT_FOUND(HttpStatus.NOT_FOUND, ErrorCode.E404, "존재하지 않는 설문입니다.", LogLevel.WARN),
 
   // survey
-  COMPLETED_EXIST_SURVEY_BUNDLE(
-      HttpStatus.BAD_REQUEST, ErrorCode.E400, "다음 번들을 진행할 준비가 되지 않았습니다.", LogLevel.ERROR),
+  NO_MORE_SURVEY_BUNDLES(
+      HttpStatus.BAD_REQUEST,
+      ErrorCode.E400,
+      "다음 번들을 진행할 준비가 되지 않았습니다. 추가로 진행할 번들이 필요합니다.",
+      LogLevel.ERROR),
 
   ALREADY_COMPLETED_SURVEY_BUNDLE(
       HttpStatus.BAD_REQUEST, ErrorCode.E400, "이미 완료된 설문 번들입니다.", LogLevel.WARN),
