@@ -31,7 +31,7 @@ public class ApiRequestResponseAop {
   public void apiRestPointCut() {}
 
   @Around("apiRestPointCut()")
-  public Object reqeustResponseLogging(ProceedingJoinPoint joinPoint) throws Throwable {
+  public Object requestResponseLogging(ProceedingJoinPoint joinPoint) throws Throwable {
     boolean isFirst = !isFirstRequest.get();
     if (isFirst) {
       isFirstRequest.set(true);
