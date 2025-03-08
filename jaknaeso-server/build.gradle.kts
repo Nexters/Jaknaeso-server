@@ -16,12 +16,6 @@ dependencies {
     testImplementation(platform("org.junit:junit-bom:5.10.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 
-    // h2
-    testRuntimeOnly("com.h2database:h2")
-
-    // spring-data-jpa
-    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa")
-
     // restdocs-api-spec
     testImplementation("com.epages:restdocs-api-spec-mockmvc:0.19.4")
 
@@ -39,6 +33,8 @@ dependencies {
     
     // validation
     implementation("org.springframework.boot:spring-boot-starter-validation")
+
+    implementation("org.springframework.boot:spring-boot-starter-aop")
 }
 
 tasks.withType<Test> {

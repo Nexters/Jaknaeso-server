@@ -423,7 +423,7 @@ class SurveyServiceTest extends IntegrationTest {
     // then
     thenThrownBy(() -> surveyService.getSurveyHistory(member.getId()))
         .isInstanceOf(CustomException.class)
-        .isEqualTo(CustomException.NOT_READY_FOR_NEXT_BUNDLE);
+        .isEqualTo(CustomException.NO_MORE_SURVEY_BUNDLES);
   }
 
   @Test

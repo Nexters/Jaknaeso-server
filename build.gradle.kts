@@ -43,15 +43,6 @@ subprojects {
         dependsOn("spotlessApply")
     }
 
-    configurations {
-        compileOnly {
-            extendsFrom(configurations.annotationProcessor.get())
-        }
-        all {
-            exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
-        }
-    }
-
     dependencies {
         implementation("org.springframework.boot:spring-boot-starter-web")
         compileOnly("org.projectlombok:lombok")
@@ -59,23 +50,21 @@ subprojects {
         testCompileOnly("org.projectlombok:lombok")
         testAnnotationProcessor("org.projectlombok:lombok")
 
+        implementation("org.springframework.boot:spring-boot-starter-logging")
+        implementation("org.slf4j:slf4j-api")
         testImplementation("org.springframework.boot:spring-boot-starter-test")
 
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
-        // log4j2
-        implementation("org.springframework.boot:spring-boot-starter-log4j2")
-        implementation("com.lmax:disruptor:4.0.0")
 
         // p6spy (local db query log)
         implementation("p6spy:p6spy:3.9.1")
         implementation("com.github.vertical-blank:sql-formatter:2.0.5")
 
-        // log4jdbc
-        implementation("org.bgee.log4jdbc-log4j2:log4jdbc-log4j2-jdbc4.1:1.16")
-
         // Jackson
         implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2")
+
+        // Logstash
+        implementation("net.logstash.logback:logstash-logback-encoder:7.4")
     }
 }
 

@@ -40,6 +40,7 @@ services:
       - mysql
     networks:
       - jaknaeso-network
+      - elastic-network
     restart: on-failure
 
   nginx:
@@ -73,4 +74,6 @@ services:
 
 networks:
   jaknaeso-network:
+    driver: bridge
+  elastic-network:
     driver: bridge
