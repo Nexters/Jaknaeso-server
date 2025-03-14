@@ -11,7 +11,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
-import org.springframework.http.ResponseEntity;
+import org.nexters.jaknaesocore.common.support.response.ApiResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -56,8 +56,8 @@ public class ApiRequestResponseAop {
     try {
       Object result = joinPoint.proceed();
       if (isFirst) {
-        if (result instanceof ResponseEntity) {
-          reqResLogging.updateResponseBody(((ResponseEntity<?>) result).getBody());
+        if (result instanceof ApiResponse<?>) {
+          reqResLogging.updateResponseBody(((ApiResponse<?>) result).getData());
         } else {
           reqResLogging.updateResponseBody("{}");
         }
